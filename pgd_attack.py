@@ -41,7 +41,7 @@ class LinfPGDAttack:
 
     self.grad = tf.gradients(loss, model.x_input)[0]
 
-  def perturb(self, x_nat, y, order, sess):
+  def perturb(self, x_nat, y, org_img, order, sess):
     """Given a set of examples (x_nat, y), returns a set of adversarial
        examples within epsilon of x_nat in l_infinity norm."""
     if self.rand:
@@ -55,12 +55,12 @@ class LinfPGDAttack:
                                             self.model.y_input: y})
 
       x += self.a * np.sign(grad)
-      tmp = np.zeros(x_nat.shape)
+      tmp = np.zeros(org_img.shape)
       for t in range(x.shape[0]):
         for j in range(x.shape[1]):
           for p in range(x.shape[2]):
-              min_idx = np.max(0, x_nat[t,j,p,0]-int(epsilon*225))
-              max_idx = np.min(255, x_nat[t,j,p,0]+int(epsilon*225)+1)
+              min_idx = np.max(0, org_img[t,j,p,0]-int(epsilon*225))
+              max_idx = np.min(255, org_img[t,j,p,0]+int(epsilon*225)+1)
               _x = np.repeat(x, max_idx-min_idx, axis=0)
               dist = np.sum(np.abs(_x-order[min_idx:max_idx]), axis=-1)
               tmp[t,j,p,0] = np.argmin(dist)+min_idx
@@ -94,6 +94,8 @@ if __name__ == '__main__':
     print('No model found')
     sys.exit()
 
+  org_imgs = np.load('data/mnist_data.npy')[60000:]
+  # org_labs = np.load('data/mnist_labels.npy')[60000:]
   imgs, labs, input_shape = load_data(permutation_path)
   x_test, y_test = imgs[60000:], labs[60000:]
   orders = np.load('2_label_permutation.npy')[:nb_labels].T
@@ -131,8 +133,9 @@ if __name__ == '__main__':
 
       x_batch = x_test[bstart:bend, :]
       y_batch = y_test[bstart:bend]
+      org_batch = org_imgs[bstart:bend, :]
 
-      x_batch_adv = attack.perturb(x_batch, y_batch, orders, sess)
+      x_batch_adv = attack.perturb(x_batch, y_batch, org_batch, orders, sess)
 
       x_adv.append(x_batch_adv)
 
