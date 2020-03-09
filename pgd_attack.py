@@ -59,8 +59,8 @@ class LinfPGDAttack:
       for t in range(x.shape[0]):
         for j in range(x.shape[1]):
           for p in range(x.shape[2]):
-              min_idx = np.max(0, org_img[t,j,p,0]-int(self.epsilon*225))
-              max_idx = np.min(255, org_img[t,j,p,0]+int(self.epsilon*225)+1)
+              min_idx = np.max(0, org_img[t,j,p,0]-int(self.epsilon*255))
+              max_idx = np.min(255, org_img[t,j,p,0]+int(self.epsilon*255)+1)
 
               _x = np.repeat(x, max_idx-min_idx, axis=0)
               dist = np.sum(np.abs(_x-order[min_idx:max_idx]), axis=-1)
@@ -95,7 +95,7 @@ if __name__ == '__main__':
     print('No model found')
     sys.exit()
 
-  org_imgs = np.load('data/mnist_data.npy')[60000:]
+  org_imgs = np.load('data/mnist_data.npy').transpose((0,2,3,1))[60000:]
   # org_labs = np.load('data/mnist_labels.npy')[60000:]
   imgs, labs, input_shape = load_data(permutation_path)
   x_test, y_test = imgs[60000:], labs[60000:]
