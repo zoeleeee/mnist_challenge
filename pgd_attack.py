@@ -59,13 +59,12 @@ class LinfPGDAttack:
       for t in range(x.shape[0]):
         for j in range(x.shape[1]):
           for p in range(x.shape[2]):
-              print(t,j,p)
-              print(type(self.epsilon))
               min_idx = np.max([0, org_img[t,j,p,0]-int(self.epsilon*255)])
               max_idx = np.min([255, org_img[t,j,p,0]+int(self.epsilon*255)+1])
 
               _x = np.repeat([x[t,j,p,:]], max_idx-min_idx, axis=0)
               dist = np.sum(np.abs(_x-order[min_idx:max_idx]), axis=-1)
+              print(dist.shape)
               tmp[t,j,p,0] = np.argmin(dist)+min_idx
               x[t,j,p,:] = order[tmp[t,j,p,0]]
       
@@ -101,7 +100,7 @@ if __name__ == '__main__':
   # org_labs = np.load('data/mnist_labels.npy')[60000:]
   imgs, labs, input_shape = load_data(permutation_path)
   x_test, y_test = imgs[60000:], labs[60000:]
-  orders = np.load('2_label_permutation.npy')[:nb_labels].T
+  orders = np.load(permutation_path).reshape(-1,1)
   # mnist = input_data.read_data_sets('MNIST_data', one_hot=False)
 
   model = Model(input_shape[-1], nb_labels)
