@@ -17,6 +17,11 @@ from tensorflow.examples.tutorials.mnist import input_data
 from model import Model
 from pgd_attack import LinfPGDAttack
 
+import sys
+from utils import load_data
+
+nb_labels = eval(sys.argv[-1])
+
 with open('config.json') as config_file:
     config = json.load(config_file)
 
@@ -31,9 +36,11 @@ num_checkpoint_steps = config['num_checkpoint_steps']
 batch_size = config['training_batch_size']
 
 # Setting up the data and the model
-mnist = input_data.read_data_sets('MNIST_data', one_hot=False)
+# mnist = input_data.read_data_sets('MNIST_data', one_hot=False)
+imgs, labels, input_shape = load_data(path, nb_labels)
+x_train, y_train = imgs[:60000], labels[:60000]
 global_step = tf.contrib.framework.get_or_create_global_step()
-model = Model(1, 10)
+model = Model(input_shape[-1], nb_labels)
 
 # Setting up the optimizer
 train_step = tf.train.AdamOptimizer(1e-4).minimize(model.xent,
@@ -75,8 +82,12 @@ with tf.Session() as sess:
   training_time = 0.0
 
   # Main training loop
+  idxs = np.arange(10000)
   for ii in range(max_num_training_steps):
-    x_batch, y_batch = mnist.train.next_batch(batch_size)
+    idxs = np.random.permutation(idxs)[:batch_size]
+    x_batch = x_train[idxs]
+    y_batch = y_train[idxs]
+    # x_batch, y_batch = mnist.train.next_batch(batch_size)
 
     # Compute Adversarial Perturbations
     start = timer()
