@@ -9,14 +9,14 @@ from __future__ import print_function
 import tensorflow as tf
 
 class Model(object):
-  def __init__(self):
+  def __init__(self, input_shape, nb_labels):
     self.x_input = tf.placeholder(tf.float32, shape = [None, 784])
     self.y_input = tf.placeholder(tf.int64, shape = [None])
 
-    self.x_image = tf.reshape(self.x_input, [-1, 28, 28, 1])
+    self.x_image = tf.reshape(self.x_input, [-1, 28, 28, input_shape])
 
     # first convolutional layer
-    W_conv1 = self._weight_variable([5,5,1,32])
+    W_conv1 = self._weight_variable([5,5,input_shape,32])
     b_conv1 = self._bias_variable([32])
 
     h_conv1 = tf.nn.relu(self._conv2d(self.x_image, W_conv1) + b_conv1)
@@ -37,8 +37,8 @@ class Model(object):
     h_fc1 = tf.nn.relu(tf.matmul(h_pool2_flat, W_fc1) + b_fc1)
 
     # output layer
-    W_fc2 = self._weight_variable([1024,10])
-    b_fc2 = self._bias_variable([10])
+    W_fc2 = self._weight_variable([1024,nb_labels])
+    b_fc2 = self._bias_variable([nb_labels])
 
     self.pre_softmax = tf.matmul(h_fc1, W_fc2) + b_fc2
 

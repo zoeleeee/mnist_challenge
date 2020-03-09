@@ -33,7 +33,7 @@ batch_size = config['training_batch_size']
 # Setting up the data and the model
 mnist = input_data.read_data_sets('MNIST_data', one_hot=False)
 global_step = tf.contrib.framework.get_or_create_global_step()
-model = Model()
+model = Model(1, 10)
 
 # Setting up the optimizer
 train_step = tf.train.AdamOptimizer(1e-4).minimize(model.xent,
@@ -80,23 +80,23 @@ with tf.Session() as sess:
 
     # Compute Adversarial Perturbations
     start = timer()
-    x_batch_adv = attack.perturb(x_batch, y_batch, sess)
+    # x_batch_adv = attack.perturb(x_batch, y_batch, sess)
     end = timer()
     training_time += end - start
 
     nat_dict = {model.x_input: x_batch,
                 model.y_input: y_batch}
 
-    adv_dict = {model.x_input: x_batch_adv,
-                model.y_input: y_batch}
+    # adv_dict = {model.x_input: x_batch_adv,
+                # model.y_input: y_batch}
 
     # Output to stdout
     if ii % num_output_steps == 0:
       nat_acc = sess.run(model.accuracy, feed_dict=nat_dict)
-      adv_acc = sess.run(model.accuracy, feed_dict=adv_dict)
+      # adv_acc = sess.run(model.accuracy, feed_dict=adv_dict)
       print('Step {}:    ({})'.format(ii, datetime.now()))
       print('    training nat accuracy {:.4}%'.format(nat_acc * 100))
-      print('    training adv accuracy {:.4}%'.format(adv_acc * 100))
+      # print('    training adv accuracy {:.4}%'.format(adv_acc * 100))
       if ii != 0:
         print('    {} examples per second'.format(
             num_output_steps * batch_size / training_time))
@@ -114,6 +114,6 @@ with tf.Session() as sess:
 
     # Actual training step
     start = timer()
-    sess.run(train_step, feed_dict=adv_dict)
+    sess.run(train_step, feed_dict=nat_dict)
     end = timer()
     training_time += end - start
