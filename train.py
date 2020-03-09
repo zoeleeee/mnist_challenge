@@ -21,6 +21,7 @@ import sys
 from utils import load_data
 
 nb_labels = eval(sys.argv[-1])
+path = sys.argv[-2]
 
 with open('config.json') as config_file:
     config = json.load(config_file)

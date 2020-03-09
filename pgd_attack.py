@@ -78,7 +78,7 @@ if __name__ == '__main__':
     print('No model found')
     sys.exit()
 
-  model = Model()
+  model = Model(1,10)
   attack = LinfPGDAttack(model,
                          config['epsilon'],
                          config['k'],

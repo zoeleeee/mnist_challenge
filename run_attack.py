@@ -21,7 +21,7 @@ from model import Model
 def run_attack(checkpoint, x_adv, epsilon):
   mnist = input_data.read_data_sets('MNIST_data', one_hot=False)
 
-  model = Model()
+  model = Model(1,10)
 
   saver = tf.train.Saver()
 
