@@ -10,16 +10,16 @@ import tensorflow as tf
 
 class Model(object):
   def __init__(self, input_shape, nb_labels):
-    self.x_input = tf.placeholder(tf.float32, shape = [None, 784])
+    self.x_input = tf.placeholder(tf.float32, shape = [None, 28, 28, input_shape])
     self.y_input = tf.placeholder(tf.int64, shape = [None])
 
-    self.x_image = tf.reshape(self.x_input, [-1, 28, 28, input_shape])
+    # self.x_image = tf.reshape(self.x_input, [-1, 28, 28, input_shape])
 
     # first convolutional layer
     W_conv1 = self._weight_variable([5,5,input_shape,32])
     b_conv1 = self._bias_variable([32])
 
-    h_conv1 = tf.nn.relu(self._conv2d(self.x_image, W_conv1) + b_conv1)
+    h_conv1 = tf.nn.relu(self._conv2d(self.x_input, W_conv1) + b_conv1)
     h_pool1 = self._max_pool_2x2(h_conv1)
 
     # second convolutional layer
