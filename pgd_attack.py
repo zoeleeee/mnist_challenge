@@ -9,10 +9,11 @@ from __future__ import print_function
 
 import tensorflow as tf
 import numpy as np
+from utils import load_data
 
 
 class LinfPGDAttack:
-  def __init__(self, model, epsilon, k, a, random_start, loss_func):
+  def __init__(self, model, epsilon, k, a, random_start, loss_func, nb_labels):
     """Attack parameter initialization. The attack performs k steps of
        size a, while always staying within epsilon from the initial
        point."""
@@ -26,7 +27,7 @@ class LinfPGDAttack:
       loss = model.xent
     elif loss_func == 'cw':
       label_mask = tf.one_hot(model.y_input,
-                              10,
+                              nb_labels,
                               on_value=1.0,
                               off_value=0.0,
                               dtype=tf.float32)
@@ -40,7 +41,7 @@ class LinfPGDAttack:
 
     self.grad = tf.gradients(loss, model.x_input)[0]
 
-  def perturb(self, x_nat, y, sess):
+  def perturb(self, x_nat, y, order, sess):
     """Given a set of examples (x_nat, y), returns a set of adversarial
        examples within epsilon of x_nat in l_infinity norm."""
     if self.rand:
@@ -54,11 +55,22 @@ class LinfPGDAttack:
                                             self.model.y_input: y})
 
       x += self.a * np.sign(grad)
+      tmp = np.zeros(x_nat.shape)
+      for t in range(x.shape[0]):
+        for j in range(x.shape[1]):
+          for p in range(x.shape[2]):
+              min_idx = np.max(0, x_nat[t,j,p,0]-int(epsilon*225))
+              max_idx = np.min(255, x_nat[t,j,p,0]+int(epsilon*225)+1)
+              _x = np.repeat(x, max_idx-min_idx, axis=0)
+              dist = np.sum(np.abs(_x-order[min_idx:max_idx]), axis=-1)
+              tmp[t,j,p,0] = np.argmin(dist)+min_idx
+              x[t,j,p,:] = order[tmp[t,j,p,0]]
+      
 
       x = np.clip(x, x_nat - self.epsilon, x_nat + self.epsilon) 
       x = np.clip(x, 0, 1) # ensure valid pixel range
 
-    return x
+    return x, tmp
 
 
 if __name__ == '__main__':
@@ -70,7 +82,11 @@ if __name__ == '__main__':
 
   from model import Model
 
-  with open('config.json') as config_file:
+  conf = sys.argv[-1]
+  permutation_path = sys.argv[-2]
+  nb_labels = eval(sys.argv[-3])
+
+  with open(conf) as config_file:
     config = json.load(config_file)
 
   model_file = tf.train.latest_checkpoint(config['model_dir'])
@@ -78,17 +94,22 @@ if __name__ == '__main__':
     print('No model found')
     sys.exit()
 
-  model = Model(1,10)
+  imgs, labs, input_shape = load_data(permutation_path)
+  x_test, y_test = imgs[60000:], labs[60000:]
+  orders = np.load('2_label_permutation.npy')[:nb_labels].T
+  # mnist = input_data.read_data_sets('MNIST_data', one_hot=False)
+
+  model = Model(input_shape[-1], nb_labels)
   attack = LinfPGDAttack(model,
                          config['epsilon'],
                          config['k'],
                          config['a'],
                          config['random_start'],
-                         config['loss_func'])
+                         config['loss_func'],
+                         nb_labels)
   saver = tf.train.Saver()
 
-  mnist = input_data.read_data_sets('MNIST_data', one_hot=False)
-
+  # idxs = np.arange(x_test.shape[0])
   with tf.Session() as sess:
     # Restore the checkpoint
     saver.restore(sess, model_file)
@@ -102,15 +123,16 @@ if __name__ == '__main__':
 
     print('Iterating over {} batches'.format(num_batches))
 
+
     for ibatch in range(num_batches):
       bstart = ibatch * eval_batch_size
       bend = min(bstart + eval_batch_size, num_eval_examples)
       print('batch size: {}'.format(bend - bstart))
 
-      x_batch = mnist.test.images[bstart:bend, :]
-      y_batch = mnist.test.labels[bstart:bend]
+      x_batch = x_test[bstart:bend, :]
+      y_batch = y_test[bstart:bend]
 
-      x_batch_adv = attack.perturb(x_batch, y_batch, sess)
+      x_batch_adv = attack.perturb(x_batch, y_batch, orders, sess)
 
       x_adv.append(x_batch_adv)
 

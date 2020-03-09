@@ -20,6 +20,8 @@ from tensorflow.examples.tutorials.mnist import input_data
 from model import Model
 from pgd_attack import LinfPGDAttack
 
+
+
 # Global constants
 with open('config.json') as config_file:
   config = json.load(config_file)
@@ -28,6 +30,9 @@ eval_batch_size = config['eval_batch_size']
 eval_on_cpu = config['eval_on_cpu']
 
 model_dir = config['model_dir']
+
+imgs, labels, input_shape = load_data(path, nb_labels)
+x_train, y_train = imgs[:60000], labels[:60000]
 
 # Set upd the data, hyperparameters, and the model
 mnist = input_data.read_data_sets('MNIST_data', one_hot=False)
