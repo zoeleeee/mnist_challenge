@@ -59,8 +59,8 @@ class LinfPGDAttack:
       for t in range(x.shape[0]):
         for j in range(x.shape[1]):
           for p in range(x.shape[2]):
-              min_idx = np.max(0, x_nat[t,j,p,0]-int(epsilon*225))
-              max_idx = np.min(255, x_nat[t,j,p,0]+int(epsilon*225)+1)
+              min_idx = np.max(0, x_nat[t,j,p,0]-int(self.epsilon*255))
+              max_idx = np.min(255, x_nat[t,j,p,0]+int(self.epsilon*255)+1)
               _x = np.repeat(x, max_idx-min_idx, axis=0)
               dist = np.sum(np.abs(_x-order[min_idx:max_idx]), axis=-1)
               tmp[t,j,p,0] = np.argmin(dist)+min_idx
