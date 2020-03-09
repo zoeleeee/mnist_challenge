@@ -103,7 +103,7 @@ with tf.Session() as sess:
         training_time = 0.0
     # Tensorboard summaries
     if ii % num_summary_steps == 0:
-      summary = sess.run(merged_summaries, feed_dict=adv_dict)
+      summary = sess.run(merged_summaries, feed_dict=nat_dict)
       summary_writer.add_summary(summary, global_step.eval(sess))
 
     # Write a checkpoint
