@@ -67,7 +67,7 @@ def run_attack(checkpoint, x_adv, config):#epsilon, permutation_path, nb_labels)
       y_nat_pred_batch = sess.run([model.y_pred],
                                         feed_dict=dict_nat)
       amt += np.sum(y_nat_pred_batch == y_batch)
-      cor += np.sum(y_adv_pred_batch[y_nat_pred_batch==y_batch] == y_batch)
+      cor += np.sum(y_adv_pred_batch[y_nat_pred_batch==y_batch] == y_batch[y_nat_pred_batch==y_batch])
 
       # total_corr += cur_corr
       y_pred.append([y_nat_pred_batch, y_adv_pred_batch])
