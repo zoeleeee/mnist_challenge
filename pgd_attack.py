@@ -86,8 +86,8 @@ if __name__ == '__main__':
   from model import Model
 
   conf = sys.argv[-1]
-  permutation_path = sys.argv[-2]
-  nb_labels = eval(sys.argv[-3])
+  permutation_path = config['permutation']
+  nb_labels = config['num_labels']
 
   with open(conf) as config_file:
     config = json.load(config_file)
