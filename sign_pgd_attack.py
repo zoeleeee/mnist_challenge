@@ -54,7 +54,8 @@ class LinfPGDAttack:
       grad = sess.run(self.grad, feed_dict={self.model.x_input: x,
                                             self.model.y_input: y})
 
-      x += self.a * np.sign(grad)
+      # x += self.a * np.sign(grad)
+      x_upd = x+self.a*np.sign(grad)
       tmp = np.zeros(org_img.shape)
       for t in range(x.shape[0]):
         for j in range(x.shape[1]):
@@ -62,10 +63,15 @@ class LinfPGDAttack:
               min_idx = np.max([0, org_img[t,j,p,0]-int(self.epsilon*255)])
               max_idx = np.min([255, org_img[t,j,p,0]+int(self.epsilon*255)+1])
 
-              _x = np.repeat([x[t,j,p,:]], max_idx-min_idx, axis=0)
-              dist = np.sum(np.abs(_x-order[min_idx:max_idx]), axis=-1)
+              sign_neighbors = np.sign(order[min_idx:max_idx]-np.repeat([x[t,j,p,:]], max_idx-min_idx, axis=0))
+              matches = np.sum(np.repeat([np.sign(grad[t,j,p,:])], max_idx-min_idx, axis=0) == sign_neighbors, axis=-1)
+
+              idxs = np.arange(len(matches))[matches==np.max(matches)]
+              _x = np.repeat([x_upd[t,j,p,:]], len(idxs), axis=0)
+              dist = np.sum(np.abs(_x-order[idxs+min_idx]), axis=-1)
               # print(dist.shape)
-              tmp[t,j,p,0] = int(np.argmin(dist)+min_idx)
+
+              tmp[t,j,p,0] = int(idxs[np.argmin(dist)]+min_idx)
               # print(tmp[t,j,p,0])
               x[t,j,p,:] = order[int(tmp[t,j,p,0])]
               
