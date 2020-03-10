@@ -73,7 +73,7 @@ tf.summary.scalar('accuracy train', model.accuracy)
 # tf.summary.scalar('accuracy adv', model.accuracy)
 tf.summary.scalar('xent train', model.xent / batch_size)
 # tf.summary.scalar('xent adv', model.xent / batch_size)
-tf.summary.image('images train', model.x_input)
+# tf.summary.image('images train', model.x_input)
 merged_summaries = tf.summary.merge_all()
 
 shutil.copy('config.json', model_dir)
