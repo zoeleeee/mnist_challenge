@@ -17,11 +17,15 @@ from tensorflow.examples.tutorials.mnist import input_data
 import numpy as np
 
 from model import Model
+from utils import load_data
 
-def run_attack(checkpoint, x_adv, epsilon):
-  mnist = input_data.read_data_sets('MNIST_data', one_hot=False)
+def run_attack(checkpoint, x_adv, config):#epsilon, permutation_path, nb_labels):
+  epsilon = config['epsilon']
+  imgs, labs, input_shape = load_data(config['permutation'])
+  x_test, y_test = imgs[60000:], labs[60000:]
+  # mnist = input_data.read_data_sets('MNIST_data', one_hot=False)
 
-  model = Model(1,10)
+  model = Model(input_shape[-1], config['num_labels'])
 
   saver = tf.train.Saver()
 
@@ -31,7 +35,7 @@ def run_attack(checkpoint, x_adv, epsilon):
   num_batches = int(math.ceil(num_eval_examples / eval_batch_size))
   total_corr = 0
 
-  x_nat = mnist.test.images
+  x_nat = x_test
   l_inf = np.amax(np.abs(x_nat - x_adv))
   
   if l_inf > epsilon + 0.0001:
@@ -44,34 +48,44 @@ def run_attack(checkpoint, x_adv, epsilon):
   with tf.Session() as sess:
     # Restore the checkpoint
     saver.restore(sess, checkpoint)
-
+    amt, cor = 0, 0
     # Iterate over the samples batch-by-batch
     for ibatch in range(num_batches):
       bstart = ibatch * eval_batch_size
       bend = min(bstart + eval_batch_size, num_eval_examples)
 
       x_batch = x_adv[bstart:bend, :]
-      y_batch = mnist.test.labels[bstart:bend]
+      x_nat_batch = x_test[bstart:bend, :]
+      y_batch = y_test[bstart:bend]
 
       dict_adv = {model.x_input: x_batch,
                   model.y_input: y_batch}
-      cur_corr, y_pred_batch = sess.run([model.num_correct, model.y_pred],
+      dict_nat = {model.x_input: x_nat_batch,
+                  model.y_input: y_batch}
+      y_adv_pred_batch = sess.run([model.y_pred],
                                         feed_dict=dict_adv)
+      y_nat_pred_batch = sess.run([model.y_pred],
+                                        feed_dict=dict_nat)
+      amt += np.sum(y_nat_pred_batch == y_batch)
+      cor += np.sum(y_adv_pred_batch[y_nat_pred_batch==y_batch] == y_batch)
 
-      total_corr += cur_corr
-      y_pred.append(y_pred_batch)
+      # total_corr += cur_corr
+      y_pred.append([y_nat_pred_batch, y_adv_pred_batch])
 
-  accuracy = total_corr / num_eval_examples
+  accuracy = cor / amt
 
-  print('Accuracy: {:.2f}%'.format(100.0 * accuracy))
+  print('Accuracy: {} / {} = {:.2f}%'.format(cor, amt, 100.0 * accuracy))
   y_pred = np.concatenate(y_pred, axis=0)
   np.save('pred.npy', y_pred)
   print('Output saved at pred.npy')
 
 if __name__ == '__main__':
   import json
+  import sys
 
-  with open('config.json') as config_file:
+  conf = sys.argv[-1]
+
+  with open(conf) as config_file:
     config = json.load(config_file)
 
   model_dir = config['model_dir']
@@ -90,4 +104,4 @@ if __name__ == '__main__':
                                                               np.amin(x_adv),
                                                               np.amax(x_adv)))
   else:
-    run_attack(checkpoint, x_adv, config['epsilon'])
+    run_attack(checkpoint, x_adv, config)
