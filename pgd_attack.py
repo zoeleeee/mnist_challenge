@@ -64,9 +64,9 @@ class LinfPGDAttack:
 
               _x = np.repeat([x[t,j,p,:]], max_idx-min_idx, axis=0)
               dist = np.sum(np.abs(_x-order[min_idx:max_idx]), axis=-1)
-              print(dist.shape)
+              # print(dist.shape)
               tmp[t,j,p,0] = int(np.argmin(dist)+min_idx)
-              print(tmp[t,j,p,0])
+              # print(tmp[t,j,p,0])
               x[t,j,p,:] = order[int(tmp[t,j,p,0])]
               
 
@@ -102,7 +102,7 @@ if __name__ == '__main__':
   imgs, labs, input_shape = load_data(permutation_path)
   x_test, y_test = imgs[60000:], labs[60000:]
   orders = np.load(permutation_path).reshape(-1,1).astype(np.float32)
-  orders /= int(permutation_path.split('/')[-1].split('_')[1].split('.')[0])
+  orders /= int(permutation_path.split('/')[-1].split('_')[1].split('.')[0])-1
   # mnist = input_data.read_data_sets('MNIST_data', one_hot=False)
 
   model = Model(input_shape[-1], nb_labels)

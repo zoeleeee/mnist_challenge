@@ -41,6 +41,7 @@ batch_size = config['training_batch_size']
 # mnist = input_data.read_data_sets('MNIST_data', one_hot=False)
 imgs, labels, input_shape = load_data(path, nb_labels)
 x_train, y_train = imgs[:60000], labels[:60000]
+x_test, y_test = imgs[60000:], labels[60000:]
 global_step = tf.contrib.framework.get_or_create_global_step()
 model = Model(input_shape[-1], nb_labels)
 
@@ -130,3 +131,5 @@ with tf.Session() as sess:
     sess.run(train_step, feed_dict=nat_dict)
     end = timer()
     training_time += end - start
+
+
