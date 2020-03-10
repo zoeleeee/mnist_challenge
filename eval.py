@@ -19,6 +19,7 @@ from tensorflow.examples.tutorials.mnist import input_data
 
 from model import Model
 from pgd_attack import LinfPGDAttack
+from utils import load_data
 
 conf = sys.argv[-1]
 
@@ -54,7 +55,7 @@ x_test, y_test = imgs[60000:], labels[60000:]
 #                          config['a'],
 #                          config['random_start'],
 #                          config['loss_func'])
-
+model = Model(input_shape[-1], config['num_labels'])
 global_step = tf.contrib.framework.get_or_create_global_step()
 
 # Setting up the Tensorboard and checkpoint outputs
@@ -87,8 +88,8 @@ def evaluate_checkpoint(filename):
       bstart = ibatch * eval_batch_size
       bend = min(bstart + eval_batch_size, num_eval_examples)
 
-      x_batch = x_test[bstart:bend, :]
-      y_batch = y_test[bstart:bend]
+      x_batch = x_train[bstart:bend, :]
+      y_batch = y_train[bstart:bend]
 
       dict_nat = {model.x_input: x_batch,
                   model.y_input: y_batch}
