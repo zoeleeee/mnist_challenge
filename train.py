@@ -46,7 +46,7 @@ global_step = tf.contrib.framework.get_or_create_global_step()
 model = Model(input_shape[-1], nb_labels)
 
 # Setting up the optimizer
-train_step = tf.train.AdamOptimizer(1).minimize(model.xent,
+train_step = tf.train.AdamOptimizer(1e-3).minimize(model.xent,
                                                    global_step=global_step)
 
 # Set up adversary
@@ -106,7 +106,7 @@ with tf.Session() as sess:
 
     # Output to stdout
     if ii % num_output_steps == 0:
-      nat_acc, nat_loss = sess.run([model.accuracy, model.xtent], feed_dict=nat_dict)
+      nat_acc, nat_loss = sess.run([model.accuracy, model.xent], feed_dict=nat_dict)
       # adv_acc = sess.run(model.accuracy, feed_dict=adv_dict)
       print('Step {}:    ({})'.format(ii, datetime.now()))
       print('    training nat loss {:.6}'.format(nat_loss))
