@@ -91,8 +91,8 @@ with tf.Session() as sess:
     beg = ii % batch_num
     if ii%batch_num == 0:
       idxs = np.random.permutation(idxs)
-    else:
-      idx = idxs[beg:beg+batch_num]
+    
+    idx = idxs[beg:beg+batch_num]
     x_batch = x_train[idx]
     y_batch = y_train[idx]
     # x_batch, y_batch = mnist.train.next_batch(batch_size)
