@@ -86,12 +86,12 @@ if __name__ == '__main__':
   from model import Model
 
   conf = sys.argv[-1]
-  permutation_path = config['permutation']
-  nb_labels = config['num_labels']
 
   with open(conf) as config_file:
     config = json.load(config_file)
 
+  permutation_path = config['permutation']
+  nb_labels = config['num_labels']
   model_file = tf.train.latest_checkpoint(config['model_dir'])
   if model_file is None:
     print('No model found')
