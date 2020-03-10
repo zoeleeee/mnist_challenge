@@ -85,11 +85,16 @@ with tf.Session() as sess:
   training_time = 0.0
 
   # Main training loop
-  idxs = np.arange(10000)
+  idxs = np.arange(60000)
+  batch_num = int(len(idxs)/batch_size)
   for ii in range(max_num_training_steps):
-    idxs = np.random.permutation(idxs)[:batch_size]
-    x_batch = x_train[idxs]
-    y_batch = y_train[idxs]
+    beg = ii % batch_num
+    if ii%batch_num == 0:
+      idxs = np.random.permutation(idxs)
+    else:
+      idx = idxs[beg:beg+batch_num]
+    x_batch = x_train[idx]
+    y_batch = y_train[idx]
     # x_batch, y_batch = mnist.train.next_batch(batch_size)
 
     # Compute Adversarial Perturbations
@@ -132,5 +137,9 @@ with tf.Session() as sess:
     sess.run(train_step, feed_dict=nat_dict)
     end = timer()
     training_time += end - start
+
+  saver.save(sess,
+                 os.path.join(model_dir, 'checkpoint'),
+                 global_step=global_step)
 
 
