@@ -65,8 +65,9 @@ class LinfPGDAttack:
               _x = np.repeat([x[t,j,p,:]], max_idx-min_idx, axis=0)
               dist = np.sum(np.abs(_x-order[min_idx:max_idx]), axis=-1)
               print(dist.shape)
-              tmp[t,j,p,0] = np.argmin(dist)+min_idx
-              x[t,j,p,:] = order[tmp[t,j,p,0]]
+              tmp[t,j,p,0] = int(np.argmin(dist)+min_idx)
+              print(tmp[t,j,p,0])
+              x[t,j,p,:] = order[int(tmp[t,j,p,0])]
       
 
       x = np.clip(x, x_nat - self.epsilon, x_nat + self.epsilon) 
@@ -85,12 +86,12 @@ if __name__ == '__main__':
   from model import Model
 
   conf = sys.argv[-1]
-  permutation_path = sys.argv[-2]
-  nb_labels = eval(sys.argv[-3])
 
   with open(conf) as config_file:
     config = json.load(config_file)
 
+  permutation_path = config['permutation']
+  nb_labels = config['num_labels']
   model_file = tf.train.latest_checkpoint(config['model_dir'])
   if model_file is None:
     print('No model found')
@@ -124,7 +125,7 @@ if __name__ == '__main__':
     num_batches = int(math.ceil(num_eval_examples / eval_batch_size))
 
     x_adv = [] # adv accumulator
-
+    x_show = []
     print('Iterating over {} batches'.format(num_batches))
 
 
@@ -137,12 +138,15 @@ if __name__ == '__main__':
       y_batch = y_test[bstart:bend]
       org_batch = org_imgs[bstart:bend, :]
 
-      x_batch_adv = attack.perturb(x_batch, y_batch, org_batch, orders, sess)
+      x_batch_adv, x_batch_show = attack.perturb(x_batch, y_batch, org_batch, orders, sess)
 
       x_adv.append(x_batch_adv)
+      x_show.append(x_batch_show)
 
     print('Storing examples')
     path = config['store_adv_path']
     x_adv = np.concatenate(x_adv, axis=0)
     np.save(path, x_adv)
+    x_adv = np.concatenate(x_show, axis=0)
+    np.save(path[:-10]+'show.npy', x_adv)
     print('Examples stored in {}'.format(path))

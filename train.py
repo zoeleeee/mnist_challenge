@@ -20,11 +20,12 @@ from pgd_attack import LinfPGDAttack
 import sys
 from utils import load_data
 
-nb_labels = eval(sys.argv[-1])
-path = sys.argv[-2]
-
-with open('config.json') as config_file:
+conf = sys.argv[-1]
+with open(conf) as config_file:
     config = json.load(config_file)
+
+nb_labels = config['num_labels']
+path = config['permutation']
 
 # Setting up training parameters
 tf.set_random_seed(config['random_seed'])
@@ -48,12 +49,12 @@ train_step = tf.train.AdamOptimizer(1e-4).minimize(model.xent,
                                                    global_step=global_step)
 
 # Set up adversary
-attack = LinfPGDAttack(model, 
-                       config['epsilon'],
-                       config['k'],
-                       config['a'],
-                       config['random_start'],
-                       config['loss_func'])
+# attack = LinfPGDAttack(model, 
+#                        config['epsilon'],
+#                        config['k'],
+#                        config['a'],
+#                        config['random_start'],
+#                        config['loss_func'])
 
 # Setting up the Tensorboard and checkpoint outputs
 model_dir = config['model_dir']

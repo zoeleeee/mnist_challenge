@@ -21,5 +21,10 @@
   "a": 0.01,
   "random_start": true,
   "loss_func": "xent",
-  "store_adv_path": "advs/256.1_mnist_attack.npy",
+
+  "store_adv_path": "advs/256.1_pgd_attack.npy",
+
+  "permutation": "permutation/256_256.1_permutation",
+  "num_labels": 10
+
 }
