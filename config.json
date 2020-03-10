@@ -24,7 +24,7 @@
 
   "store_adv_path": "advs/256.1_pgd_attack.npy",
 
-  "permutation": "permutation/256_256.1_permutation",
+  "permutation": "permutation/256_256.1_permutation.npy",
   "num_labels": 10
 
 }
