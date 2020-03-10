@@ -95,8 +95,8 @@ if __name__ == '__main__':
 
   if checkpoint is None:
     print('No checkpoint found')
-  elif x_adv.shape != (10000, 784):
-    print('Invalid shape: expected (10000,784), found {}'.format(x_adv.shape))
+  elif len(x_adv.shape) != 4:
+    print('Invalid shape: expected (10000,28,28,-1), found {}'.format(x_adv.shape))
   elif np.amax(x_adv) > 1.0001 or \
        np.amin(x_adv) < -0.0001 or \
        np.isnan(np.amax(x_adv)):

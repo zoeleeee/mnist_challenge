@@ -124,7 +124,7 @@ if __name__ == '__main__':
     num_batches = int(math.ceil(num_eval_examples / eval_batch_size))
 
     x_adv = [] # adv accumulator
-
+    x_show = []
     print('Iterating over {} batches'.format(num_batches))
 
 
@@ -137,12 +137,15 @@ if __name__ == '__main__':
       y_batch = y_test[bstart:bend]
       org_batch = org_imgs[bstart:bend, :]
 
-      x_batch_adv = attack.perturb(x_batch, y_batch, org_batch, orders, sess)
+      x_batch_adv, x_batch_show = attack.perturb(x_batch, y_batch, org_batch, orders, sess)
 
       x_adv.append(x_batch_adv)
+      x_show.append(x_batch_show)
 
     print('Storing examples')
     path = config['store_adv_path']
     x_adv = np.concatenate(x_adv, axis=0)
     np.save(path, x_adv)
+    x_adv = np.concatenate(x_show, axis=0)
+    np.save(path[:-10]+'show.npy', x_adv)
     print('Examples stored in {}'.format(path))
