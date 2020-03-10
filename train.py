@@ -85,7 +85,7 @@ with tf.Session() as sess:
   training_time = 0.0
 
   # Main training loop
-  idxs = np.arange(10000)
+  idxs = np.arange(60000)
   for ii in range(max_num_training_steps):
     idxs = np.random.permutation(idxs)[:batch_size]
     x_batch = x_train[idxs]
@@ -132,5 +132,9 @@ with tf.Session() as sess:
     sess.run(train_step, feed_dict=nat_dict)
     end = timer()
     training_time += end - start
+
+  saver.save(sess,
+                 os.path.join(model_dir, 'checkpoint'),
+                 global_step=global_step)
 
 
