@@ -125,6 +125,7 @@ with tf.Session() as sess:
       nat_labels = np.zeros(nat_scores.shape).astype(np.float32)
       nat_labels[nat_scores>=0.5] = 1.
       nat_acc = np.sum(np.sum(np.absolute(nat_labels-y_batch), axis=-1) == 0) / batch_num
+      print(nat_loss.shape)
       print('Step {}: {} -{}  ({})'.format(ii, _beg, _end, datetime.now()))
       print('    training nat loss {:.6}'.format(nat_loss))
       print('    training nat accuracy {:.4}%'.format(nat_acc * 100))
