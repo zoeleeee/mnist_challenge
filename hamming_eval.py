@@ -4,13 +4,13 @@ import json
 
 from utils import load_data
 
-def hamming_idxs(scores, config):
+def hamming_idxs(scores, y_input, config):
 	res = []
 	nb_labels = config['num_labels']
 	rep = np.load('2_label_permutation.npy')[:nb_labels].T
 
 	imgs, labels, input_shape = load_data(config['permutation'], nb_labels)
-
+	labels = labels[60000:]
 
 	nat_labels = np.zeros(scores.shape).astype(np.float32)
 	nat_labels[scores>=0.5] = 1.
@@ -41,9 +41,10 @@ with open(sys.argv[-1]) as config_file:
 
 model_dir = config['model_dir']
 scores = np.load('preds/pred_{}_origin.npy'.format(model_dir.split('/')[1]))
-print(scores.shape)
-preds_dist, correct_idxs, error_idxs = hamming_idxs(scores, config)
-print(preds_dist.shape)
+labels = np.load('preds/labels_{}_origin.npy'.format(model_dir.split('/')[1]))
+# print(scores.shape)
+preds_dist, correct_idxs, error_idxs = hamming_idxs(scores, labels, config)
+# print(preds_dist.shape)
 print('avg Hamming distance:{}, max:{}, min:{}, med:{}'.format(np.mean(preds_dist), np.max(preds_dist), np.min(preds_dist), np.median(preds_dist)))
 
 ts = np.arange(np.max(preds_dist))
