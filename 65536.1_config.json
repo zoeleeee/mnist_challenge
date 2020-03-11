@@ -1,6 +1,6 @@
 {
   "_comment": "===== MODEL CONFIGURATION =====",
-  "model_dir": "models/256.1_mnist_30",
+  "model_dir": "models/65536.1_30_mnist",
 
   "_comment": "===== TRAINING CONFIGURATION =====",
   "random_seed": 2395306,
@@ -22,10 +22,9 @@
   "random_start": true,
   "loss_func": "bce",
 
-  "store_adv_path": "advs/256.1_pgd_attack.npy",
+  "store_adv_path": "advs/65536.1_pgd_attack.npy",
 
-  "permutation": "permutation/256_256.1_permutation.npy",
-  "num_labels": 30,
-  "preds": "preds/256.1"
+  "permutation": "permutation/256_65536.1_permutation.npy",
+  "num_labels": 30
 
 }
