@@ -31,10 +31,11 @@ eval_batch_size = config['eval_batch_size']
 eval_on_cpu = config['eval_on_cpu']
 
 model_dir = config['model_dir']
+rep = np.load('2_label_permutation.npy')[:nb_labels].T
 
 if dataset == 'origin.npy':
   imgs, labels, input_shape = load_data(config['permutation'], config['num_labels'])
-  # x_train, y_train = imgs[:60000], labels[:60000]
+  labels = np.array([rep[i] for i in labels])
   x_test, y_test = imgs[60000:], labels[60000:]
 else:
   x_test = np.load(dataset)
