@@ -77,7 +77,7 @@ already_seen_state = False
 
 saver = tf.train.Saver()
 summary_writer = tf.summary.FileWriter(eval_dir)
-avg_nat_acc = 0
+
 # A function for evaluating a single checkpoint
 def evaluate_checkpoint(filename):
   with tf.Session() as sess:
@@ -89,6 +89,7 @@ def evaluate_checkpoint(filename):
     bce_score_nat = []
     # total_xent_adv = 0.
     total_corr_nat = 0
+    avg_nat_acc = 0
     # total_corr_adv = 0
 
     for ibatch in range(num_batches):
