@@ -117,8 +117,12 @@ with tf.Session() as sess:
     # Output to stdout
     if ii % num_output_steps == 0:
       # nat_acc, nat_loss = sess.run([model.accuracy, model.xent], feed_dict=nat_dict)
-      nat_scores nat_loss = sess.run([model.bce_score, model.bce_loss], feed_dict=nat_dict)
+      nat_scores, nat_loss = sess.run([model.bce_score, model.bce_loss], feed_dict=nat_dict)
       # adv_acc = sess.run(model.accuracy, feed_dict=adv_dict)
+      nat_scores = np.array(nat_scores)
+      nat_labels = np.zeros(nat_scores.shape).astype(np.float32)
+      nat_labels[nat_scores>=0.5] = 1.
+      nat_acc = np.sum(np.sum(nat_labels-y_batch, axis=-1) == 0) / batch_num
       print('Step {}:    ({})'.format(ii, datetime.now()))
       print('    training nat loss {:.6}'.format(nat_loss))
       print('    training nat accuracy {:.4}%'.format(nat_acc * 100))
