@@ -93,12 +93,12 @@ with tf.Session() as sess:
   idxs = np.arange(60000)
   batch_num = int(len(idxs)/batch_size)
   for ii in range(max_num_training_steps):
-    beg = ii % batch_num * batch_num
-    end = min(60000, beg+batch_num)
+    _beg = ii % batch_num * batch_num
+    _end = min(60000, _beg+batch_num)
     if ii%batch_num == 0:
       idxs = np.random.permutation(idxs)
     
-    idx = idxs[beg:end]
+    idx = idxs[_beg:_end]
     x_batch = x_train[idx]
     y_batch = y_train[idx]
     # x_batch, y_batch = mnist.train.next_batch(batch_size)
@@ -124,7 +124,7 @@ with tf.Session() as sess:
       nat_labels = np.zeros(nat_scores.shape).astype(np.float32)
       nat_labels[nat_scores>=0.5] = 1.
       nat_acc = np.sum(np.sum(np.absolute(nat_labels-y_batch), axis=-1) == 0) / batch_num
-      print('Step {}:    ({})'.format(ii, datetime.now()))
+      print('Step {}: {} -{}  ({})'.format(ii, _beg, _end, datetime.now()))
       print('    training nat loss {:.6}'.format(nat_loss))
       print('    training nat accuracy {:.4}%'.format(nat_acc * 100))
       # print('    training adv accuracy {:.4}%'.format(adv_acc * 100))

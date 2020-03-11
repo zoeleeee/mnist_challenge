@@ -37,6 +37,7 @@ rep = np.load('2_label_permutation.npy')[:nb_labels].T
 if dataset == 'origin.npy':
   imgs, labels, input_shape = load_data(config['permutation'], config['num_labels'])
   labels = np.array([rep[i] for i in labels])
+  x_train, y_train = imgs[:60000], labels[:60000]
   x_test, y_test = imgs[60000:], labels[60000:]
 else:
   x_test = np.load(dataset)
@@ -94,8 +95,8 @@ def evaluate_checkpoint(filename):
       bstart = ibatch * eval_batch_size
       bend = min(bstart + eval_batch_size, num_eval_examples)
 
-      x_batch = x_test[bstart:bend, :]
-      y_batch = y_test[bstart:bend]
+      x_batch = x_train[bstart:bend, :]
+      y_batch = y_train[bstart:bend]
 
       dict_nat = {model.x_input: x_batch,
                   model.y_input: y_batch}
