@@ -11,7 +11,8 @@ import tensorflow as tf
 class Model(object):
   def __init__(self, input_shape, nb_labels):
     self.x_input = tf.placeholder(tf.float32, shape = [None, 28, 28, input_shape])
-    self.y_input = tf.placeholder(tf.int64, shape = [None])
+    # self.y_input = tf.placeholder(tf.int64, shape = [None])
+    self.y_input = tf.placeholder(tf.float32, shape = [None,nb_labels])
 
     # self.x_image = tf.reshape(self.x_input, [-1, 28, 28, input_shape])
 
@@ -42,17 +43,20 @@ class Model(object):
 
     self.pre_softmax = tf.matmul(h_fc1, W_fc2) + b_fc2
 
-    y_xent = tf.nn.sparse_softmax_cross_entropy_with_logits(
-        labels=self.y_input, logits=self.pre_softmax)
+    self.bce_loss = tf.reduce_sum(tf.nn.sigmoid_cross_entropy_with_logits(labels=self.y_input, logits=self.pre_softmax))
+    self.bce_score = tf.nn.sigmoid(self.pre_softmax)
 
-    self.xent = tf.reduce_sum(y_xent)
+#    y_xent = tf.nn.sparse_softmax_cross_entropy_with_logits(
+ #       labels=self.y_input, logits=self.pre_softmax)
 
-    self.y_pred = tf.argmax(self.pre_softmax, 1)
+  #  self.xent = tf.reduce_sum(y_xent)
 
-    correct_prediction = tf.equal(self.y_pred, self.y_input)
+   # self.y_pred = tf.argmax(self.pre_softmax, 1)
 
-    self.num_correct = tf.reduce_sum(tf.cast(correct_prediction, tf.int64))
-    self.accuracy = tf.reduce_mean(tf.cast(correct_prediction, tf.float32))
+ #   correct_prediction = tf.equal(self.y_pred, self.y_input)
+
+ #   self.num_correct = tf.reduce_sum(tf.cast(correct_prediction, tf.int64))
+#    self.accuracy = tf.reduce_mean(tf.cast(correct_prediction, tf.float32))
 
   @staticmethod
   def _weight_variable(shape):
