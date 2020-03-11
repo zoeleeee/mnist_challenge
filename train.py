@@ -42,7 +42,7 @@ batch_size = config['training_batch_size']
 # mnist = input_data.read_data_sets('MNIST_data', one_hot=False)
 # imgs, labels, input_shape = load_data(path, nb_labels)
 imgs, labs, input_shape = load_data(path, nb_labels)
-labels = np.array(lab_perm[i] for i in labs)
+labels = np.array([lab_perm[i] for i in labs])
 x_train, y_train = imgs[:60000], labels[:60000]
 x_test, y_test = imgs[60000:], labels[60000:]
 global_step = tf.contrib.framework.get_or_create_global_step()
