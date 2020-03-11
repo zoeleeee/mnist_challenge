@@ -94,10 +94,11 @@ with tf.Session() as sess:
   batch_num = int(len(idxs)/batch_size)
   for ii in range(max_num_training_steps):
     beg = ii % batch_num * batch_num
+    end = min(60000, beg+batch_num)
     if ii%batch_num == 0:
       idxs = np.random.permutation(idxs)
     
-    idx = idxs[beg:beg+batch_num]
+    idx = idxs[beg:end]
     x_batch = x_train[idx]
     y_batch = y_train[idx]
     # x_batch, y_batch = mnist.train.next_batch(batch_size)
