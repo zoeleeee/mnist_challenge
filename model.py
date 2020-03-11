@@ -11,7 +11,8 @@ import tensorflow as tf
 class Model(object):
   def __init__(self, input_shape, nb_labels):
     self.x_input = tf.placeholder(tf.float32, shape = [None, 28, 28, input_shape])
-    self.y_input = tf.placeholder(tf.int64, shape = [None])
+    # self.y_input = tf.placeholder(tf.int64, shape = [None])
+    self.y_input = tf.placeholder(tf.int64, shape = [None,nb_labels])
 
     # self.x_image = tf.reshape(self.x_input, [-1, 28, 28, input_shape])
 
