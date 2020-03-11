@@ -88,8 +88,8 @@ def evaluate_checkpoint(filename):
       bstart = ibatch * eval_batch_size
       bend = min(bstart + eval_batch_size, num_eval_examples)
 
-      x_batch = x_train[bstart:bend, :]
-      y_batch = y_train[bstart:bend]
+      x_batch = x_test[bstart:bend, :]
+      y_batch = y_test[bstart:bend]
 
       dict_nat = {model.x_input: x_batch,
                   model.y_input: y_batch}
