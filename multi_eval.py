@@ -36,7 +36,7 @@ rep = np.load('2_label_permutation.npy')[:nb_labels].T
 
 if dataset == 'origin.npy':
   imgs, labels, input_shape = load_data(config['permutation'], config['num_labels'])
-  labels = np.array([rep[i] for i in labels])
+  labels = np.array([rep[i] for i in labels]).astype(np.float32)
   x_train, y_train = imgs[:60000], labels[:60000]
   x_test, y_test = imgs[60000:], labels[60000:]
 else:
@@ -77,7 +77,7 @@ already_seen_state = False
 
 saver = tf.train.Saver()
 summary_writer = tf.summary.FileWriter(eval_dir)
-
+avg_nat_acc = 0
 # A function for evaluating a single checkpoint
 def evaluate_checkpoint(filename):
   with tf.Session() as sess:
@@ -117,6 +117,12 @@ def evaluate_checkpoint(filename):
         bce_score_nat = np.array(cur_nat_score)
       else:
         bce_score_nat = np.vstack((bce_score_nat, cur_nat_score))
+
+      cur_nat_score = np.array(cur_nat_score)
+      nat_labels = np.zeros(cur_nat_score.shape).astype(np.float32)
+      nat_labels[cur_nat_score>=0.5] = 1.
+      nat_acc = np.sum(np.sum(np.absolute(nat_labels-y_batch), axis=-1) == 0)
+      avg_nat_acc += nat_acc
       #bce_score_nat.append(cur_nat_score)
       # total_xent_adv += cur_xent_adv
       total_corr_nat += cur_bce_nat
@@ -125,6 +131,7 @@ def evaluate_checkpoint(filename):
     # avg_xent_nat = total_xent_nat / num_eval_examples
     # avg_xent_adv = total_xent_adv / num_eval_examples
     avg_bce_nat = total_corr_nat / num_eval_examples
+    avg_nat_acc /= num_eval_examples
     # acc_adv = total_corr_adv / num_eval_examples
 
     # summary = tf.Summary(value=[
@@ -136,7 +143,7 @@ def evaluate_checkpoint(filename):
     #       # tf.Summary.Value(tag='accuracy nat', simple_value= acc_nat)])
     # summary_writer.add_summary(summary, global_step.eval(sess))
 
-    # print('natural: {:.2f}%'.format(100 * acc_nat))
+    print('natural: {:.2f}%'.format(100 * avg_nat_acc))
     # # print('adversarial: {:.2f}%'.format(100 * acc_adv))
     print('avg nat loss: {:.4f}'.format(avg_bce_nat))
     np.save('preds/pred_{}_{}'.format(model_dir.split('/')[1], dataset), bce_score_nat)
