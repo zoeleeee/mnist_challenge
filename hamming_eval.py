@@ -1,5 +1,6 @@
 import numpy as np
 import sys
+import json
 
 def hamming_idxs(scores, config):
 	res = []
@@ -33,8 +34,9 @@ def hamming_idxs(scores, config):
 	return preds_dist, correct_idxs, error_idxs
 
 	
+with open(sys.argv[-1]) as config_file:
+  config = json.load(config_file)
 
-conf = np.load(sys.argv[-1])
 model_dir = config['model_dir']
 scores = np.load(np.load('preds/pred_{}_origin.npy'.format(model_dir.split('/')[1])))
 with open(conf) as config_file:
