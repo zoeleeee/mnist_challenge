@@ -112,7 +112,10 @@ def evaluate_checkpoint(filename):
       #                                 [model.num_correct,model.xent],
       #                                 feed_dict = dict_adv)
 
-
+      if len(bce_score_nat) == 0:
+        bce_score_nat = cur_nat_score
+      else:
+        bce_score_nat = np.vstack((bce_score_nat, cur_nat_score))
       bce_score_nat.append(cur_nat_score)
       # total_xent_adv += cur_xent_adv
       total_corr_nat += cur_bce_nat
