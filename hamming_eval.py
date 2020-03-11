@@ -20,9 +20,9 @@ def hamming_idxs(scores, config):
 	for i in range(len(nat_labels)):
 		tmp = np.repeat([nat_labels[i]], rep.shape[0], axis=0)
 		dists = np.sum(np.absolute(tmp-rep), axis=1)
-		min_dist = np.min(dist)
+		min_dist = np.min(dists)
 		pred_labels = np.arange(len(dists))[dists==min_dist]
-		pred_scores = [np.sum([scores[i][k] if samples[i][k] == rep[j][k] else 1-scores[i][k] for k in np.arange(len(scores[i]))]) for j in pred_labels]
+		pred_scores = [np.sum([scores[i][k] if nat_labels[i][k] == rep[j][k] else 1-scores[i][k] for k in np.arange(len(scores[i]))]) for j in pred_labels]
 		pred_label = pred_labels[np.argmax(pred_scores)]
 		preds.append(pred_label)
 		preds_dist.append(dists[pred_label])
