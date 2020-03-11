@@ -93,7 +93,7 @@ with tf.Session() as sess:
   idxs = np.arange(60000)
   batch_num = int(len(idxs)/batch_size)
   for ii in range(max_num_training_steps):
-    beg = ii % batch_num
+    beg = ii % batch_num * batch_num
     if ii%batch_num == 0:
       idxs = np.random.permutation(idxs)
     
