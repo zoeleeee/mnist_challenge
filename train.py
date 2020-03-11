@@ -26,6 +26,7 @@ with open(conf) as config_file:
 
 nb_labels = config['num_labels']
 path = config['permutation']
+lab_perm = np.load('2_label_permutation.npy')[:nb_labels].T
 
 # Setting up training parameters
 tf.set_random_seed(config['random_seed'])
@@ -39,15 +40,17 @@ batch_size = config['training_batch_size']
 
 # Setting up the data and the model
 # mnist = input_data.read_data_sets('MNIST_data', one_hot=False)
-imgs, labels, input_shape = load_data(path, nb_labels)
+# imgs, labels, input_shape = load_data(path, nb_labels)
+imgs, labs, input_shape = load_data(path, nb_labels)
+labels = np.array(lab_perm[i] for i in labs)
 x_train, y_train = imgs[:60000], labels[:60000]
 x_test, y_test = imgs[60000:], labels[60000:]
 global_step = tf.contrib.framework.get_or_create_global_step()
 model = Model(input_shape[-1], nb_labels)
 
 # Setting up the optimizer
-train_step = tf.train.AdamOptimizer(1e-3).minimize(model.xent,
-                                                   global_step=global_step)
+# train_step = tf.train.AdamOptimizer(1e-3).minimize(model.xent, global_step=global_step)
+train_step = tf.train.AdamOptimizer(1e-3).minimize(model.bce_loss, global_step=global_step)
 
 # Set up adversary
 # attack = LinfPGDAttack(model, 
@@ -69,9 +72,10 @@ if not os.path.exists(model_dir):
 # - eval of different runs
 
 saver = tf.train.Saver(max_to_keep=3)
-tf.summary.scalar('accuracy train', model.accuracy)
+# tf.summary.scalar('accuracy train', model.accuracy)
 # tf.summary.scalar('accuracy adv', model.accuracy)
-tf.summary.scalar('xent train', model.xent / batch_size)
+# tf.summary.scalar('xent train', model.xent / batch_size)
+tf.summary.scalar('bce train', model.bce_loss / batch_size)
 # tf.summary.scalar('xent adv', model.xent / batch_size)
 # tf.summary.image('images train', model.x_input)
 merged_summaries = tf.summary.merge_all()
@@ -111,7 +115,8 @@ with tf.Session() as sess:
 
     # Output to stdout
     if ii % num_output_steps == 0:
-      nat_acc, nat_loss = sess.run([model.accuracy, model.xent], feed_dict=nat_dict)
+      # nat_acc, nat_loss = sess.run([model.accuracy, model.xent], feed_dict=nat_dict)
+      nat_acc, nat_loss = sess.run([model.bce_score, model.bce_loss], feed_dict=nat_dict)
       # adv_acc = sess.run(model.accuracy, feed_dict=adv_dict)
       print('Step {}:    ({})'.format(ii, datetime.now()))
       print('    training nat loss {:.6}'.format(nat_loss))

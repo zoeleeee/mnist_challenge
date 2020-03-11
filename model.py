@@ -42,6 +42,9 @@ class Model(object):
 
     self.pre_softmax = tf.matmul(h_fc1, W_fc2) + b_fc2
 
+    self.bce_loss = tf.reduce_sum(tf.nn.sigmoid_cross_entropy_with_logits(labels=self.y_input, logits=self.pre_softmax))
+    self.bce_scores = tf.nn.sigmoid(self.pre_softmax)
+
     y_xent = tf.nn.sparse_softmax_cross_entropy_with_logits(
         labels=self.y_input, logits=self.pre_softmax)
 
