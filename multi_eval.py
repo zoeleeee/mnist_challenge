@@ -22,7 +22,7 @@ from pgd_attack import LinfPGDAttack
 from utils import load_data
 
 conf = sys.argv[-1]
-
+dataset = sys.argv[-2]
 # Global constants
 with open(conf) as config_file:
   config = json.load(config_file)
@@ -32,9 +32,13 @@ eval_on_cpu = config['eval_on_cpu']
 
 model_dir = config['model_dir']
 
-imgs, labels, input_shape = load_data(config['permutation'], config['num_labels'])
-x_train, y_train = imgs[:60000], labels[:60000]
-x_test, y_test = imgs[60000:], labels[60000:]
+if dataset == 'origin.npy':
+  imgs, labels, input_shape = load_data(config['permutation'], config['num_labels'])
+  # x_train, y_train = imgs[:60000], labels[:60000]
+  x_test, y_test = imgs[60000:], labels[60000:]
+else:
+  x_test = np.load(dataset)
+
 # Set upd the data, hyperparameters, and the model
 # mnist = input_data.read_data_sets('MNIST_data', one_hot=False)
 
@@ -129,7 +133,7 @@ def evaluate_checkpoint(filename):
     # print('natural: {:.2f}%'.format(100 * acc_nat))
     # # print('adversarial: {:.2f}%'.format(100 * acc_adv))
     print('avg nat loss: {:.4f}'.format(avg_bce_nat))
-    np.save(config['preds']+'_normal.npy')
+    np.save('preds/pred_{}_{}'.format(model_dir, dataset), bce_score_nat)
     # print('avg adv loss: {:.4f}'.format(avg_xent_adv))
 
 # Infinite eval loop
