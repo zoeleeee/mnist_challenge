@@ -42,7 +42,7 @@ batch_size = config['training_batch_size']
 # mnist = input_data.read_data_sets('MNIST_data', one_hot=False)
 # imgs, labels, input_shape = load_data(path, nb_labels)
 imgs, labs, input_shape = load_data(path, nb_labels)
-labels = np.array([lab_perm[i] for i in labs])
+labels = np.array([lab_perm[i] for i in labs]).astype(np.float32)
 print(labels.shape)
 x_train, y_train = imgs[:60000], labels[:60000]
 x_test, y_test = imgs[60000:], labels[60000:]
@@ -117,7 +117,7 @@ with tf.Session() as sess:
     # Output to stdout
     if ii % num_output_steps == 0:
       # nat_acc, nat_loss = sess.run([model.accuracy, model.xent], feed_dict=nat_dict)
-      nat_acc, nat_loss = sess.run([model.bce_score, model.bce_loss], feed_dict=nat_dict)
+      nat_scores nat_loss = sess.run([model.bce_score, model.bce_loss], feed_dict=nat_dict)
       # adv_acc = sess.run(model.accuracy, feed_dict=adv_dict)
       print('Step {}:    ({})'.format(ii, datetime.now()))
       print('    training nat loss {:.6}'.format(nat_loss))
