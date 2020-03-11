@@ -20,6 +20,7 @@ from tensorflow.examples.tutorials.mnist import input_data
 from model import Model
 from pgd_attack import LinfPGDAttack
 from utils import load_data
+import numpy as np
 
 conf = sys.argv[-1]
 dataset = sys.argv[-2]
@@ -29,7 +30,7 @@ with open(conf) as config_file:
 num_eval_examples = config['num_eval_examples']
 eval_batch_size = config['eval_batch_size']
 eval_on_cpu = config['eval_on_cpu']
-
+nb_labels = config['num_labels']
 model_dir = config['model_dir']
 rep = np.load('2_label_permutation.npy')[:nb_labels].T
 
@@ -134,7 +135,7 @@ def evaluate_checkpoint(filename):
     # print('natural: {:.2f}%'.format(100 * acc_nat))
     # # print('adversarial: {:.2f}%'.format(100 * acc_adv))
     print('avg nat loss: {:.4f}'.format(avg_bce_nat))
-    np.save('preds/pred_{}_{}'.format(model_dir, dataset), bce_score_nat)
+    np.save('preds/pred_{}_{}'.format(model_dir.split('/')[1], dataset), bce_score_nat)
     # print('avg adv loss: {:.4f}'.format(avg_xent_adv))
 
 # Infinite eval loop

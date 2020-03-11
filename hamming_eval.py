@@ -34,9 +34,9 @@ def hamming_idxs(scores, config):
 
 	
 
-conf = np.load(sys.argv[-2])
+conf = np.load(sys.argv[-1])
 model_dir = config['model_dir']
-scores = np.load(np.load('preds/pred_{}_origin.npy'.format(model_dir)))
+scores = np.load(np.load('preds/pred_{}_origin.npy'.format(model_dir.split('/')[1])))
 with open(conf) as config_file:
 	config = json.load(config_file)
 
