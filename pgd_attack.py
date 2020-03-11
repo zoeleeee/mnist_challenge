@@ -25,6 +25,8 @@ class LinfPGDAttack:
 
     if loss_func == 'xent':
       loss = model.xent
+    elif loss_func == 'bce':
+      loss = model.bce_loss
     elif loss_func == 'cw':
       label_mask = tf.one_hot(model.y_input,
                               nb_labels,
