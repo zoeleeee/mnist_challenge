@@ -87,6 +87,7 @@ def evaluate_checkpoint(filename):
     # Iterate over the samples batch-by-batch
     num_batches = int(math.ceil(num_eval_examples / eval_batch_size))
     bce_score_nat = []
+    bce_labels = []
     # total_xent_adv = 0.
     total_corr_nat = 0
     avg_nat_acc = 0
@@ -116,13 +117,17 @@ def evaluate_checkpoint(filename):
 
       if len(bce_score_nat) == 0:
         bce_score_nat = np.array(cur_nat_score)
+        bce_labels = np.array(y_batch)
       else:
         bce_score_nat = np.vstack((bce_score_nat, cur_nat_score))
+        bce_labels = np.vstack((bce_labels, y_batch))
 
       cur_nat_score = np.array(cur_nat_score)
       nat_labels = np.zeros(cur_nat_score.shape).astype(np.float32)
       nat_labels[cur_nat_score>=0.5] = 1.
-      nat_acc = np.sum(np.sum(np.absolute(nat_labels-y_batch), axis=-1) == 0)
+      nat_dists = np.sum(np.absolute(nat_labels-y_batch), axis=-1)
+      nat_acc = np.sum(nat_dists == 0)
+      print(nat_dists.shape)
       avg_nat_acc += nat_acc
       #bce_score_nat.append(cur_nat_score)
       # total_xent_adv += cur_xent_adv
@@ -148,6 +153,7 @@ def evaluate_checkpoint(filename):
     # # print('adversarial: {:.2f}%'.format(100 * acc_adv))
     print('avg nat loss: {:.4f}'.format(avg_bce_nat))
     np.save('preds/pred_{}_{}'.format(model_dir.split('/')[1], dataset), bce_score_nat)
+    np.save('preds/labels_{}_{}'.format(model_dir.split('/')[1], dataset), bce_labels)
     # print('avg adv loss: {:.4f}'.format(avg_xent_adv))
 
 # Infinite eval loop
