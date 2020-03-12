@@ -104,13 +104,14 @@ if __name__ == '__main__':
 
   org_imgs = np.load('data/mnist_data.npy').transpose((0,2,3,1))[60000:]
   # org_labs = np.load('data/mnist_labels.npy')[60000:]
-  # imgs, labs, input_shape = load_data(permutation_path)
-  imgs, labels, input_shape = load_data(permutation_path)
+  imgs, labs, input_shape = load_data(permutation_path)
+  # imgs, labels, input_shape = load_data(permutation_path)
 
   #labels = np.random.randint(0, 10,labels.shape)
   labels = np.load('advs_targeted_labels.npy')
-  labs = np.array([lab_perm[i] for i in labels])
-  x_test, y_test = imgs[60000:], labs
+  # labs = np.array([lab_perm[i] for i in labels])
+  # x_test, y_test = imgs[60000:], labs
+  x_test, y_test = imgs[60000:], labs[60000:]
   orders = np.load(permutation_path).reshape(-1,1).astype(np.float32)
   orders /= int(permutation_path.split('/')[-1].split('_')[1].split('.')[0])-1
   # mnist = input_data.read_data_sets('MNIST_data', one_hot=False)
