@@ -127,7 +127,7 @@ def evaluate_checkpoint(filename):
       nat_labels[cur_nat_score>=0.5] = 1.
       nat_dists = np.sum(np.absolute(nat_labels-y_batch), axis=-1)
       nat_acc = np.sum(nat_dists == 0)
-      print(nat_dists)
+      # print(nat_dists)
       avg_nat_acc += nat_acc
       #bce_score_nat.append(cur_nat_score)
       # total_xent_adv += cur_xent_adv
