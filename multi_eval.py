@@ -17,7 +17,7 @@ import time
 import tensorflow as tf
 from tensorflow.examples.tutorials.mnist import input_data
 
-from model import Model
+from multi_model import Model
 from pgd_attack import LinfPGDAttack
 from utils import load_data
 import numpy as np
