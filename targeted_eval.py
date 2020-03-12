@@ -1,6 +1,6 @@
 import numpy as np
 import sys
-
+import json
 from hamming_eval import hamming_idxs
 
 conf = np.load(sys.argv[-2])

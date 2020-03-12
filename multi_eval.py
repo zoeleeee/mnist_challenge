@@ -34,12 +34,12 @@ nb_labels = config['num_labels']
 model_dir = config['model_dir']
 rep = np.load('2_label_permutation.npy')[:nb_labels].T
 
-if dataset == 'origin.npy':
-  imgs, labels, input_shape = load_data(config['permutation'], config['num_labels'])
-  labels = np.array([rep[i] for i in labels]).astype(np.float32)
-  x_train, y_train = imgs[:60000], labels[:60000]
-  x_test, y_test = imgs[60000:], labels[60000:]
-else:
+#if dataset == 'origin.npy':
+imgs, labels, input_shape = load_data(config['permutation'], config['num_labels'])
+labels = np.array([rep[i] for i in labels]).astype(np.float32)
+x_train, y_train = imgs[:60000], labels[:60000]
+x_test, y_test = imgs[60000:], labels[60000:]
+if dataset != 'origin.npy':
   x_test = np.load(dataset)
 
 # Set upd the data, hyperparameters, and the model
@@ -152,8 +152,8 @@ def evaluate_checkpoint(filename):
     print('natural: {:.2f}%'.format(100 * avg_nat_acc))
     # # print('adversarial: {:.2f}%'.format(100 * acc_adv))
     print('avg nat loss: {:.4f}'.format(avg_bce_nat))
-    np.save('preds/pred_{}_{}'.format(model_dir.split('/')[1], dataset), bce_score_nat)
-    np.save('preds/labels_{}_{}'.format(model_dir.split('/')[1], dataset), bce_labels)
+    np.save('preds/pred_{}_{}'.format(model_dir.split('/')[1], dataset.split('/')[-1]), bce_score_nat)
+    np.save('preds/labels_{}_{}'.format(model_dir.split('/')[1], dataset.split('/')[-1]), bce_labels)
     # print('avg adv loss: {:.4f}'.format(avg_xent_adv))
 
 # Infinite eval loop

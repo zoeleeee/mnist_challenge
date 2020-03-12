@@ -75,8 +75,8 @@ if not os.path.exists(model_dir):
 saver = tf.train.Saver(max_to_keep=3)
 # tf.summary.scalar('accuracy train', model.accuracy)
 # tf.summary.scalar('accuracy adv', model.accuracy)
-# tf.summary.scalar('xent train', model.xent / batch_size)
-tf.summary.scalar('bce train', model.bce_loss / batch_size)
+tf.summary.scalar('xent train', model.xent / batch_size)
+#tf.summary.scalar('bce train', model.bce_loss / batch_size)
 # tf.summary.scalar('xent adv', model.xent / batch_size)
 # tf.summary.image('images train', model.x_input)
 merged_summaries = tf.summary.merge_all()
@@ -120,7 +120,7 @@ with tf.Session() as sess:
     if ii % num_output_steps == 0:
       nat_acc, nat_loss = sess.run([model.accuracy, model.xent], feed_dict=nat_dict)
       # nat_scores, nat_loss = sess.run([model.bce_score, model.bce_loss], feed_dict=nat_dict)
-      nat_acc = sess.run(model.accuracy, feed_dict=adv_dict)
+      #nat_acc = sess.run(model.accuracy, feed_dict=adv_dict)
       # nat_scores = np.array(nat_scores)
       # nat_labels = np.zeros(nat_scores.shape).astype(np.float32)
       # nat_labels[nat_scores>=0.5] = 1.

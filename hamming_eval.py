@@ -38,10 +38,10 @@ def hamming_idxs(scores, y_input, config):
 	
 with open(sys.argv[-1]) as config_file:
   config = json.load(config_file)
-
+name = sys.argv[-2].split('/')[-1][5:]
 model_dir = config['model_dir']
-scores = np.load('preds/pred_{}_origin.npy'.format(model_dir.split('/')[1]))
-labels = np.load('preds/labels_{}_origin.npy'.format(model_dir.split('/')[1]))
+scores = np.load('preds/pred_{}'.format(name))
+labels = np.load('preds/labels_{}'.format(name))
 # print(scores.shape)
 preds_dist, correct_idxs, error_idxs = hamming_idxs(scores, labels, config)
 # print(preds_dist.shape)
