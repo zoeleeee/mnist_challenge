@@ -49,8 +49,7 @@ class Model(object):
     # self.bce_score = tf.nn.sigmoid(self.pre_softmax)
     # self.bce_loss = tf.reduce_sum(tf.abs(tf.keras.backend.binary_crossentropy(self.y_input, self.bce_score)))
 
-   y_xent = tf.nn.sparse_softmax_cross_entropy_with_logits(
-       labels=self.y_input, logits=self.pre_softmax)
+   y_xent = tf.nn.sparse_softmax_cross_entropy_with_logits(labels=self.y_input, logits=self.pre_softmax)
 
    self.xent = tf.reduce_sum(y_xent)
 
