@@ -64,9 +64,7 @@ class LinfPGDAttack:
 
               _x = np.repeat([x[t,j,p,:]], max_idx-min_idx, axis=0)
               dist = np.sum(np.abs(_x-order[min_idx:max_idx]), axis=-1)
-              print(dist.shape)
               tmp[t,j,p,0] = int(np.argmin(dist)+min_idx)
-              print(tmp[t,j,p,0])
               x[t,j,p,:] = order[int(tmp[t,j,p,0])]
       
 
