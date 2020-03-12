@@ -25,6 +25,8 @@ class LinfPGDAttack:
 
     if loss_func == 'xent':
       loss = model.xent
+    elif loss_func == 'bce':
+      loss = model.bce_loss
     elif loss_func == 'cw':
       label_mask = tf.one_hot(model.y_input,
                               nb_labels,
@@ -64,9 +66,11 @@ class LinfPGDAttack:
 
               _x = np.repeat([x[t,j,p,:]], max_idx-min_idx, axis=0)
               dist = np.sum(np.abs(_x-order[min_idx:max_idx]), axis=-1)
+              # print(dist.shape)
               tmp[t,j,p,0] = int(np.argmin(dist)+min_idx)
+              # print(tmp[t,j,p,0])
               x[t,j,p,:] = order[int(tmp[t,j,p,0])]
-      
+              
 
       x = np.clip(x, x_nat - self.epsilon, x_nat + self.epsilon) 
       x = np.clip(x, 0, 1) # ensure valid pixel range
@@ -90,6 +94,9 @@ if __name__ == '__main__':
 
   permutation_path = config['permutation']
   nb_labels = config['num_labels']
+
+  lab_perm = np.load('2_label_permutation.npy')[:nb_labels].T
+
   model_file = tf.train.latest_checkpoint(config['model_dir'])
   if model_file is None:
     print('No model found')
@@ -97,9 +104,12 @@ if __name__ == '__main__':
 
   org_imgs = np.load('data/mnist_data.npy').transpose((0,2,3,1))[60000:]
   # org_labs = np.load('data/mnist_labels.npy')[60000:]
-  imgs, labs, input_shape = load_data(permutation_path)
+  # imgs, labs, input_shape = load_data(permutation_path)
+  imgs, labels, input_shape = load_data(permutation_path)
+  labs = np.array([lab_perm[i] for i in labels])
   x_test, y_test = imgs[60000:], labs[60000:]
-  orders = np.load(permutation_path).reshape(-1,1)
+  orders = np.load(permutation_path).reshape(-1,1).astype(np.float32)
+  orders /= int(permutation_path.split('/')[-1].split('_')[1].split('.')[0])-1
   # mnist = input_data.read_data_sets('MNIST_data', one_hot=False)
 
   model = Model(input_shape[-1], nb_labels)

@@ -25,6 +25,8 @@ class LinfPGDAttack:
 
     if loss_func == 'xent':
       loss = model.xent
+    elif loss_func == 'bce':
+      loss = model.bce_loss
     elif loss_func == 'cw':
       label_mask = tf.one_hot(model.y_input,
                               nb_labels,
@@ -54,10 +56,7 @@ class LinfPGDAttack:
       grad = sess.run(self.grad, feed_dict={self.model.x_input: x,
                                             self.model.y_input: y})
 
-
-      # x += self.a * np.sign(grad)
-      x_upd = x+self.a*np.sign(grad)
-
+      x -= self.a * np.sign(grad)
       tmp = np.zeros(org_img.shape)
       for t in range(x.shape[0]):
         for j in range(x.shape[1]):
@@ -65,17 +64,13 @@ class LinfPGDAttack:
               min_idx = np.max([0, org_img[t,j,p,0]-int(self.epsilon*255)])
               max_idx = np.min([255, org_img[t,j,p,0]+int(self.epsilon*255)+1])
 
-              sign_neighbors = np.sign(order[min_idx:max_idx]-np.repeat([x[t,j,p,:]], max_idx-min_idx, axis=0))
-              matches = np.sum(np.repeat([np.sign(grad[t,j,p,:])], max_idx-min_idx, axis=0) == sign_neighbors, axis=-1)
-
-              idxs = np.arange(len(matches))[matches==np.max(matches)]
-              _x = np.repeat([x_upd[t,j,p,:]], len(idxs), axis=0)
-              dist = np.sum(np.abs(_x-order[idxs+min_idx]), axis=-1)
+              _x = np.repeat([x[t,j,p,:]], max_idx-min_idx, axis=0)
+              dist = np.sum(np.abs(_x-order[min_idx:max_idx]), axis=-1)
               # print(dist.shape)
-
-              tmp[t,j,p,0] = int(idxs[np.argmin(dist)]+min_idx)
+              tmp[t,j,p,0] = int(np.argmin(dist)+min_idx)
               # print(tmp[t,j,p,0])
               x[t,j,p,:] = order[int(tmp[t,j,p,0])]
+              
 
       x = np.clip(x, x_nat - self.epsilon, x_nat + self.epsilon) 
       x = np.clip(x, 0, 1) # ensure valid pixel range
@@ -99,6 +94,9 @@ if __name__ == '__main__':
 
   permutation_path = config['permutation']
   nb_labels = config['num_labels']
+
+  lab_perm = np.load('2_label_permutation.npy')[:nb_labels].T
+
   model_file = tf.train.latest_checkpoint(config['model_dir'])
   if model_file is None:
     print('No model found')
@@ -106,9 +104,13 @@ if __name__ == '__main__':
 
   org_imgs = np.load('data/mnist_data.npy').transpose((0,2,3,1))[60000:]
   # org_labs = np.load('data/mnist_labels.npy')[60000:]
-  imgs, labs, input_shape = load_data(permutation_path)
-  x_test, y_test = imgs[60000:], labs[60000:]
+  # imgs, labs, input_shape = load_data(permutation_path)
+  imgs, labels, input_shape = load_data(permutation_path)
 
+  #labels = np.random.randint(0, 10,labels.shape)
+  labels = np.load('advs_targeted_labels.npy')
+  labs = np.array([lab_perm[i] for i in labels])
+  x_test, y_test = imgs[60000:], labs
   orders = np.load(permutation_path).reshape(-1,1).astype(np.float32)
   orders /= int(permutation_path.split('/')[-1].split('_')[1].split('.')[0])-1
   # mnist = input_data.read_data_sets('MNIST_data', one_hot=False)
