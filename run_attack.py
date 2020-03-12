@@ -30,7 +30,7 @@ def run_attack(checkpoint, x_adv, config):#epsilon, permutation_path, nb_labels)
   saver = tf.train.Saver()
 
   num_eval_examples = 10000
-  eval_batch_size = 64
+  eval_batch_size = 50
 
   num_batches = int(math.ceil(num_eval_examples / eval_batch_size))
   total_corr = 0

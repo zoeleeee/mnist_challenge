@@ -4,7 +4,7 @@ import json
 
 from utils import load_data
 
-def hamming_idxs(scores, y_input, config):
+def hamming_idxs(scores, config):
 	res = []
 	nb_labels = config['num_labels']
 	rep = np.load('2_label_permutation.npy')[:nb_labels].T
@@ -43,7 +43,7 @@ if __name__ == '__main__':
 	scores = np.load('preds/pred_{}'.format(name))
 	labels = np.load('preds/labels_{}'.format(name))
 	# print(scores.shape)
-	preds_dist, correct_idxs, error_idxs = hamming_idxs(scores, labels, config)
+	preds_dist, correct_idxs, error_idxs = hamming_idxs(scores, config)
 	# print(preds_dist.shape)
 	print('avg Hamming distance:{}, max:{}, min:{}, med:{}'.format(np.mean(preds_dist), np.max(preds_dist), np.min(preds_dist), np.median(preds_dist)))
 
