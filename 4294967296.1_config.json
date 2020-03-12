@@ -20,11 +20,11 @@
   "k": 40,
   "a": 0.01,
   "random_start": true,
-  "loss_func": "bce",
+  "loss_func": "xent",
 
   "store_adv_path": "advs/4294967296.1_pgd_attack.npy",
 
   "permutation": "permutation/256_4294967296.1_permutation.npy",
-  "num_labels": 30
+  "num_labels": 10
 
 }
