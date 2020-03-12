@@ -48,17 +48,16 @@ class Model(object):
     # self.bce_loss = tf.reduce_sum(tf.abs(tf.nn.sigmoid_cross_entropy_with_logits(labels=self.y_input, logits=self.pre_softmax)))
     # self.bce_score = tf.nn.sigmoid(self.pre_softmax)
     # self.bce_loss = tf.reduce_sum(tf.abs(tf.keras.backend.binary_crossentropy(self.y_input, self.bce_score)))
+    y_xent = tf.nn.sparse_softmax_cross_entropy_with_logits(labels=self.y_input, logits=self.pre_softmax)
 
-   y_xent = tf.nn.sparse_softmax_cross_entropy_with_logits(labels=self.y_input, logits=self.pre_softmax)
+    self.xent = tf.reduce_sum(y_xent)
 
-   self.xent = tf.reduce_sum(y_xent)
+    self.y_pred = tf.argmax(self.pre_softmax, 1)
 
-   self.y_pred = tf.argmax(self.pre_softmax, 1)
+    correct_prediction = tf.equal(self.y_pred, self.y_input)
 
-   correct_prediction = tf.equal(self.y_pred, self.y_input)
-
-   self.num_correct = tf.reduce_sum(tf.cast(correct_prediction, tf.int64))
-   self.accuracy = tf.reduce_mean(tf.cast(correct_prediction, tf.float32))
+    self.num_correct = tf.reduce_sum(tf.cast(correct_prediction, tf.int64))
+    self.accuracy = tf.reduce_mean(tf.cast(correct_prediction, tf.float32))
 
   @staticmethod
   def _weight_variable(shape):
