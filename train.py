@@ -81,7 +81,7 @@ tf.summary.scalar('xent train', model.xent / batch_size)
 # tf.summary.image('images train', model.x_input)
 merged_summaries = tf.summary.merge_all()
 
-shutil.copy('config.json', model_dir)
+shutil.copy(conf, model_dir)
 
 with tf.Session() as sess:
   # Initialize the summary writer, global variables, and our time counter.

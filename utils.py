@@ -1,6 +1,7 @@
 import keras
 import numpy as np
 import os
+import copy
 
 def permutate_labels(labels, path='2_label_permutation.npy'):
 	order = np.load(path)
