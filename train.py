@@ -26,7 +26,7 @@ with open(conf) as config_file:
 
 nb_labels = config['num_labels']
 path = config['permutation']
-# lab_perm = np.load('2_label_permutation.npy')[:nb_labels].T
+lab_perm = np.load('2_label_permutation.npy')[:nb_labels].T
 
 # Setting up training parameters
 tf.set_random_seed(config['random_seed'])
@@ -41,20 +41,23 @@ batch_size = config['training_batch_size']
 # Setting up the data and the model
 # mnist = input_data.read_data_sets('MNIST_data', one_hot=False)
 imgs, labels, input_shape = load_data(path, nb_labels)
-# imgs, labs, input_shape = load_data(path, nb_labels)
-# labels = np.array([lab_perm[i] for i in labs]).astype(np.float32)
-print(labels.shape)
-x_train, y_train = imgs[:60000], labels[:60000]
-x_test, y_test = imgs[60000:], labels[60000:]
 global_step = tf.contrib.framework.get_or_create_global_step()
 if config['loss_func'] == 'bce':
   from multi_model import Model
   model = Model(input_shape[-1], nb_labels)
   train_step = tf.train.AdamOptimizer(1e-3).minimize(model.bce_loss, global_step=global_step)
+  labels = np.array([lab_perm[i] for i in labels]).astype(np.float32)
 elif config['loss_func'] == 'xent':
   from model import Model
   model = Model(input_shape[-1], nb_labels)
   train_step = tf.train.AdamOptimizer(1e-3).minimize(model.xent, global_step=global_step)
+
+
+# imgs, labs, input_shape = load_data(path, nb_labels)
+
+print(labels.shape)
+x_train, y_train = imgs[:60000], labels[:60000]
+x_test, y_test = imgs[60000:], labels[60000:]
 
 # Setting up the optimizer
 
