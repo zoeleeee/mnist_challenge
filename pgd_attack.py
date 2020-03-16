@@ -85,7 +85,7 @@ if __name__ == '__main__':
 
   from tensorflow.examples.tutorials.mnist import input_data
 
-  from model import Model
+  from multi_model import Model
 
   conf = sys.argv[-1]
 

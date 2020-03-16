@@ -85,7 +85,7 @@ if __name__ == '__main__':
 
   from tensorflow.examples.tutorials.mnist import input_data
 
-  from model import Model
+  
 
   conf = sys.argv[-1]
 
@@ -107,16 +107,22 @@ if __name__ == '__main__':
   imgs, labs, input_shape = load_data(permutation_path)
   # imgs, labels, input_shape = load_data(permutation_path)
 
-  #labels = np.random.randint(0, 10,labels.shape)
   labels = np.load('advs_targeted_labels.npy')
-  # labs = np.array([lab_perm[i] for i in labels])
+
+  if config['loss_func'] == 'bce':
+    labels = np.array([lab_perm[i] for i in labels])
+    from multi_model import Model
+    model = Model(input_shape[-1], nb_labels)
+  elif config['loss_func'] == 'xent':
+    from model import Model
+    model = Model(input_shape[-1], nb_labels)
+    
   x_test, y_test = imgs[60000:], labels
-  # x_test, y_test = imgs[60000:], labs[60000:]
   orders = np.load(permutation_path).reshape(-1,1).astype(np.float32)
   orders /= int(permutation_path.split('/')[-1].split('_')[1].split('.')[0])-1
   # mnist = input_data.read_data_sets('MNIST_data', one_hot=False)
 
-  model = Model(input_shape[-1], nb_labels)
+  
   attack = LinfPGDAttack(model,
                          config['epsilon'],
                          config['k'],
