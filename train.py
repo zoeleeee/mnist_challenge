@@ -47,11 +47,16 @@ print(labels.shape)
 x_train, y_train = imgs[:60000], labels[:60000]
 x_test, y_test = imgs[60000:], labels[60000:]
 global_step = tf.contrib.framework.get_or_create_global_step()
-model = Model(input_shape[-1], nb_labels)
+if config['loss_func'] == 'bce':
+  from multi_model import Model
+  model = Model(input_shape[-1], nb_labels)
+  train_step = tf.train.AdamOptimizer(1e-3).minimize(model.bce_loss, global_step=global_step)
+elif config['loss_func'] == 'xent':
+  from model import Model
+  model = Model(input_shape[-1], nb_labels)
+  train_step = tf.train.AdamOptimizer(1e-3).minimize(model.xent, global_step=global_step)
 
 # Setting up the optimizer
-train_step = tf.train.AdamOptimizer(1e-3).minimize(model.xent, global_step=global_step)
-# train_step = tf.train.AdamOptimizer(1e-3).minimize(model.bce_loss, global_step=global_step)
 
 # Set up adversary
 # attack = LinfPGDAttack(model, 
@@ -75,8 +80,10 @@ if not os.path.exists(model_dir):
 saver = tf.train.Saver(max_to_keep=3)
 # tf.summary.scalar('accuracy train', model.accuracy)
 # tf.summary.scalar('accuracy adv', model.accuracy)
-tf.summary.scalar('xent train', model.xent / batch_size)
-#tf.summary.scalar('bce train', model.bce_loss / batch_size)
+if config['loss_func'] == 'bce':
+  tf.summary.scalar('bce train', model.bce_loss / batch_size)
+elif config['loss_func'] == 'xent':
+  tf.summary.scalar('xent train', model.xent / batch_size)
 # tf.summary.scalar('xent adv', model.xent / batch_size)
 # tf.summary.image('images train', model.x_input)
 merged_summaries = tf.summary.merge_all()
@@ -118,18 +125,24 @@ with tf.Session() as sess:
 
     # Output to stdout
     if ii % num_output_steps == 0:
-      nat_acc, nat_loss = sess.run([model.accuracy, model.xent], feed_dict=nat_dict)
-      # nat_scores, nat_loss = sess.run([model.bce_score, model.bce_loss], feed_dict=nat_dict)
-      #nat_acc = sess.run(model.accuracy, feed_dict=adv_dict)
-      # nat_scores = np.array(nat_scores)
-      # nat_labels = np.zeros(nat_scores.shape).astype(np.float32)
-      # nat_labels[nat_scores>=0.5] = 1.
-      # nat_acc = np.sum(np.sum(np.absolute(nat_labels-y_batch), axis=-1) == 0) / batch_size
-      # print(nat_loss.shape)
+      if config['loss_func'] == 'bce':
+        nat_scores, nat_loss = sess.run([model.bce_score, model.bce_loss], feed_dict=nat_dict)
+        nat_scores = np.array(nat_scores)
+        nat_labels = np.zeros(nat_scores.shape).astype(np.float32)
+        nat_labels[nat_scores>=0.5] = 1.
+        nat_acc = np.sum(np.sum(np.absolute(nat_labels-y_batch), axis=-1) == 0) / batch_size
+        nat_loss = np.sum(nat_loss)
+      elif config['loss_func'] == 'xent':
+        nat_acc, nat_loss = sess.run([model.accuracy, model.xent], feed_dict=nat_dict)
+      
       print('Step {}: {} -{}  ({})'.format(ii, _beg, _end, datetime.now()))
       print('    training nat loss {:.6}'.format(nat_loss))
-      # print('    training nat loss {:.6}'.format(np.sum(nat_loss)))
       print('    training nat accuracy {:.4}%'.format(nat_acc * 100))
+      #nat_acc = sess.run(model.accuracy, feed_dict=adv_dict)
+      # 
+      
+      # print('    training nat loss {:.6}'.format(np.sum(nat_loss)))
+      
       # print('    training adv accuracy {:.4}%'.format(adv_acc * 100))
       if ii != 0:
         print('    {} examples per second'.format(
