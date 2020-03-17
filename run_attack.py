@@ -104,8 +104,11 @@ if __name__ == '__main__':
   model_dir = config['model_dir']
 
   checkpoint = tf.train.latest_checkpoint(model_dir)
-  x_adv = np.load(config['store_adv_path'][:-10]+'show.npy')
-  x_adv = extend_data(config['permutation'], x_adv)
+  if os.path.exists(config['store_adv_path']):
+    x_adv = np.load(config['store_adv_path'])
+  else:
+    x_adv = np.load(config['store_adv_path'][:-10]+'show.npy')
+    x_adv = extend_data(config['permutation'], x_adv)
 
   if checkpoint is None:
     print('No checkpoint found')
