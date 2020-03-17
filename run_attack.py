@@ -86,8 +86,8 @@ def run_attack(checkpoint, x_adv, config):#epsilon, permutation_path, nb_labels)
   idxs = idxs[y_pred[0][idxs] == y_test[idxs]]
   cor = np.sum(y_pred[1][idxs] == y_test[idxs])
   adv_cor = np.sum(y_pred[1][idxs] == y_adv[idxs])
-  print('Accuracy: {} / {} = {:.2f}%'.format(cor, len(idxs), cor/len(idxs)))
-  print('Adversarial Accuracy: {} / {} = {:.2f}%'.format(adv_cor, len(idxs), adv_cor/len(idxs)))
+  print('Accuracy: {} / {} = {:.2f}%'.format(cor, len(idxs), cor/len(idxs)*100))
+  print('Adversarial Accuracy: {} / {} = {:.2f}%'.format(adv_cor, len(idxs), adv_cor/len(idxs)*100))
 
   # np.save('pred.npy', y_pred)
   # print('Output saved at pred.npy')
