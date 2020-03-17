@@ -27,17 +27,24 @@ def load_data(path, nb_labels=-1, one_hot=False):
 	# 	input_shape = (28, 28, 2)
 	elif len(order.shape) > 1:
 		input_shape = (28, 28, int(path.split('_')[1].split('.')[-1]))
-		imgs = np.transpose(np.load('data/mnist_data.npy').astype(np.int), (1,0,2,3))[0]
+		imgs = np.transpose(np.load('data/mnist_data.npy').astype(np.int), (0,2,3,1))
 		#imgs = np.clip(np.transpose(np.load('mnist_data.npy').astype(np.float32)+1, (1,0,2,3))[0], 0, 255).astype(np.int)
 
-		tmp = np.array([copy.deepcopy(imgs) for i in np.arange(int(path.split('_')[1].split('.')[-1]))])
-		samples = np.array([[[[order[d][i] for d in c] for c in b] for b in tmp[i]] for i in np.arange(tmp.shape[0])])
+		# tmp = np.array([copy.deepcopy(imgs) for i in np.arange(int(path.split('_')[1].split('.')[-1]))])
+		samples = np.array([[[order[d[0]] for d in c] for c in b] for b in imgs])
 		imgs = np.transpose(samples, (1,2,3,0)).astype(np.float32) / (int(path.split('_')[1].split('.')[0])-1)
-		np.save('data/{}_mnist_data.npy'.format(path.split('_')[1]),imgs)
+		# np.save('data/{}_mnist_data.npy'.format(path.split('_')[1]),imgs)
 	elif len(order.shape) == 1:
 		input_shape = (28, 28, 1)
 		imgs = np.transpose(np.load('data/mnist_data.npy'), (0,2,3,1)) 
 		samples = np.array([[[[order[a] for a in b] for b in c] for c in d] for d in imgs])
 		imgs = samples.astype(np.float32) / (int(path.split('_')[1].split('.')[0])-1)
-		np.save('data/{}_mnist_data.npy'.format(path.split('_')[1]), imgs)
+		# np.save('data/{}_mnist_data.npy'.format(path.split('_')[1]), imgs)
 	return imgs, labels, input_shape
+
+def extend_data(path, imgs):
+	order = np.load(path)
+	imgs = imgs.astype(np.int)
+	samples = np.array([[[order[d[0]] for d in c] for c in b] for b in imgs]).astype(np.float32) / (int(path.split('_')[1].split('.')[0])-1)
+	return samples
+	

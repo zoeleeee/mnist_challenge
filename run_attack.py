@@ -16,15 +16,18 @@ from tensorflow.examples.tutorials.mnist import input_data
 
 import numpy as np
 
-from model import Model
-from utils import load_data
+from utils import load_data, extend_data
 
 def run_attack(checkpoint, x_adv, config):#epsilon, permutation_path, nb_labels):
   epsilon = config['epsilon']
   imgs, labs, input_shape = load_data(config['permutation'])
   x_test, y_test = imgs[60000:], labs[60000:]
+  y_adv = np.load('advs_targeted_labels.npy')
   # mnist = input_data.read_data_sets('MNIST_data', one_hot=False)
-
+  if config['loss_func'] == 'bce':
+    from multi_model import Model
+  elif config['loss_func'] == 'xent':
+    from  model import Model
   model = Model(input_shape[-1], config['num_labels'])
 
   saver = tf.train.Saver()
@@ -55,8 +58,9 @@ def run_attack(checkpoint, x_adv, config):#epsilon, permutation_path, nb_labels)
       bend = min(bstart + eval_batch_size, num_eval_examples)
 
       x_batch = x_adv[bstart:bend, :]
+      y_batch = y_adv[bstart:bend]
       x_nat_batch = x_test[bstart:bend, :]
-      y_batch = y_test[bstart:bend]
+      y_nat_batch = y_test[bstart:bend]
 
       dict_adv = {model.x_input: x_batch,
                   model.y_input: y_batch}
@@ -66,19 +70,27 @@ def run_attack(checkpoint, x_adv, config):#epsilon, permutation_path, nb_labels)
                                         feed_dict=dict_adv))[0]
       y_nat_pred_batch = np.array(sess.run([model.y_pred],
                                         feed_dict=dict_nat))[0]
-      print(y_batch.shape, y_adv_pred_batch.shape, y_nat_pred_batch.shape)
-      amt += np.sum(y_nat_pred_batch == y_batch)
-      cor += np.sum(y_adv_pred_batch[y_nat_pred_batch==y_batch] == y_batch[y_nat_pred_batch==y_batch])
+      # print(y_batch.shape, y_adv_pred_batch.shape, y_nat_pred_batch.shape)
+
+      # amt += np.sum(y_nat_pred_batch == y_batch)
+      # cor += np.sum(y_adv_pred_batch[y_nat_pred_batch==y_batch] == y_batch[y_nat_pred_batch==y_batch])
 
       # total_corr += cur_corr
       y_pred.append([y_nat_pred_batch, y_adv_pred_batch])
 
-  accuracy = cor / amt
+  # accuracy = cor / amt
 
-  print('Accuracy: {} / {} = {:.2f}%'.format(cor, amt, 100.0 * accuracy))
-  y_pred = np.concatenate(y_pred, axis=0)
-  np.save('pred.npy', y_pred)
-  print('Output saved at pred.npy')
+  # print('Accuracy: {} / {} = {:.2f}%'.format(cor, amt, 100.0 * accuracy))
+  y_pred = np.concatenate(y_pred, axis=0).transpose((1,0))
+  idxs = np.arange(len(y_pred))[y_test != y_adv]
+  idxs = idxs[y_pred[0][idxs] == y_test[idxs]]
+  cor = np.sum(y_pred[idxs] == y_test[idxs])
+  adv_cor = np.sum(y_pred[idxs] == y_adv[idxs])
+  print('Accuracy: {} / {} = {:.2f}%'.format(cor, len(idxs), cor/len(idxs)))
+  print('Adversarial Accuracy: {} / {} = {:.2f}%'.format(adv_cor, len(idxs), adv_cor/len(idxs)))
+
+  # np.save('pred.npy', y_pred)
+  # print('Output saved at pred.npy')
 
 if __name__ == '__main__':
   import json
@@ -92,7 +104,8 @@ if __name__ == '__main__':
   model_dir = config['model_dir']
 
   checkpoint = tf.train.latest_checkpoint(model_dir)
-  x_adv = np.load(config['store_adv_path'])
+  x_adv = np.load(config['store_adv_path'][:-10]+'show.npy')
+  x_adv = extend_data(config['permutation'], x_adv)
 
   if checkpoint is None:
     print('No checkpoint found')
