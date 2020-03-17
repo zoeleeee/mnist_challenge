@@ -39,12 +39,12 @@ def run_attack(checkpoint, x_adv, config):#epsilon, permutation_path, nb_labels)
   total_corr = 0
 
   x_nat = x_test
-  l_inf = np.amax(np.abs(x_nat - x_adv))
+  # l_inf = np.amax(np.abs(x_nat - x_adv))
   
-  if l_inf > epsilon + 0.0001:
-    print('maximum perturbation found: {}'.format(l_inf))
-    print('maximum perturbation allowed: {}'.format(epsilon))
-    return
+  # if l_inf > epsilon + 0.0001:
+  #   print('maximum perturbation found: {}'.format(l_inf))
+  #   print('maximum perturbation allowed: {}'.format(epsilon))
+  #   return
 
   y_pred = [] # label accumulator
 
@@ -87,8 +87,8 @@ def run_attack(checkpoint, x_adv, config):#epsilon, permutation_path, nb_labels)
   idxs = idxs[y_pred[0][idxs] == y_test[idxs]]
   cor = np.sum(y_pred[1][idxs] == y_test[idxs])
   adv_cor = np.sum(y_pred[1][idxs] == y_adv[idxs])
-  print('Accuracy: {} / {} = {:.2f}%'.format(cor, len(idxs), cor/len(idxs)))
-  print('Adversarial Accuracy: {} / {} = {:.2f}%'.format(adv_cor, len(idxs), adv_cor/len(idxs)))
+  print('Accuracy: {} / {} = {:.2f}%'.format(cor, len(idxs), cor/len(idxs)*100))
+  print('Adversarial Accuracy: {} / {} = {:.2f}%'.format(adv_cor, len(idxs), adv_cor/len(idxs)*100))
 
   # np.save('pred.npy', y_pred)
   # print('Output saved at pred.npy')

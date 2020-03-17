@@ -72,8 +72,8 @@ class LinfPGDAttack:
               x[t,j,p,:] = order[int(tmp[t,j,p,0])]
               
 
-      x = np.clip(x, x_nat - self.epsilon, x_nat + self.epsilon) 
-      x = np.clip(x, 0, 1) # ensure valid pixel range
+      # x = np.clip(x, x_nat - self.epsilon, x_nat + self.epsilon) 
+      # x = np.clip(x, 0, 1) # ensure valid pixel range
 
     return x, tmp
 
