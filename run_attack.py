@@ -39,12 +39,12 @@ def run_attack(checkpoint, x_adv, config):#epsilon, permutation_path, nb_labels)
   total_corr = 0
 
   x_nat = x_test
-  l_inf = np.amax(np.abs(x_nat - x_adv))
+  # l_inf = np.amax(np.abs(x_nat - x_adv))
   
-  if l_inf > epsilon + 0.0001:
-    print('maximum perturbation found: {}'.format(l_inf))
-    print('maximum perturbation allowed: {}'.format(epsilon))
-    return
+  # if l_inf > epsilon + 0.0001:
+  #   print('maximum perturbation found: {}'.format(l_inf))
+  #   print('maximum perturbation allowed: {}'.format(epsilon))
+  #   return
 
   y_pred = [] # label accumulator
 
