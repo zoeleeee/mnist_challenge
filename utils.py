@@ -32,7 +32,7 @@ def load_data(path, nb_labels=-1, one_hot=False):
 
 		# tmp = np.array([copy.deepcopy(imgs) for i in np.arange(int(path.split('_')[1].split('.')[-1]))])
 		samples = np.array([[[order[d[0]] for d in c] for c in b] for b in imgs])
-		imgs = np.transpose(samples, (1,2,3,0)).astype(np.float32) / (int(path.split('_')[1].split('.')[0])-1)
+		imgs = samples.astype(np.float32) / (int(path.split('_')[1].split('.')[0])-1)
 		# np.save('data/{}_mnist_data.npy'.format(path.split('_')[1]),imgs)
 	elif len(order.shape) == 1:
 		input_shape = (28, 28, 1)
