@@ -72,8 +72,8 @@ class LinfPGDAttack:
               x[t,j,p,:] = order[int(tmp[t,j,p,0])]
               
 
-      x = np.clip(x, x_nat - self.epsilon, x_nat + self.epsilon) 
-      x = np.clip(x, 0, 1) # ensure valid pixel range
+#      x = np.clip(x, x_nat - self.epsilon, x_nat + self.epsilon) 
+#      x = np.clip(x, 0, 1) # ensure valid pixel range
 
     return x, tmp
 
@@ -118,7 +118,7 @@ if __name__ == '__main__':
     model = Model(input_shape[-1], nb_labels)
     
   x_test, y_test = imgs[60000:], labels
-  orders = np.load(permutation_path).reshape(-1,1).astype(np.float32)
+  orders = np.load(permutation_path).astype(np.float32)
   orders /= int(permutation_path.split('/')[-1].split('_')[1].split('.')[0])-1
   # mnist = input_data.read_data_sets('MNIST_data', one_hot=False)
 

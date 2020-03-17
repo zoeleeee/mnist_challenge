@@ -108,7 +108,7 @@ if __name__ == '__main__':
   imgs, labels, input_shape = load_data(permutation_path)
   labs = np.array([lab_perm[i] for i in labels])
   x_test, y_test = imgs[60000:], labs[60000:]
-  orders = np.load(permutation_path).reshape(-1,1).astype(np.float32)
+  orders = np.load(permutation_path).astype(np.float32)
   orders /= int(permutation_path.split('/')[-1].split('_')[1].split('.')[0])-1
   # mnist = input_data.read_data_sets('MNIST_data', one_hot=False)
 
