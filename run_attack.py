@@ -70,7 +70,7 @@ def run_attack(checkpoint, x_adv, config):#epsilon, permutation_path, nb_labels)
                                         feed_dict=dict_adv))[0]
       y_nat_pred_batch = np.array(sess.run([model.y_pred],
                                         feed_dict=dict_nat))[0]
-      # print(y_batch.shape, y_adv_pred_batch.shape, y_nat_pred_batch.shape)
+      print(y_batch.shape, y_adv_pred_batch.shape, y_nat_pred_batch.shape)
 
       # amt += np.sum(y_nat_pred_batch == y_batch)
       # cor += np.sum(y_adv_pred_batch[y_nat_pred_batch==y_batch] == y_batch[y_nat_pred_batch==y_batch])
@@ -82,6 +82,7 @@ def run_attack(checkpoint, x_adv, config):#epsilon, permutation_path, nb_labels)
 
   # print('Accuracy: {} / {} = {:.2f}%'.format(cor, amt, 100.0 * accuracy))
   y_pred = np.concatenate(y_pred, axis=0).transpose((1,0))
+  print(y_test.shape, y_adv.shape, y_pred.shape)
   idxs = np.arange(len(y_pred))[y_test != y_adv]
   idxs = idxs[y_pred[0][idxs] == y_test[idxs]]
   cor = np.sum(y_pred[idxs] == y_test[idxs])
