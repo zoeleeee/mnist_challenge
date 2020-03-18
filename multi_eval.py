@@ -19,7 +19,7 @@ from tensorflow.examples.tutorials.mnist import input_data
 
 from multi_model import Model
 from pgd_attack import LinfPGDAttack
-from utils import load_data
+from utils import load_data, extend_data
 import numpy as np
 
 conf = sys.argv[-1]
