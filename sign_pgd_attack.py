@@ -60,6 +60,7 @@ class LinfPGDAttack:
       # x += self.a * np.sign(grad)
       if targeted:
         x_upd = x-self.a*np.sign(grad)
+
       else:
         x_upd = x+self.a*np.sign(grad)
 
