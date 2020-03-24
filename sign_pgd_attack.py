@@ -133,7 +133,7 @@ if __name__ == '__main__':
   orders /= int(permutation_path.split('/')[-1].split('_')[1].split('.')[0])-1
   # mnist = input_data.read_data_sets('MNIST_data', one_hot=False)
 
-  model = Model(input_shape[-1], nb_labels)
+  # model = Model(input_shape[-1], nb_labels)
   attack = LinfPGDAttack(model,
                          config['epsilon'],
                          config['k'],
