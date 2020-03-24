@@ -15,6 +15,8 @@ model_dir = config['model_dir']
 rep = np.load('2_label_permutation.npy')[:nb_labels].T
 
 imgs, labels, input_shape = load_data(config['permutation'], nb_labels)
+labels = labels[60000:]
+
 advs_label = np.load('advs_targeted_labels.npy')
 
 nat_labs = np.zeros(scores.shape).astype(np.float32)
