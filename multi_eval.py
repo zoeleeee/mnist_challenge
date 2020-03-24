@@ -43,7 +43,7 @@ if dataset != 'origin.npy':
   x_test = np.load(dataset)
   if dataset.endswith('show.npy'):
     x_test = extend_data(config['permutation'], x_test)
-
+print(x_test.shape, y_test.shape)
 # Set upd the data, hyperparameters, and the model
 # mnist = input_data.read_data_sets('MNIST_data', one_hot=False)
 
