@@ -47,8 +47,5 @@ for t in ts:
 	corr_idx = correct_idxs[nat_dist[correct_idxs]<t]
 	idxs = np.intersect1d(adv_idxs, corr_idx)
 
-	print('{} advs acc: {} / {} = {}'.format(t, np.sum(preds_dist[idxs[preds[idxs] == advs_label[idxs]]] < t), len(idxs), np.sum(preds_dist[idxs[preds[idxs] == advs_label[idxs]]] < t) / len(idxs)))
-	print('{} acc: {} / {} = {}'.format(t, np.sum(preds_dist[idxs[preds[idxs] == labels[idxs]]] < t), len(idxs), np.sum(preds_dist[idxs[preds[idxs] == labels[idxs]]] < t) / len(idxs)))
-
-
-
+        print('{} advs acc: {} / {} = {:.2f}%'.format(t, np.sum(preds_dist[idxs[preds[idxs] == advs_label[idxs]]] < t), len(idxs), np.sum(preds_dist[idxs[preds[idxs] == advs_label[idxs]]] < t) / len(idxs)*100))
+        print('{} acc: {} / {} = {:.2f}%'.format(t, np.sum(preds_dist[idxs[preds[idxs] == labels[idxs]]] < t), len(idxs), np.sum(preds_dist[idxs[preds[idxs] == labels[idxs]]] < t) / len(idxs)*100))
