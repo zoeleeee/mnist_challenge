@@ -25,6 +25,8 @@ class LinfPGDAttack:
 
     if loss_func == 'xent':
       loss = model.xent
+    elif loss_func == 'bce':
+      loss = model.bce_loss
     elif loss_func == 'cw':
       label_mask = tf.one_hot(model.y_input,
                               nb_labels,
@@ -41,7 +43,7 @@ class LinfPGDAttack:
 
     self.grad = tf.gradients(loss, model.x_input)[0]
 
-  def perturb(self, x_nat, y, org_img, order, sess):
+  def perturb(self, x_nat, y, org_img, order, sess, targeted=False):
     """Given a set of examples (x_nat, y), returns a set of adversarial
        examples within epsilon of x_nat in l_infinity norm."""
     if self.rand:
@@ -56,7 +58,10 @@ class LinfPGDAttack:
 
 
       # x += self.a * np.sign(grad)
-      x_upd = x+self.a*np.sign(grad)
+      if targeted:
+        x_upd = x-self.a*np.sign(grad)
+      else:
+        x_upd = x+self.a*np.sign(grad)
 
       tmp = np.zeros(org_img.shape)
       for t in range(x.shape[0]):
@@ -77,8 +82,8 @@ class LinfPGDAttack:
               # print(tmp[t,j,p,0])
               x[t,j,p,:] = order[int(tmp[t,j,p,0])]
 
-      x = np.clip(x, x_nat - self.epsilon, x_nat + self.epsilon) 
-      x = np.clip(x, 0, 1) # ensure valid pixel range
+      # x = np.clip(x, x_nat - self.epsilon, x_nat + self.epsilon) 
+      # x = np.clip(x, 0, 1) # ensure valid pixel range
 
     return x, tmp
 
@@ -93,12 +98,17 @@ if __name__ == '__main__':
   from model import Model
 
   conf = sys.argv[-1]
+  targeted = (sys.argv[-2] == 'target')
 
   with open(conf) as config_file:
     config = json.load(config_file)
 
   permutation_path = config['permutation']
   nb_labels = config['num_labels']
+  path = 'sign_' + config['store_adv_path']
+
+  lab_perm = np.load('2_label_permutation.npy')[:nb_labels].T
+
   model_file = tf.train.latest_checkpoint(config['model_dir'])
   if model_file is None:
     print('No model found')
@@ -108,8 +118,18 @@ if __name__ == '__main__':
   # org_labs = np.load('data/mnist_labels.npy')[60000:]
   imgs, labs, input_shape = load_data(permutation_path)
   x_test, y_test = imgs[60000:], labs[60000:]
+  if targeted:
+    y_test = np.load('advs_targeted_labels.npy')
+    path = 'target_'+path
+  if config['loss_func'] == 'bce':
+    from multi_model import Model
+    model = Model(input_shape[-1], nb_labels)
+    y_test = np.array([lab_perm[i] for i in y_test])
+  elif config['loss_func'] == 'xent':
+    from model import Model
+    model = Model(input_shape[-1], nb_labels)
 
-  orders = np.load(permutation_path).reshape(-1,1).astype(np.float32)
+  orders = np.load(permutation_path).astype(np.float32)
   orders /= int(permutation_path.split('/')[-1].split('_')[1].split('.')[0])-1
   # mnist = input_data.read_data_sets('MNIST_data', one_hot=False)
 
@@ -147,15 +167,14 @@ if __name__ == '__main__':
       y_batch = y_test[bstart:bend]
       org_batch = org_imgs[bstart:bend, :]
 
-      x_batch_adv, x_batch_show = attack.perturb(x_batch, y_batch, org_batch, orders, sess)
+      x_batch_adv, x_batch_show = attack.perturb(x_batch, y_batch, org_batch, orders, sess, targeted)
 
       x_adv.append(x_batch_adv)
       x_show.append(x_batch_show)
 
     print('Storing examples')
-    path = config['store_adv_path']
-    x_adv = np.concatenate(x_adv, axis=0)
-    np.save(path, x_adv)
+    # x_adv = np.concatenate(x_adv, axis=0)
+    # np.save(path, x_adv)
     x_adv = np.concatenate(x_show, axis=0)
     np.save(path[:-10]+'show.npy', x_adv)
     print('Examples stored in {}'.format(path))
