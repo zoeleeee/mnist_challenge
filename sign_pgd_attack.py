@@ -106,7 +106,7 @@ if __name__ == '__main__':
 
   permutation_path = config['permutation']
   nb_labels = config['num_labels']
-  path = 'sign_' + config['store_adv_path']
+  path = config['store_adv_path'].split('/')[0] + '/sign_'+config['store_adv_path'].split('/')[1]
 
   lab_perm = np.load('2_label_permutation.npy')[:nb_labels].T
 
