@@ -106,7 +106,7 @@ if __name__ == '__main__':
 
   permutation_path = config['permutation']
   nb_labels = config['num_labels']
-  path = 'sign_' + config['store_adv_path']
+  path = config['store_adv_path'].split('/')[0] + '/sign_'+config['store_adv_path'].split('/')[1]
 
   lab_perm = np.load('2_label_permutation.npy')[:nb_labels].T
 
@@ -121,7 +121,7 @@ if __name__ == '__main__':
   x_test, y_test = imgs[60000:], labs[60000:]
   if targeted:
     y_test = np.load('advs_targeted_labels.npy')
-    path = 'target_'+path
+    path = path.split('/')[0] + '/target_'+path.split('/')[1]
   if config['loss_func'] == 'bce':
     from multi_model import Model
     model = Model(input_shape[-1], nb_labels)
