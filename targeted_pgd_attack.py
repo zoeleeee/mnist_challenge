@@ -163,8 +163,10 @@ if __name__ == '__main__':
 
     print('Storing examples')
     path = config['store_adv_path']
-    x_adv = np.concatenate(x_adv, axis=0)
-    #np.save(path, x_adv)
+
+    # x_adv = np.concatenate(x_adv, axis=0)
+    # np.save(path, x_adv)
+
     x_adv = np.concatenate(x_show, axis=0)
     np.save(path[:-10]+'show.npy', x_adv)
     print('Examples stored in {}'.format(path))

@@ -19,7 +19,7 @@ from tensorflow.examples.tutorials.mnist import input_data
 
 from multi_model import Model
 from pgd_attack import LinfPGDAttack
-from utils import load_data
+from utils import load_data, extend_data
 import numpy as np
 
 conf = sys.argv[-1]
@@ -43,6 +43,10 @@ if dataset != 'origin.npy':
   x_test = np.load(dataset)
   if dataset.endswith('show.npy'):
     x_test = extend_data(config['permutation'], x_test)
+
+if len(x_test) == 3:
+  x_test = x_test.reshape(x_test.shape[0], x_test.shape[1], x_test.shape[2], 1)
+
 
 # Set upd the data, hyperparameters, and the model
 # mnist = input_data.read_data_sets('MNIST_data', one_hot=False)
