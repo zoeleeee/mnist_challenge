@@ -121,7 +121,7 @@ if __name__ == '__main__':
   x_test, y_test = imgs[60000:], labs[60000:]
   if targeted:
     y_test = np.load('advs_targeted_labels.npy')
-    path = 'target_'+path
+    path = path.split('/')[0] + '/target_'+path.split('/')[1]
   if config['loss_func'] == 'bce':
     from multi_model import Model
     model = Model(input_shape[-1], nb_labels)
