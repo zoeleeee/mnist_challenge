@@ -71,7 +71,10 @@ class LinfPGDAttack:
               min_idx = np.max([0, org_img[t,j,p,0]-int(self.epsilon*255)])
               max_idx = np.min([255, org_img[t,j,p,0]+int(self.epsilon*255)+1])
 
-              sign_neighbors = np.sign(order[min_idx:max_idx]-np.repeat([x[t,j,p,:]], max_idx-min_idx, axis=0))
+              if targeted:
+                sign_neighbors = np.sign(-order[min_idx:max_idx]+np.repeat([x[t,j,p,:]], max_idx-min_idx, axis=0))
+              else:
+                sign_neighbors = np.sign(order[min_idx:max_idx]-np.repeat([x[t,j,p,:]], max_idx-min_idx, axis=0))
               matches = np.sum(np.repeat([np.sign(grad[t,j,p,:])], max_idx-min_idx, axis=0) == sign_neighbors, axis=-1)
 
               idxs = np.arange(len(matches))[matches==np.max(matches)]
