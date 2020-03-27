@@ -63,7 +63,7 @@ class LinfPGDAttack:
 
       else:
         x_upd = x+self.a*np.sign(grad)
-        print(grad.shape,np.sum(np.sign(grad)==0),grad[0,0,0,:])
+      print(grad.shape,np.sum(np.sign(grad)==0),grad[0,0,0,:])
       tmp = np.zeros(org_img.shape)
       for t in range(x.shape[0]):
         for j in range(x.shape[1]):
@@ -97,7 +97,7 @@ if __name__ == '__main__':
   import sys
   import math
 
-  from tensorflow.examples.tutorials.mnist import input_data
+  #from tensorflow.examples.tutorials.mnist import input_data
 
   from model import Model
 
