@@ -47,7 +47,7 @@ if __name__ == '__main__':
 	# print(preds_dist.shape)
 	print('avg Hamming distance:{}, max:{}, min:{}, med:{}'.format(np.mean(preds_dist), np.max(preds_dist), np.min(preds_dist), np.median(preds_dist)))
 
-	ts = np.arange(np.max(preds_dist))
+	ts = np.arange(np.max(preds_dist)+1)
 	for t in ts:
 		print(t, 'acc:', np.sum(preds_dist[correct_idxs] < t) / len(scores))
 		print(t, 'err:', np.sum(preds_dist[error_idxs] < t) / len(scores))
