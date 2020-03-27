@@ -42,9 +42,9 @@ if __name__ == '__main__':
 	model_dir = config['model_dir']
 	scores = np.load('preds/pred_{}'.format(name))
 	labels = np.load('preds/labels_{}'.format(name))
-	# print(scores.shape)
+	print(scores.shape)
 	preds_dist, correct_idxs, error_idxs = hamming_idxs(scores, config)
-	# print(preds_dist.shape)
+	print(preds_dist.shape)
 	print('avg Hamming distance:{}, max:{}, min:{}, med:{}'.format(np.mean(preds_dist), np.max(preds_dist), np.min(preds_dist), np.median(preds_dist)))
 
 	ts = np.arange(np.max(preds_dist)+1)
