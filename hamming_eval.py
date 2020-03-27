@@ -49,8 +49,8 @@ if __name__ == '__main__':
 
 	ts = np.arange(np.max(preds_dist)+1)
 	for t in ts:
-		print(t, 'acc:', np.sum(preds_dist[correct_idxs] < t) / len(scores))
-		print(t, 'err:', np.sum(preds_dist[error_idxs] < t) / len(scores))
+		print(t, 'acc:', np.sum(preds_dist[correct_idxs] < t+1) / len(scores))
+		print(t, 'err:', np.sum(preds_dist[error_idxs] < t+1) / len(scores))
 
 
 
