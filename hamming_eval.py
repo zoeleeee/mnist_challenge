@@ -29,6 +29,7 @@ def hamming_idxs(scores, config):
 		preds_score.append(np.max(pred_scores))
 
 	preds = np.array(preds)
+        print(preds)
 	preds_dist = np.array(preds_dist)
 
 	correct_idxs = np.arange(len(preds))[preds == labels]
