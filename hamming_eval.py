@@ -30,7 +30,7 @@ def hamming_idxs(scores, config):
 
 	preds = np.array(preds)
 	preds_dist = np.array(preds_dist)
-
+	print(preds)
 	correct_idxs = np.arange(len(preds))[preds == labels]
 	error_idxs = np.arange(len(preds))[preds != labels]
 	return preds_dist, correct_idxs, error_idxs
