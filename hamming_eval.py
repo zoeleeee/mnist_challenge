@@ -10,7 +10,7 @@ def hamming_idxs(scores, config):
 	rep = np.load('2_label_permutation.npy')[:nb_labels].T
 
 	imgs, labels, input_shape = load_data(config['permutation'], nb_labels)
-	labels = labels[60000:]
+	labels = labels[60000:60000+len(scores)]
 
 	nat_labels = np.zeros(scores.shape).astype(np.float32)
 	nat_labels[scores>=0.5] = 1.
