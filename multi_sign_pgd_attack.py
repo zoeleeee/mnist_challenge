@@ -23,23 +23,23 @@ class LinfPGDAttack:
     self.a = a
     self.rand = random_start
 
-    if loss_func == 'xent':
-      loss = model.xent
-    elif loss_func == 'bce':
-      loss = model.bce_loss
-    elif loss_func == 'cw':
-      label_mask = tf.one_hot(model.y_input,
-                              nb_labels,
-                              on_value=1.0,
-                              off_value=0.0,
-                              dtype=tf.float32)
-      correct_logit = tf.reduce_sum(label_mask * model.pre_softmax, axis=1)
-      wrong_logit = tf.reduce_max((1-label_mask) * model.pre_softmax
-                                  - 1e4*label_mask, axis=1)
-      loss = -tf.nn.relu(correct_logit - wrong_logit + 50)
-    else:
-      print('Unknown loss function. Defaulting to cross-entropy')
-      loss = model.xent
+    #if loss_func == 'xent':
+     # loss = model.xent
+#    elif loss_func == 'bce':
+#      loss = model.bce_loss
+#    elif loss_func == 'cw':
+#      label_mask = tf.one_hot(model.y_input,
+#                              nb_labels,
+#                              on_value=1.0,
+#                              off_value=0.0,
+#                              dtype=tf.float32)
+#      correct_logit = tf.reduce_sum(label_mask * model.pre_softmax, axis=1)
+#      wrong_logit = tf.reduce_max((1-label_mask) * model.pre_softmax
+                                  #- 1e4*label_mask, axis=1)
+#      loss = -tf.nn.relu(correct_logit - wrong_logit + 50)
+#    else:
+#      print('Unknown loss function. Defaulting to cross-entropy')
+#      loss = model.xent
 
     loss = tf.reduce_sum([model.bce_loss for model in models])
     self.grad = tf.gradients(loss, model.x_input)[0]
@@ -104,7 +104,7 @@ if __name__ == '__main__':
   nb_models = int(sys.argv[-3])
   targeted = (sys.argv[-2] == 'target')
 
-  models = []
+  models, y_test = [], []
   lab_permutation = np.load('2_label_permutation.npy')
   if targeted:
     y_lab = np.load('advs_targeted_labels.npy')
@@ -130,7 +130,7 @@ if __name__ == '__main__':
       from model import Model
       model = Model(32, nb_labels)
     models.append(model)
-    conf = conf_m[:-6]+str(nb_labels*(i+1))+'.npy'
+    conf = conf[:-6]+str(nb_labels*(i+1))+'.json'
 
 
   permutation_path = config['permutation']
