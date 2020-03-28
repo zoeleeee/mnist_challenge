@@ -57,7 +57,7 @@ class LinfPGDAttack:
     for i in range(self.k):
       tt = dict([(m.x_input,x) for m in self.models]+[(self.models[i].y_input:y[i] for i in range(len(self.models)))])
       grad = sess.run(self.grad, feed_dict=tt)
-
+      print(grad.shape, np.sum(np.sign(grad!=0)), np.sum(np.sign(grad>0)))
 
       # x += self.a * np.sign(grad)
       if targeted:
@@ -164,7 +164,7 @@ if __name__ == '__main__':
     saver.restore(sess, model_file)
 
     # Iterate over the samples batch-by-batch
-    num_eval_examples = config['num_eval_examples']
+    num_eval_examples = 20#config['num_eval_examples']
     eval_batch_size = config['eval_batch_size']
     num_batches = int(math.ceil(num_eval_examples / eval_batch_size))
 
