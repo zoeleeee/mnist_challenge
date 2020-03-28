@@ -22,27 +22,28 @@ class LinfPGDAttack:
     self.k = k
     self.a = a
     self.rand = random_start
-
-    if loss_func == 'xent':
-      loss = model.xent
-    elif loss_func == 'bce':
-      loss = model.bce_loss
-    elif loss_func == 'cw':
-      label_mask = tf.one_hot(model.y_input,
-                              nb_labels,
-                              on_value=1.0,
-                              off_value=0.0,
-                              dtype=tf.float32)
-      correct_logit = tf.reduce_sum(label_mask * model.pre_softmax, axis=1)
-      wrong_logit = tf.reduce_max((1-label_mask) * model.pre_softmax
-                                  - 1e4*label_mask, axis=1)
-      loss = -tf.nn.relu(correct_logit - wrong_logit + 50)
-    else:
-      print('Unknown loss function. Defaulting to cross-entropy')
-      loss = model.xent
-
-    loss = tf.reduce_sum([model.bce_loss for model in models])
-    self.grad = tf.gradients(loss, model.x_input)[0]
+    self.input = tf.placeholder(tf.float32, models[0].input.shape)
+    self.labels = tf.placeholder(tf.float32, models[0].output.shape*len(models))
+    # if loss_func == 'xent':
+    #   loss = model.xent
+    # elif loss_func == 'bce':
+    #   loss = model.bce_loss
+    # elif loss_func == 'cw':
+    #   label_mask = tf.one_hot(model.y_input,
+    #                           nb_labels,
+    #                           on_value=1.0,
+    #                           off_value=0.0,
+    #                           dtype=tf.float32)
+    #   correct_logit = tf.reduce_sum(label_mask * model.pre_softmax, axis=1)
+    #   wrong_logit = tf.reduce_max((1-label_mask) * model.pre_softmax
+    #                               - 1e4*label_mask, axis=1)
+    #   loss = -tf.nn.relu(correct_logit - wrong_logit + 50)
+    # else:
+    #   print('Unknown loss function. Defaulting to cross-entropy')
+    #   loss = model.xent
+    
+    loss = tf.reduce_sum([model.bce_loss for model in self.models])
+    self.grad = tf.reduce_sum([tf.gradients(loss, m.x_input)[0] for m in self.models], 0)
 
   def perturb(self, x_nat, y, org_img, order, sess, targeted=False):
     """Given a set of examples (x_nat, y), returns a set of adversarial
@@ -54,8 +55,8 @@ class LinfPGDAttack:
       x = np.copy(x_nat)
 
     for i in range(self.k):
-      grad = sess.run(self.grad, feed_dict={self.model.x_input: x,
-                                            self.model.y_input: y[0]})
+      tt = dict([(m.x_input,x) for m in self.models]+[(self.models[i].y_input:y[i] for i in range(len(self.models)))])
+      grad = sess.run(self.grad, feed_dict=tt)
 
 
       # x += self.a * np.sign(grad)
@@ -131,7 +132,7 @@ if __name__ == '__main__':
       model = Model(32, nb_labels)
     models.append(model)
     conf = conf_m[:-5]+str(nb_labels*(i+1))+'.npy'
-
+  print(y_test.shape)
 
   permutation_path = config['permutation']
   path = config['store_adv_path'].split('/')[0] + '/sign_'+config['store_adv_path'].split('/')[1]
