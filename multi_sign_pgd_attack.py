@@ -130,7 +130,7 @@ if __name__ == '__main__':
       from model import Model
       model = Model(32, nb_labels)
     models.append(model)
-    conf = conf_m[:-5]+str(nb_labels*(i+1))+'.npy'
+    conf = conf_m[:-6]+str(nb_labels*(i+1))+'.npy'
 
 
   permutation_path = config['permutation']
