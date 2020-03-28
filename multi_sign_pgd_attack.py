@@ -55,7 +55,7 @@ class LinfPGDAttack:
 
     for i in range(self.k):
       grad = sess.run(self.grad, feed_dict={self.model.x_input: x,
-                                            self.model.y_input: y})
+                                            self.model.y_input: y[0]})
 
 
       # x += self.a * np.sign(grad)
@@ -100,16 +100,16 @@ if __name__ == '__main__':
 
   from tensorflow.examples.tutorials.mnist import input_data
 
+  conf = sys.argv[-1]
+  nb_models = int(sys.argv[-3])
+  targeted = (sys.argv[-2] == 'target')
+
   models = []
   lab_permutation = np.load('2_label_permutation.npy')
   if targeted:
     y_lab = np.load('advs_targeted_labels.npy')
   else:
     y_lab = np.load('data/mnist_labels.npy')[60000:]
-
-  conf = sys.argv[-1]
-  nb_models = int(sys.argv[-3])
-  targeted = (sys.argv[-2] == 'target')
 
   for i in range(nb_models):
     with open(conf) as config_file:
@@ -178,7 +178,7 @@ if __name__ == '__main__':
       print('batch size: {}'.format(bend - bstart))
 
       x_batch = x_test[bstart:bend, :]
-      y_batch = y_test[bstart:bend]
+      y_batch = y_test[:,bstart:bend,:]
       org_batch = org_imgs[bstart:bend, :]
 
       x_batch_adv, x_batch_show = attack.perturb(x_batch, y_batch, org_batch, orders, sess, targeted)
