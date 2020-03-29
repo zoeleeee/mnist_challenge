@@ -47,10 +47,11 @@ model = keras.Sequential([keras.layers.Conv2D(32, kernel_size=(5,5), activation=
 
 def custom_loss(y_true, y_pred):
 	if config['loss_func'] == 'bce':
-		loss = keras.losses.BinaryCrossentropy(y_true, y_pred)
+		loss = keras.losses.BinaryCrossentropy()
+		return loss(y_true, y_pred)
 	elif config['loss_func'] == 'xent':
-		loss = keras.losses.SparseCategoricalCrossentropy(y_true, keras.activations.softmax(y_pred))
-	return loss
+		loss = keras.losses.SparseCategoricalCrossentropy()
+		return loss(y_true, keras.activations.softmax(y_pred))
 model.compile(loss=custom_loss, optimizer=keras.optimizers.Adam(1e-3))
 
 x_train, y_train = imgs[:60000], labels[:60000]
