@@ -1,13 +1,16 @@
 from __future__ import print_function
 import tensorflow as tf
 from tensorflow import keras
-from mnist import get_data
+#from mnist import get_data
 from keras.models import Sequential
 from keras.layers import Dense, Dropout, Flatten
 from keras.layers import Conv2D, MaxPooling2D
 from keras import backend as K
 import sys
 import os
+import json
+from utils import load_data
+import numpy as np
 
 conf = sys.argv[-1]
 with open(conf) as config_file:
@@ -44,18 +47,18 @@ model = keras.Sequential([keras.layers.Conv2D(32, kernel_size=(5,5), activation=
 
 def custom_loss(y_true, y_pred):
 	if config['loss_func'] == 'bce':
-		loss = keras.losses.BinaryCrossentropy(y_true, tf.nn.sigmoid(y_pred))
+		loss = keras.losses.BinaryCrossentropy(y_true, y_pred)
 	elif config['loss_func'] == 'xent':
-		loss = keras.losses.SparseCategoricalCrossentropy(y_true, tf.nn.softmax(y_pred))
+		loss = keras.losses.SparseCategoricalCrossentropy(y_true, keras.activations.softmax(y_pred))
 	return loss
-  model.compile(loss=custom_loss, optimizer=keras.optimizer.Adam(1e-3))
+model.compile(loss=custom_loss, optimizer=keras.optimizers.Adam(1e-3))
 
 x_train, y_train = imgs[:60000], labels[:60000]
 x_test, y_test = imgs[60000:], labels[60000:]
 
 epochs = max_num_training_steps * batch_size / len(x_train)
 
-model.fit(x_train, y_train, batch_size=batch_size, epochs=epochs, verbose=0, validation_data=(x_test,y_test))
+model.fit(x_train, y_train, batch_size=batch_size, epochs=epochs, verbose=2, validation_data=(x_test,y_test))
 
 model.save(model_dir+'.h5')
 
