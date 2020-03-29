@@ -14,10 +14,11 @@ from utils import load_data
 
 
 class LinfPGDAttack:
-  def __init__(self, model, epsilon, k, a, random_start, loss_func, nb_labels, input_shape, batch_size):
+  def __init__(self, sess, model, epsilon, k, a, random_start, loss_func, nb_labels, input_shape, batch_size):
     """Attack parameter initialization. The attack performs k steps of
        size a, while always staying within epsilon from the initial
        point."""
+    self.sess = sess
     self.models = models
     self.epsilon = epsilon
     self.k = k
@@ -59,7 +60,7 @@ class LinfPGDAttack:
     # self.setup.append(self.labels.assign(self.assign_labels))
     # self.init = tf.variables_initializer(var_list=)
 
-  def perturb(self, x_nat, y, org_img, order, sess, targeted=False):
+  def perturb(self, x_nat, y, org_img, order, targeted=False):
     """Given a set of examples (x_nat, y), returns a set of adversarial
        examples within epsilon of x_nat in l_infinity norm."""
     if self.rand:
@@ -70,7 +71,7 @@ class LinfPGDAttack:
 
     for i in range(self.k):
       # tt = dict([(m.x_input,x) for m in self.models]+[(self.models[i].y_input:y[i] for i in range(len(self.models)))])
-      grad = sess.run(self.grad, feed_dict={self.assign_input:x, self.assign_labels:y})
+      grad = self.sess.run(self.grad, feed_dict={self.assign_input:x, self.assign_labels:y})
       print(grad.shape, np.sum(np.sign(grad!=0)), np.sum(np.sign(grad>0)))
 
       # x += self.a * np.sign(grad)
@@ -187,7 +188,7 @@ if __name__ == '__main__':
     eval_batch_size = config['eval_batch_size']
     num_batches = int(math.ceil(num_eval_examples / eval_batch_size))
     
-    attack = LinfPGDAttack(models,
+    attack = LinfPGDAttack(sess, models,
                          config['epsilon'],
                          config['k'],
                          config['a'],
@@ -209,7 +210,7 @@ if __name__ == '__main__':
       y_batch = y_test[:,bstart:bend,:]
       org_batch = org_imgs[bstart:bend, :]
 
-      x_batch_adv, x_batch_show = attack.perturb(x_batch, y_batch, org_batch, orders, sess, targeted)
+      x_batch_adv, x_batch_show = attack.perturb(x_batch, y_batch, org_batch, orders, targeted)
 
       x_adv.append(x_batch_adv)
       x_show.append(x_batch_show)
