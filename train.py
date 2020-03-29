@@ -26,8 +26,8 @@ with open(conf) as config_file:
 
 nb_labels = config['num_labels']
 path = config['permutation']
-st_lab = config['start_label']
-lab_perm = np.load('2_label_permutation.npy')[st_lab:st_lab+nb_labels].T
+#st_lab = config['start_label']
+lab_perm = np.load('2_label_permutation.npy')[:nb_labels].T#[st_lab:st_lab+nb_labels].T
 
 # Setting up training parameters
 tf.set_random_seed(config['random_seed'])

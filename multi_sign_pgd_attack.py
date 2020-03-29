@@ -130,6 +130,7 @@ if __name__ == '__main__':
 
   loss = ''
   for i in range(nb_models):
+    print(conf)
     with open(conf) as config_file:
       config = json.load(config_file)
 
