@@ -180,7 +180,7 @@ if __name__ == '__main__':
 
   # idxs = np.arange(x_test.shape[0])
   with tf.Session() as sess:
-    sess.run(tf.global_variables_initializer())
+    sess.run(tf.initialize_all_variables())
 
     # Iterate over the samples batch-by-batch
     num_eval_examples = 20#config['num_eval_examples']
