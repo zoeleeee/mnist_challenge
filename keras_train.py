@@ -59,7 +59,12 @@ x_test, y_test = imgs[60000:], labels[60000:]
 
 epochs = max_num_training_steps * batch_size / len(x_train)
 
-model.fit(x_train, y_train, batch_size=batch_size, epochs=epochs, verbose=2, validation_data=(x_test,y_test))
+chkpt_cb = tf.keras.callbacks.ModelCheckpoint(model_dir+'.h5',
+                                              monitor='val_loss',
+                                              save_best_only=True,
+                                              mode='min')
+
+model.fit(x_train, y_train, batch_size=batch_size, epochs=epochs, verbose=2, validation_data=(x_test,y_test), callbacks=[chkpt_cb])
 
 model.save(model_dir+'.h5')
 
