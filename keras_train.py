@@ -67,7 +67,7 @@ chkpt_cb = tf.keras.callbacks.ModelCheckpoint(model_dir+'.h5',
                                               save_best_only=True,
                                               mode='min')
 
-model.fit(x_train, y_train, batch_size=batch_size, epochs=epochs, verbose=2, validation_data=(x_test,y_test), callbacks=[chkpt_cb])
+model.fit(x_train, y_train, batch_size=batch_size, epochs=int(epochs), verbose=2, validation_data=(x_test,y_test), callbacks=[chkpt_cb])
 #>>>>>>> refs/remotes/origin/master
 
 #model.save(model_dir+'.h5')
