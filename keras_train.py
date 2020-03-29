@@ -48,7 +48,7 @@ model = keras.Sequential([keras.layers.Conv2D(32, kernel_size=(5,5), activation=
 def custom_loss(y_true, y_pred):
 	if config['loss_func'] == 'bce':
 		loss = keras.losses.BinaryCrossentropy()
-		return loss(y_true, y_pred)
+		return loss(y_true, tf.nn.sigmoid(y_pred))
 	elif config['loss_func'] == 'xent':
 		loss = keras.losses.SparseCategoricalCrossentropy()
 		return loss(y_true, keras.activations.softmax(y_pred))
@@ -59,12 +59,16 @@ x_test, y_test = imgs[60000:], labels[60000:]
 
 epochs = max_num_training_steps * batch_size / len(x_train)
 
+#<<<<<<< HEAD
+#model.fit(x_train, y_train, batch_size=batch_size, epochs=int(epochs), verbose=2, validation_data=(x_test,y_test))
+#=======
 chkpt_cb = tf.keras.callbacks.ModelCheckpoint(model_dir+'.h5',
                                               monitor='val_loss',
                                               save_best_only=True,
                                               mode='min')
 
-model.fit(x_train, y_train, batch_size=batch_size, epochs=epochs, verbose=2, validation_data=(x_test,y_test), callbacks=[chkpt_cb])
+model.fit(x_train, y_train, batch_size=batch_size, epochs=int(epochs), verbose=2, validation_data=(x_test,y_test), callbacks=[chkpt_cb])
+#>>>>>>> refs/remotes/origin/master
 
-model.save(model_dir+'.h5')
+#model.save(model_dir+'.h5')
 

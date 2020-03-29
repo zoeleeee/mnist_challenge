@@ -43,7 +43,8 @@ class LinfPGDAttack:
     #   loss = model.xent
     self.input = tf.placeholder(tf.float32, shape=[None, 28, 28, input_shape[-1]])
     self.labels = tf.placeholder(tf.float32, shape=[len(models), None, nb_labels])
-    loss = tf.reduce_sum([keras.losses.BinaryCrossentropy(self.labels, tf.nn.sigmoid(model.predict(self.input))) for model in self.models])
+    bce_loss = keras.losses.BinaryCrossentropy()
+    loss = tf.reduce_sum([bce_loss(self.labels[i], tf.nn.sigmoid(model.predict(self.input))) for i,model in enumerate(self.models)])
     # self.grad = tf.reduce_sum([tf.gradients(loss, )[0] for m in self.models], 0)
     self.grad = tf.gradients(loss, self.input)
 
@@ -59,7 +60,7 @@ class LinfPGDAttack:
 
     for i in range(self.k):
       # tt = dict([(m.x_input,x) for m in self.models]+[(self.models[i].y_input:y[i] for i in range(len(self.models)))])
-      grad = sess.run(self.grad, feed_dict={self.input:x, self.labels=y})
+      grad = sess.run(self.grad, feed_dict={self.input:x, self.labels:y})
       print(grad.shape, np.sum(np.sign(grad!=0)), np.sum(np.sign(grad>0)))
 
       # x += self.a * np.sign(grad)
