@@ -41,6 +41,7 @@ class LinfPGDAttack:
     # else:
     #   print('Unknown loss function. Defaulting to cross-entropy')
     #   loss = model.xent
+    
     self.input = tf.placeholder(tf.float32, shape=[None, 28, 28, input_shape[-1]])
     self.labels = tf.placeholder(tf.float32, shape=[len(models), None, nb_labels])
     bce_loss = keras.losses.BinaryCrossentropy()
