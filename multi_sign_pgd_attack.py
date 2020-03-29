@@ -14,7 +14,7 @@ from utils import load_data
 
 
 class LinfPGDAttack:
-  def __init__(self, model, epsilon, k, a, random_start, loss_func, nb_labels):
+  def __init__(self, model, epsilon, k, a, random_start, loss_func, nb_labels, input_shape):
     """Attack parameter initialization. The attack performs k steps of
        size a, while always staying within epsilon from the initial
        point."""
@@ -23,8 +23,7 @@ class LinfPGDAttack:
     self.k = k
     self.a = a
     self.rand = random_start
-    self.input = tf.placeholder(tf.float32, models[0].input.shape)
-    self.labels = tf.placeholder(tf.float32, models[0].output.shape*len(models))
+
     # if loss_func == 'xent':
     #   loss = model.xent
     # elif loss_func == 'bce':
@@ -42,9 +41,12 @@ class LinfPGDAttack:
     # else:
     #   print('Unknown loss function. Defaulting to cross-entropy')
     #   loss = model.xent
-    
-    loss = tf.reduce_sum([model.bce_loss for model in self.models])
-    self.grad = tf.reduce_sum([tf.gradients(loss, m.x_input)[0] for m in self.models], 0)
+    self.input = tf.placeholder(tf.float32, shape=[None, 28, 28, input_shape[-1]])
+    self.labels = tf.placeholder(tf.float32, shape=[len(models), None, nb_labels])
+    loss = tf.reduce_sum([keras.losses.BinaryCrossentropy(self.labels, tf.nn.sigmoid(model.predict(self.input))) for model in self.models])
+    # self.grad = tf.reduce_sum([tf.gradients(loss, )[0] for m in self.models], 0)
+    self.grad = tf.gradients(loss, self.input)
+
 
   def perturb(self, x_nat, y, org_img, order, sess, targeted=False):
     """Given a set of examples (x_nat, y), returns a set of adversarial
@@ -56,8 +58,8 @@ class LinfPGDAttack:
       x = np.copy(x_nat)
 
     for i in range(self.k):
-      tt = dict([(m.x_input,x) for m in self.models]+[(self.models[i].y_input:y[i] for i in range(len(self.models)))])
-      grad = sess.run(self.grad, feed_dict=tt)
+      # tt = dict([(m.x_input,x) for m in self.models]+[(self.models[i].y_input:y[i] for i in range(len(self.models)))])
+      grad = sess.run(self.grad, feed_dict={self.input:x, self.labels=y})
       print(grad.shape, np.sum(np.sign(grad!=0)), np.sum(np.sign(grad>0)))
 
       # x += self.a * np.sign(grad)
@@ -106,7 +108,7 @@ if __name__ == '__main__':
   nb_models = int(sys.argv[-3])
   targeted = (sys.argv[-2] == 'target')
 
-  models = []
+  models, y_test = [], []
   lab_permutation = np.load('2_label_permutation.npy')
   if targeted:
     y_lab = np.load('advs_targeted_labels.npy')
@@ -132,8 +134,8 @@ if __name__ == '__main__':
     if loss == 'bce':
       lab_perm = lab_permutation[config['start_label']:config['start_label']+nb_labels]
       y_test.append([lab_perm[i] for i in y_lab])
-
-    conf = conf_m[:-5]+str(nb_labels*(i+1))+'.npy'
+    conf = conf[:-6]+str(nb_labels*(i+1))+'.json'
+  y_test = np.array(y_test).astype(np.float32)
   print(y_test.shape)
 
   permutation_path = config['permutation']
@@ -158,12 +160,10 @@ if __name__ == '__main__':
                          config['random_start'],
                          config['loss_func'],
                          nb_labels)
-  saver = tf.train.Saver()
 
   # idxs = np.arange(x_test.shape[0])
   with tf.Session() as sess:
-    # Restore the checkpoint
-    saver.restore(sess, model_file)
+    sess.run(tf.global_variables_initializer())
 
     # Iterate over the samples batch-by-batch
     num_eval_examples = 20#config['num_eval_examples']
