@@ -8,6 +8,7 @@ from __future__ import division
 from __future__ import print_function
 
 import tensorflow as tf
+from tensorflow import keras
 import numpy as np
 from utils import load_data
 
@@ -112,25 +113,26 @@ if __name__ == '__main__':
   else:
     y_lab = np.load('data/mnist_labels.npy')[60000:]
 
+  loss = ''
   for i in range(nb_models):
     with open(conf) as config_file:
       config = json.load(config_file)
 
     model_file = tf.train.latest_checkpoint(config['model_dir'])
+    model = keras.models.load_model(config['model_dir']+'.h5')
+    models.append(model)
+    if loss == '':
+        loss = config['loss_func']
+    elif loss != config_file['loss_func']:
+        print('loss func inconsistent')
+        exit()
 
-    if model_file is None:
-      print('No model found')
-      sys.exit()
     nb_labels = config['num_labels']
-    if config['loss_func'] == 'bce':
-      from multi_model import Model
-      model = Model(32, nb_labels)
+
+    if loss == 'bce':
       lab_perm = lab_permutation[config['start_label']:config['start_label']+nb_labels]
       y_test.append([lab_perm[i] for i in y_lab])
-    elif config['loss_func'] == 'xent':
-      from model import Model
-      model = Model(32, nb_labels)
-    models.append(model)
+
     conf = conf_m[:-5]+str(nb_labels*(i+1))+'.npy'
   print(y_test.shape)
 
