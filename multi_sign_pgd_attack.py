@@ -50,7 +50,7 @@ class LinfPGDAttack:
     self.labels.assign(self.assign_labels)
 
     bce_loss = keras.losses.BinaryCrossentropy()
-    loss = tf.reduce_sum([bce_loss(self.labels[i], tf.nn.sigmoid(model.predict(self.input, steps=1))) for i,model in enumerate(self.models)])
+    loss = tf.reduce_sum([bce_loss(self.assign_labels[i], tf.nn.sigmoid(model.predict(self.assign_input, steps=1))) for i,model in enumerate(self.models)])
     # self.grad = tf.reduce_sum([tf.gradients(loss, )[0] for m in self.models], 0)
     self.grad = tf.gradients(loss, self.input)
 
