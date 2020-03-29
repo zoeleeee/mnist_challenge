@@ -176,13 +176,7 @@ if __name__ == '__main__':
   # mnist = input_data.read_data_sets('MNIST_data', one_hot=False)
 
   # model = Model(input_shape[-1], nb_labels)
-  attack = LinfPGDAttack(models,
-                         config['epsilon'],
-                         config['k'],
-                         config['a'],
-                         config['random_start'],
-                         config['loss_func'],
-                         nb_labels, input_shape, config['eval_batch_size'])
+  
 
   # idxs = np.arange(x_test.shape[0])
   with tf.Session() as sess:
@@ -192,6 +186,14 @@ if __name__ == '__main__':
     num_eval_examples = 20#config['num_eval_examples']
     eval_batch_size = config['eval_batch_size']
     num_batches = int(math.ceil(num_eval_examples / eval_batch_size))
+    
+    attack = LinfPGDAttack(models,
+                         config['epsilon'],
+                         config['k'],
+                         config['a'],
+                         config['random_start'],
+                         config['loss_func'],
+                         nb_labels, input_shape, config['eval_batch_size'])
 
     x_adv = [] # adv accumulator
     x_show = []
