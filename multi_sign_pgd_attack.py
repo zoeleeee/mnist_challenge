@@ -55,7 +55,7 @@ class LinfPGDAttack:
       x = np.copy(x_nat)
 
     for i in range(self.k):
-      tt = dict([(m.x_input,x) for m in self.models]+[(self.models[i].y_input:y[i] for i in range(len(self.models)))])
+      tt = dict([(m.x_input,x) for m in self.models]+[(self.models[i].y_input,y[i]) for i in range(len(self.models))])
       grad = sess.run(self.grad, feed_dict=tt)
       print(grad.shape, np.sum(np.sign(grad!=0)), np.sum(np.sign(grad>0)))
 
@@ -133,6 +133,7 @@ if __name__ == '__main__':
     models.append(model)
 
     conf = conf[:-6]+str(nb_labels*(i+1))+'.json'
+  y_test= np.array(y_test).astype(np.float)
   print(y_test.shape)
 
   permutation_path = config['permutation']
