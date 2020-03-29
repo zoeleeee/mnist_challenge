@@ -120,8 +120,16 @@ if __name__ == '__main__':
     with open(conf) as config_file:
       config = json.load(config_file)
 
+    def custom_loss(y_true, y_pred):
+    if config['loss_func'] == 'bce':
+        loss = keras.losses.BinaryCrossentropy()
+        return loss(y_true, y_pred)
+    elif config['loss_func'] == 'xent':
+        loss = keras.losses.SparseCategoricalCrossentropy()
+        return loss(y_true, keras.activations.softmax(y_pred))
+
     model_file = tf.train.latest_checkpoint(config['model_dir'])
-    model = keras.models.load_model(config['model_dir']+'.h5')
+    model = keras.models.load_model(config['model_dir']+'.h5', , custom_objects={ 'loss': custom_loss })
     models.append(model)
     if loss == '':
         loss = config['loss_func']
@@ -137,6 +145,8 @@ if __name__ == '__main__':
     conf = conf[:-6]+str(nb_labels*(i+1))+'.json'
   y_test = np.array(y_test).astype(np.float32)
   print(y_test.shape)
+
+
 
   permutation_path = config['permutation']
   path = config['store_adv_path'].split('/')[0] + '/sign_'+config['store_adv_path'].split('/')[1]
