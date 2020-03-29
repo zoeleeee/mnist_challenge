@@ -46,14 +46,13 @@ class LinfPGDAttack:
     self.assign_input = tf.placeholder(tf.float32, shape=[batch_size, 28, 28, input_shape[-1]])
     self.assign_labels = tf.placeholder(tf.float32, shape=[len(models), batch_size, nb_labels])
 
-    self.input.assign(self.assign_input)
-    self.labels.assign(self.assign_labels)
-
     bce_loss = keras.losses.BinaryCrossentropy()
     loss = tf.reduce_sum([bce_loss(self.labels[i], tf.nn.sigmoid(model.predict(self.input, steps=1))) for i,model in enumerate(self.models)])
     # self.grad = tf.reduce_sum([tf.gradients(loss, )[0] for m in self.models], 0)
     self.grad = tf.gradients(loss, self.input)
 
+    self.input.assign(self.assign_input)
+    self.labels.assign(self.assign_labels)
 
     # self.setup = []
     # self.setup.append(self.input.assign(self.assign_input))
