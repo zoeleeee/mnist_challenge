@@ -14,7 +14,7 @@ from utils import load_data
 
 
 class LinfPGDAttack:
-  def __init__(self, model, epsilon, k, a, random_start, loss_func, nb_labels, input_shape):
+  def __init__(self, model, epsilon, k, a, random_start, loss_func, nb_labels, input_shape, batch_size):
     """Attack parameter initialization. The attack performs k steps of
        size a, while always staying within epsilon from the initial
        point."""
@@ -41,14 +41,24 @@ class LinfPGDAttack:
     # else:
     #   print('Unknown loss function. Defaulting to cross-entropy')
     #   loss = model.xent
-    
-    self.input = tf.placeholder(tf.float32, shape=[None, 28, 28, input_shape[-1]])
-    self.labels = tf.placeholder(tf.float32, shape=[len(models), None, nb_labels])
+    self.input = tf.Variable(np.zeros([batch_size, 28, 28, input_shape[-1]]), dtype=tf.float32, name='input')
+    self.labels = tf.Variable(np.zeros([len(models), batch_size, nb_labels]), dtype=tf.float32, name='labels')
+    self.assign_input = tf.placeholder(tf.float32, shape=[batch_size, 28, 28, input_shape[-1]])
+    self.assign_labels = tf.placeholder(tf.float32, shape=[len(models), batch_size, nb_labels])
+
+    self.input.assign(self.assign_input)
+    self.labels.assign(self.assign_labels)
+
     bce_loss = keras.losses.BinaryCrossentropy()
-    loss = tf.reduce_sum([bce_loss(self.labels[i], tf.nn.sigmoid(model.predict(self.input))) for i,model in enumerate(self.models)])
+    loss = tf.reduce_sum([bce_loss(self.labels[i], tf.nn.sigmoid(model.predict(self.input, steps=1))) for i,model in enumerate(self.models)])
     # self.grad = tf.reduce_sum([tf.gradients(loss, )[0] for m in self.models], 0)
     self.grad = tf.gradients(loss, self.input)
 
+
+    # self.setup = []
+    # self.setup.append(self.input.assign(self.assign_input))
+    # self.setup.append(self.labels.assign(self.assign_labels))
+    # self.init = tf.variables_initializer(var_list=)
 
   def perturb(self, x_nat, y, org_img, order, sess, targeted=False):
     """Given a set of examples (x_nat, y), returns a set of adversarial
@@ -61,7 +71,7 @@ class LinfPGDAttack:
 
     for i in range(self.k):
       # tt = dict([(m.x_input,x) for m in self.models]+[(self.models[i].y_input:y[i] for i in range(len(self.models)))])
-      grad = sess.run(self.grad, feed_dict={self.input:x, self.labels:y})
+      grad = sess.run(self.grad, feed_dict={self.assign_input:x, self.assign_labels:y})
       print(grad.shape, np.sum(np.sign(grad!=0)), np.sum(np.sign(grad>0)))
 
       # x += self.a * np.sign(grad)
@@ -122,27 +132,29 @@ if __name__ == '__main__':
     with open(conf) as config_file:
       config = json.load(config_file)
 
-    def custom_loss(y_true, y_pred):
-    if config['loss_func'] == 'bce':
-        loss = keras.losses.BinaryCrossentropy()
-        return loss(y_true, y_pred)
-    elif config['loss_func'] == 'xent':
-        loss = keras.losses.SparseCategoricalCrossentropy()
-        return loss(y_true, keras.activations.softmax(y_pred))
-
-    model_file = tf.train.latest_checkpoint(config['model_dir'])
-    model = keras.models.load_model(config['model_dir']+'.h5', , custom_objects={ 'loss': custom_loss })
+    def custom_loss():
+      def loss(y_true, y_pred):
+        if config['loss_func'] == 'bce':
+            _loss = keras.losses.BinaryCrossentropy()
+            return _loss(y_true, tf.nn.sigmoid(y_pred))
+        elif config['loss_func'] == 'xent':
+            _loss = keras.losses.SparseCategoricalCrossentropy()
+            return _loss(y_true, tf.nn.softmax(y_pred))
+        return loss
+#   keras.losses.custom_loss = custom_loss
+    #model_file = tf.train.latest_checkpoint(config['model_dir'])
+    model = keras.models.load_model(config['model_dir']+'.h5', custom_objects={ 'custom_loss': custom_loss(), 'loss':custom_loss() }, compile=False)
     models.append(model)
-    if loss == '':
-        loss = config['loss_func']
-    elif loss != config_file['loss_func']:
-        print('loss func inconsistent')
-        exit()
-
+#    if loss == '':
+#        loss = config['loss_func']
+#    elif loss != config_file['loss_func']:
+#        print('loss func inconsistent')
+#        exit()
+#
     nb_labels = config['num_labels']
 
-    if loss == 'bce':
-      lab_perm = lab_permutation[config['start_label']:config['start_label']+nb_labels]
+    if config['loss_func'] == 'bce':
+      lab_perm = lab_permutation[config['start_label']:config['start_label']+nb_labels].T
       y_test.append([lab_perm[i] for i in y_lab])
     conf = conf[:-6]+str(nb_labels*(i+1))+'.json'
   y_test = np.array(y_test).astype(np.float32)
@@ -171,7 +183,7 @@ if __name__ == '__main__':
                          config['a'],
                          config['random_start'],
                          config['loss_func'],
-                         nb_labels)
+                         nb_labels, input_shape, config['eval_batch_size'])
 
   # idxs = np.arange(x_test.shape[0])
   with tf.Session() as sess:
