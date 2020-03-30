@@ -7,7 +7,7 @@ from utils import load_data
 def hamming_idxs(scores, config):
 	res = []
 	nb_labels = config['num_labels']
-	rep = np.load('2_label_permutation.npy')[:nb_labels].T
+	rep = np.load('2_label_permutation.npy')[:scores.shape[-1]].T
 
 	imgs, labels, input_shape = load_data(config['permutation'], nb_labels)
 	labels = labels[60000:60000+len(scores)]

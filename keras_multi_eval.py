@@ -25,7 +25,8 @@ eval_batch_size = config['eval_batch_size']
 eval_on_cpu = config['eval_on_cpu']
 nb_labels = config['num_labels']
 model_dir = config['model_dir']
-rep = np.load('2_label_permutation.npy')[:nb_labels].T
+st_lab = config['start_label']
+rep = np.load('2_label_permutation.npy')[st_lab:st_lab+nb_labels].T
 
 #if dataset == 'origin.npy':
 imgs, labels, input_shape = load_data(config['permutation'], config['num_labels'])
@@ -41,7 +42,7 @@ if len(x_test.shape) == 3:
   x_test = x_test.reshape(x_test.shape[0], x_test.shape[1], x_test.shape[2], 1)
 print(x_test.shape, len(x_test))
 
-model = keras.models.load_model(model_dir+'.h5')
+model = keras.models.load_model(model_dir+'.h5', custom_objects={ 'custom_loss': custom_loss(), 'loss':custom_loss() }, compile=False)
 
 output = model.predict(x_test, batch_size=eval_batch_size)
 nat_labels = np.zeros(output.shape).astype(np.float32)

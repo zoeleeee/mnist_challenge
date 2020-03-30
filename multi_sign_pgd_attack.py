@@ -42,18 +42,18 @@ class LinfPGDAttack:
     # else:
     #   print('Unknown loss function. Defaulting to cross-entropy')
     #   loss = model.xent
-    self.input = tf.Variable(np.zeros([batch_size, 28, 28, input_shape[-1]]), dtype=tf.float32, name='input')
-    self.labels = tf.Variable(np.zeros([len(models), batch_size, nb_labels]), dtype=tf.float32, name='labels')
+#    self.input = tf.Variable(np.zeros([batch_size, 28, 28, input_shape[-1]]), dtype=tf.float32, name='input')
+#    self.labels = tf.Variable(np.zeros([len(models), batch_size, nb_labels]), dtype=tf.float32, name='labels')
     self.assign_input = tf.placeholder(tf.float32, shape=[batch_size, 28, 28, input_shape[-1]])
     self.assign_labels = tf.placeholder(tf.float32, shape=[len(models), batch_size, nb_labels])
 
     bce_loss = keras.losses.BinaryCrossentropy()
-    loss = tf.reduce_sum([bce_loss(self.assign_labels[i], tf.nn.sigmoid(model.predict(self.input, steps=1))) for i,model in enumerate(self.models)])
+    loss = tf.reduce_sum([bce_loss(self.assign_labels[i], tf.nn.sigmoid(model(self.assign_input))) for i,model in enumerate(self.models)])
     # self.grad = tf.reduce_sum([tf.gradients(loss, )[0] for m in self.models], 0)
-    self.grad = tf.gradients(loss, self.input)
+    self.grad = tf.gradients(loss, self.assign_input)
 
-    self.input.assign(self.assign_input)
-    self.labels.assign(self.assign_labels)
+ #   self.input.assign(self.assign_input)
+ #   self.labels.assign(self.assign_labels)
 
     # self.setup = []
     # self.setup.append(self.input.assign(self.assign_input))
@@ -73,7 +73,8 @@ class LinfPGDAttack:
       # tt = dict([(m.x_input,x) for m in self.models]+[(self.models[i].y_input:y[i] for i in range(len(self.models)))])
       grad = sess.run(self.grad, feed_dict={self.assign_input:x, self.assign_labels:y})
       grad = np.array(grad)[0]
-      print(grad.shape, np.sum(np.sign(grad!=0)), np.sum(np.sign(grad>0)))
+
+      print(grad.shape, np.sum(np.sign(grad)==0), np.sum(np.sign(grad)>0))
 
       # x += self.a * np.sign(grad)
       if targeted:
@@ -130,6 +131,7 @@ if __name__ == '__main__':
 
   loss = ''
   for i in range(nb_models):
+    print(conf)
     with open(conf) as config_file:
       config = json.load(config_file)
 
@@ -188,9 +190,14 @@ if __name__ == '__main__':
 
   # idxs = np.arange(x_test.shape[0])
   with tf.Session() as sess:
+#<<<<<<< HEAD
+#    sess.run(tf.initialize_all_variables())
+
+#=======
     sess.run(tf.global_variables_initializer())
+#>>>>>>> df2b83375f333e49e3c1110078c38addf93fad74
     # Iterate over the samples batch-by-batch
-    num_eval_examples = 20#config['num_eval_examples']
+    num_eval_examples = config['num_eval_examples']
     eval_batch_size = config['eval_batch_size']
     num_batches = int(math.ceil(num_eval_examples / eval_batch_size))
     
