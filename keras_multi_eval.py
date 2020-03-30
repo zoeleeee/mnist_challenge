@@ -25,7 +25,8 @@ eval_batch_size = config['eval_batch_size']
 eval_on_cpu = config['eval_on_cpu']
 nb_labels = config['num_labels']
 model_dir = config['model_dir']
-rep = np.load('2_label_permutation.npy')[:nb_labels].T
+st_lab = config['start_label']
+rep = np.load('2_label_permutation.npy')[st_lab:st_lab+nb_labels].T
 
 #if dataset == 'origin.npy':
 imgs, labels, input_shape = load_data(config['permutation'], config['num_labels'])
