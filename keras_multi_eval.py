@@ -43,14 +43,14 @@ if len(x_test.shape) == 3:
 print(x_test.shape, len(x_test))
 
 def custom_loss():
-    def loss(y_true, y_pred):
-     	if config['loss_func'] == 'bce':
-            _loss = keras.losses.BinaryCrossentropy()
-            return _loss(y_true, tf.nn.sigmoid(y_pred))
-        elif config['loss_func'] == 'xent':
-            _loss = keras.losses.SparseCategoricalCrossentropy()
-            return _loss(y_true, tf.nn.softmax(y_pred))
-        return loss
+  def loss(y_true, y_pred):
+    if config['loss_func'] == 'bce':
+      _loss = keras.losses.BinaryCrossentropy()
+      return _loss(y_true, tf.nn.sigmoid(y_pred))
+    elif config['loss_func'] == 'xent':
+      _loss = keras.losses.SparseCategoricalCrossentropy()
+      return _loss(y_true, tf.nn.softmax(y_pred))
+  return loss
 
 model = keras.models.load_model(model_dir+'.h5', custom_objects={ 'custom_loss': custom_loss(), 'loss':custom_loss() }, compile=False)
 
