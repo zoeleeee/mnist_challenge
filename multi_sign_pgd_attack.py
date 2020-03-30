@@ -72,6 +72,7 @@ class LinfPGDAttack:
     for i in range(self.k):
       # tt = dict([(m.x_input,x) for m in self.models]+[(self.models[i].y_input:y[i] for i in range(len(self.models)))])
       grad = sess.run(self.grad, feed_dict={self.assign_input:x, self.assign_labels:y})
+      grad = np.array(grad)[0]
       print(grad.shape, np.sum(np.sign(grad!=0)), np.sum(np.sign(grad>0)))
 
       # x += self.a * np.sign(grad)
