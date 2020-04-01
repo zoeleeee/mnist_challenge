@@ -46,8 +46,8 @@ nat_dist, correct_idxs, error_idxs = hamming_idxs(np.load('preds/pred_{}_origin.
 ts = np.arange(np.max(preds_dist))
 
 for t in ts:
-	corr_idx = correct_idxs[nat_dist[correct_idxs]<t]
+	corr_idx = correct_idxs[nat_dist[correct_idxs]<t+1]
 	idxs = np.intersect1d(adv_idxs, corr_idx)
 
-	print('{} advs acc: {} / {} = {:.2f}%'.format(t, np.sum(preds_dist[idxs[preds[idxs] == advs_label[idxs]]] < t), len(idxs), np.sum(preds_dist[idxs[preds[idxs] == advs_label[idxs]]] < t) / len(idxs)*100))
-	print('{} acc: {} / {} = {:.2f}%'.format(t, np.sum(preds_dist[idxs[preds[idxs] == labels[idxs]]] < t), len(idxs), np.sum(preds_dist[idxs[preds[idxs] == labels[idxs]]] < t) / len(idxs)*100))
+	print('{} advs acc: {} / {} = {:.2f}%'.format(t, np.sum(preds_dist[idxs[preds[idxs] == advs_label[idxs]]] < t+1), len(idxs), np.sum(preds_dist[idxs[preds[idxs] == advs_label[idxs]]] < t+1) / len(idxs)*100))
+	print('{} acc: {} / {} = {:.2f}%'.format(t, np.sum(preds_dist[idxs[preds[idxs] == labels[idxs]]] < t+1), len(idxs), np.sum(preds_dist[idxs[preds[idxs] == labels[idxs]]] < t+1) / len(idxs)*100))
