@@ -158,8 +158,8 @@ if __name__ == '__main__':
 
     if config['loss_func'] == 'bce':
       lab_perm = lab_permutation[config['start_label']:config['start_label']+nb_labels].T
-      y_test.append([lab_perm[i] for i in y_lab])
-    conf = conf[:-6]+str(nb_labels*(i+1))+'.json'
+      y_test.append([lab_perm[j] for j in y_lab])
+    conf = conf[:conf.find(conf.split('_')[-1])]+str(nb_labels*(i+1))+'.json'
   y_test = np.array(y_test).astype(np.float32)
   print(y_test.shape)
 

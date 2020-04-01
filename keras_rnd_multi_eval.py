@@ -16,7 +16,7 @@ from utils import load_data, extend_data
 import numpy as np
 
 conf = sys.argv[-1]
-dataset = sys.argv[-2]
+#dataset = sys.argv[-2]
 # Global constants
 with open(conf) as config_file:
   config = json.load(config_file)
@@ -63,8 +63,8 @@ while True:
     print(tot_amt, 'total adversarial acc:', tot_advs_acc)
   else:
     tot_amt += 1
-    noise = np.random.randint(0, int(config['epsilon']*255, x_test.shape))
-    samples = np.array([[[permut[d[0]] for d in c] for c in b] for b in (x_test+noise).astype(np.int)])
+    noise = np.clip(np.random.randint(0, int(config['epsilon']*255), x_test.shape)+x_test, 0, 255).astype(np.int)
+    samples = np.array([[[permut[d[0]] for d in c] for c in b] for b in noise])
     x_test = samples.astype(np.float32) / 255.
     output = model.predict(x_test, batch_size=eval_batch_size)
     nat_labels = np.zeros(output.shape).astype(np.float32)
