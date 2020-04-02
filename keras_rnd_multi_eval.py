@@ -16,6 +16,8 @@ from utils import load_data, extend_data
 import numpy as np
 
 conf = sys.argv[-1]
+nb_models = int(sys.argv[-2])
+t = int(sys.argv[-3])
 #dataset = sys.argv[-2]
 # Global constants
 with open(conf) as config_file:
@@ -24,16 +26,15 @@ num_eval_examples = config['num_eval_examples']
 eval_batch_size = config['eval_batch_size']
 eval_on_cpu = config['eval_on_cpu']
 nb_labels = config['num_labels']
-model_dir = config['model_dir']
 st_lab = config['start_label']
-rep = np.load('2_label_permutation.npy')[st_lab:st_lab+nb_labels].T
+# rep = np.load('2_label_permutation.npy')[st_lab:st_lab+nb_labels].T
 
 #if dataset == 'origin.npy':
 # imgs, labels, input_shape = load_data(config['permutation'], config['num_labels'])
 labels = np.load('data/mnist_labels.npy')
 imgs = np.load('data/mnist_data.npy').transpose((0,2,3,1))
 permut = np.load(config['permutation'])
-labels = np.array([rep[i] for i in labels]).astype(np.float32)
+# labels = np.array([rep[i] for i in labels]).astype(np.float32)
 x_train, y_train = imgs[:60000], labels[:60000]
 x_test, y_test = imgs[60000:], labels[60000:]
 
@@ -51,7 +52,13 @@ def custom_loss():
       return _loss(y_true, tf.nn.softmax(y_pred))
   return loss
 
-model = keras.models.load_model(model_dir+'.h5', custom_objects={ 'custom_loss': custom_loss(), 'loss':custom_loss() }, compile=False)
+models = []
+for i in range(nb_models):
+  with open(conf) as config_file:
+    config = json.load(config_file)
+  model_dir = config['model_dir']
+  models.append(keras.models.load_model(model_dir+'.h5', custom_objects={ 'custom_loss': custom_loss(), 'loss':custom_loss() }, compile=False))
+  conf = conf[:conf.find(conf.split('_')[-1])]+str(nb_labels*(i+1))+'.json'
 
 tot_advs_acc = np.zeros(len(y_test))
 tot_amt = 0
@@ -66,13 +73,24 @@ while True:
     noise = np.clip(np.random.randint(0, int(config['epsilon']*255), x_test.shape)+x_test, 0, 255).astype(np.int)
     samples = np.array([[[permut[d[0]] for d in c] for c in b] for b in noise])
     x_test = samples.astype(np.float32) / 255.
-    output = model.predict(x_test, batch_size=eval_batch_size)
-    nat_labels = np.zeros(output.shape).astype(np.float32)
+    scores = []
+    for i in range(nb_models):
+      outs.append(model.predict(x_test, batch_size=eval_batch_size))
+    scores = np.hstack(scores)
     nat_labels[output>=0.5] = 1.
-    nat_dists = np.sum(np.absolute(nat_labels-y_test), axis=-1)
-    tot_advs_acc[nat_dists != 0] = 1.
+    preds, preds_dist, pred_scores = [], [], []
+    print(outs.shape)
+    for i in range(len(nat_labels)):
+      tmp = np.repeat([nat_labels[i]], rep.shape[0], axis=0)
+      dists = np.sum(np.absolute(tmp-rep), axis=-1)
+      min_dist = np.min(dists)
+      pred_labels = np.arange(len(dists))[dists==min_dist]
+      pred_scores = [np.sum([scores[i][k] if rep[j][k]==1 else 1-scores[i][k] for k in np.arange(len(scores[i]))]) for j in pred_labels]
+      pred_label = pred_labels[np.argmax(pred_scores)]
+      preds.append(pred_label)
+      preds_dist.append(dists[pred_label])
+      preds_score.append(np.max(pred_scores))
+    error_idxs = np.arange(len(preds))[preds != y_test]
+    tot_advs_acc[preds_dist[error_idxs] <= t] = 1
 
-    print('natural: {:.2f}%'.format(100 * np.mean(nat_dists != 0)))
-    # np.save('preds/pred_{}_{}'.format(model_dir.split('/')[1], dataset.split('/')[-1]), output)
-
-
+    print('{} natural: {:.2f}%; total adversarial acc:{}'.format(tot_amt, 100 * np.mean(nat_dists != 0), np.mean(tot_advs_acc)))
