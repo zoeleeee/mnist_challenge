@@ -70,9 +70,9 @@ while True:
     nat_labels = np.zeros(output.shape).astype(np.float32)
     nat_labels[output>=0.5] = 1.
     nat_dists = np.sum(np.absolute(nat_labels-y_test), axis=-1)
-    tot_advs_acc[nat_dists == 0] = 1.
+    tot_advs_acc[nat_dists != 0] = 1.
 
-    print('natural: {:.2f}%'.format(100 * np.mean(nat_dists == 0)))
+    print('{} natural: {:.2f}%; total adversarial acc:{}'.format(tot_amt, 100 * np.mean(nat_dists != 0), tot_advs_acc))
     # np.save('preds/pred_{}_{}'.format(model_dir.split('/')[1], dataset.split('/')[-1]), output)
 
 
