@@ -18,6 +18,7 @@ import numpy as np
 conf = sys.argv[-1]
 nb_models = int(sys.argv[-2])
 t = int(sys.argv[-3])
+nb_imgs = int(sys.argv[-4])
 #dataset = sys.argv[-2]
 # Global constants
 with open(conf) as config_file:
@@ -36,7 +37,7 @@ imgs = np.load('data/mnist_data.npy').transpose((0,2,3,1))
 permut = np.load(config['permutation'])
 # labels = np.array([rep[i] for i in labels]).astype(np.float32)
 x_train, y_train = imgs[:60000], labels[:60000]
-x_test, y_test = imgs[60000:], labels[60000:]
+x_test, y_test = imgs[-nb_imgs:], labels[-nb_imgs:]
 
 if len(x_test.shape) == 3:
   x_test = x_test.reshape(x_test.shape[0], x_test.shape[1], x_test.shape[2], 1)
@@ -62,6 +63,7 @@ for i in range(nb_models):
 
 tot_advs_acc = np.zeros(len(y_test))
 tot_amt = 0
+rnd_imgs = np.zeros(imgs[-nb_imgs:].shape)
 while True:
   if np.mean(tot_advs_acc) == 1.: 
     print(tot_amt, 'totally attacked succeed!')
@@ -94,6 +96,8 @@ while True:
     error_idxs = np.arange(len(preds))[preds != y_test]
     preds = np.array(preds)
     preds_dist = np.array(preds_dist)
-    tot_advs_acc[error_idxs[preds_dist[preds!=y_test]<= t]] = 1
-
+    tot_advs_acc[error_idxs[preds_dist[preds!=y_test]<= t]] = 1.
+    rnd_imgs[error_idxs[preds_dist[preds!=y_test]<= t] = noise[error_idxs[preds_dist[preds!=y_test]<= t]
+    if tot_amt % 100 == 0:
+      np.save('advs/rnd_100_25_256.32.npy', rnd_imgs)
     print('{} natural: {:.2f}%; total adversarial acc:{}'.format(tot_amt, np.sum(preds_dist[preds!=y_test] <= t), np.mean(tot_advs_acc)))
