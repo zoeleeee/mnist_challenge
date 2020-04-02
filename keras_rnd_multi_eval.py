@@ -27,7 +27,7 @@ eval_batch_size = config['eval_batch_size']
 eval_on_cpu = config['eval_on_cpu']
 nb_labels = config['num_labels']
 st_lab = config['start_label']
-# rep = np.load('2_label_permutation.npy')[st_lab:st_lab+nb_labels].T
+rep = np.load('2_label_permutation.npy')[st_lab:st_lab+nb_labels*nb_models].T
 
 #if dataset == 'origin.npy':
 # imgs, labels, input_shape = load_data(config['permutation'], config['num_labels'])
@@ -75,11 +75,12 @@ while True:
     x_test = samples.astype(np.float32) / 255.
     scores = []
     for i in range(nb_models):
-      outs.append(model.predict(x_test, batch_size=eval_batch_size))
+      scores.append(models[i].predict(x_test, batch_size=eval_batch_size))
     scores = np.hstack(scores)
-    nat_labels[output>=0.5] = 1.
-    preds, preds_dist, pred_scores = [], [], []
-    print(outs.shape)
+    nat_labels = np.zeros(scores.shape)
+    nat_labels[scores>=0.5] = 1.
+    preds, preds_dist, preds_score = [], [], []
+    print(scores.shape)
     for i in range(len(nat_labels)):
       tmp = np.repeat([nat_labels[i]], rep.shape[0], axis=0)
       dists = np.sum(np.absolute(tmp-rep), axis=-1)
@@ -91,6 +92,8 @@ while True:
       preds_dist.append(dists[pred_label])
       preds_score.append(np.max(pred_scores))
     error_idxs = np.arange(len(preds))[preds != y_test]
-    tot_advs_acc[preds_dist[error_idxs] <= t] = 1
+    preds = np.array(preds)
+    preds_dist = np.array(preds_dist)
+    tot_advs_acc[error_idxs[preds_dist[preds!=y_test]<= t]] = 1
 
-    print('{} natural: {:.2f}%; total adversarial acc:{}'.format(tot_amt, 100 * np.mean(nat_dists != 0), np.mean(tot_advs_acc)))
+    print('{} natural: {:.2f}%; total adversarial acc:{}'.format(tot_amt, np.sum(preds_dist[preds!=y_test] <= t), np.mean(tot_advs_acc)))
