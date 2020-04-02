@@ -47,8 +47,12 @@ class LinfPGDAttack:
     self.assign_input = tf.placeholder(tf.float32, shape=[batch_size, 28, 28, input_shape[-1]])
     self.assign_labels = tf.placeholder(tf.float32, shape=[len(models), batch_size, nb_labels])
 
-    bce_loss = keras.losses.BinaryCrossentropy()
-    loss = tf.reduce_sum([bce_loss(self.assign_labels[i], tf.nn.sigmoid(model(self.assign_input))) for i,model in enumerate(self.models)])
+    if loss_func == 'hinge':
+        hinge_loss = tf.keras.losses.Hinge()
+        loss = tf.reduce_sum([hinge_loss(self.assign_labels[i], model(self.assign_input)) for i, model in enumerate(self.models)])
+    elif loss_func == 'bce':
+        bce_loss = keras.losses.BinaryCrossentropy()
+        loss = tf.reduce_sum([bce_loss(self.assign_labels[i], tf.nn.sigmoid(model(self.assign_input))) for i,model in enumerate(self.models)])
     # self.grad = tf.reduce_sum([tf.gradients(loss, )[0] for m in self.models], 0)
     self.grad = tf.gradients(loss, self.assign_input)
 
@@ -121,6 +125,7 @@ if __name__ == '__main__':
   conf = sys.argv[-1]
   nb_models = int(sys.argv[-3])
   targeted = (sys.argv[-2] == 'target')
+  loss_func = sys.argv[-4]
 
   models, y_test = [], []
   lab_permutation = np.load('2_label_permutation.npy')
@@ -185,7 +190,7 @@ if __name__ == '__main__':
                          config['k'],
                          config['a'],
                          config['random_start'],
-                         config['loss_func'],
+                         loss_func, #config['loss_func'],
                          nb_labels, input_shape, config['eval_batch_size'])  
 
   # idxs = np.arange(x_test.shape[0])
