@@ -2,14 +2,18 @@ from mpmath import *
 import numpy as np
 from functools import reduce
 import operator
-mpf.dps = 100
+mp.dps = 1000
 n = 256
+
+np.random.seed(777)
+#xx = range(n)
+#yy = np.random.permutation(xx)
 
 x = range(n)
 y = list(np.load('permutation/256_256.1_permutation.npy'))
 
-xx = np.array([mpf(val) for val in x]) / 255.
-yy = np.array([mpf(str(val)) for val in y]) / 255.
+xx = np.array([mpf(val) for val in x]) #/ 255.
+yy = np.array([mpf(str(val)) for val in y]) #/ 255.
 
 coef, s = [], []
 #256*256
@@ -26,12 +30,13 @@ for i in range(3, n):
 
 coef = np.array(coef)
 param = [sum(coef[i] * coef[0]) if i!=0 else sum(coef[0]) for i in range(len(coef))]
+np.save('lagrange_weights.h5', param)
+np.save('lagrange_weights_sign.h5', np.sign(param))
 print(param)
 
 for j, v in enumerate(xx):
-	sign = 1 if (n-i-1)%2 == i%2 else -1
-	tmp = sum([sign*(v**i)*param[n-i-1] for i in range(n)])
-	print(tmp==y[j], tmp, yy[j])
+	tmp = sum([(v**i)*param[n-i-1] if (n-1)%2 == i%2 else -1*(v**i)*param[n-i-1] for i in range(n)])
+	print(tmp==yy[j], float(tmp)-float(yy[j]))
 
 ## TEST
 # def parameters(n):
