@@ -8,7 +8,7 @@ from __future__ import division
 from __future__ import print_function
 
 import tensorflow as tf
-import numpy as np
+import minpy.numpy as np
 from utils import load_data
 from mpmath import *
 mp.dps = 1000
