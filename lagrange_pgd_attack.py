@@ -47,9 +47,15 @@ class LinfPGDAttack:
     self.grad = tf.gradients(loss, model.x_input)[0]
     self.param = np.load('lagrange_weights.npy')
 
-    def perm(val):
-      return sum([(v**j)*self.param[n-j-1] if (n-1)%2 == j%2 else -1*(v**j)*self.param[n-j-1] for j in range(n)])
-    self.grad_func = gradient(perm)
+  def grad_perm(self, v):
+    n, tmp, res = 256, 1, 0
+    for j in range(1,n):
+      sign = 1 if (n-1)%2 == j%2 else -1
+      res += sign * j * tmp * param[n-j-1]
+      tmp *= v
+    return res
+      # return sum([(v**j)*self.param[n-j-1] if (n-1)%2 == j%2 else -1*(v**j)*self.param[n-j-1] for j in range(n)])
+    # self.grad_func = gradient(perm)
 
   def perturb(self, x_nat, y, org_img, order, sess, targeted=False):
     """Given a set of examples (x_nat, y), returns a set of adversarial
@@ -64,8 +70,8 @@ class LinfPGDAttack:
       grad = sess.run(self.grad, feed_dict={self.model.x_input: x,
                                             self.model.y_input: y})
       print(grad.shape)
-      n = 256
-      grad = [[[[self.grad_func(v).asnumpy() for v in a] for a in b] for b in c] for c in grad]
+      
+      grad = [[[[self.grad_perm(v) for v in a] for a in b] for b in c] for c in grad]
       print(min(grad), max(grad))
 
       # x += self.a * np.sign(grad)
