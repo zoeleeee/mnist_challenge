@@ -48,10 +48,10 @@ class LinfPGDAttack:
     self.param = np.load('lagrange_weights.npy')
 
   def grad_perm(self, v):
-    n, tmp, res = 256, 1, 0
+    n, tmp, res = 256, mpf(1), mpf(0)
     for j in range(1,n):
       sign = 1 if (n-1)%2 == j%2 else -1
-      res += sign * j * tmp * param[n-j-1]
+      res += sign * j * tmp * self.param[n-j-1]
       tmp *= v
     return res
       # return sum([(v**j)*self.param[n-j-1] if (n-1)%2 == j%2 else -1*(v**j)*self.param[n-j-1] for j in range(n)])
