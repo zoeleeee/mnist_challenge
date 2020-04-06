@@ -12,8 +12,8 @@ np.random.seed(777)
 x = range(n)
 y = list(np.load('permutation/256_256.1_permutation.npy'))
 
-xx = np.array([mpf(val) for val in x]) #/ 255.
-yy = np.array([mpf(str(val)) for val in y]) #/ 255.
+xx = np.array([mpf(val) for val in x]) / 255.
+yy = np.array([mpf(str(val)) for val in y]) / 255.
 
 coef, s = [], []
 #256*256
@@ -30,8 +30,11 @@ for i in range(3, n):
 
 coef = np.array(coef)
 param = [sum(coef[i] * coef[0]) if i!=0 else sum(coef[0]) for i in range(len(coef))]
-np.save('lagrange_weights.h5', param)
-np.save('lagrange_weights_sign.h5', np.sign(param))
+with open("lagrange_weights.txt", "w") as f:
+    for s in param:
+        f.write(str(s) +"\n")
+np.save('lagrange_weights.npy', param)
+#np.save('lagrange_weights_sign.h5', np.sign(param))
 print(param)
 
 for j, v in enumerate(xx):

@@ -11,7 +11,7 @@ import tensorflow as tf
 import numpy as np
 from utils import load_data
 from mpmath import *
-mp.dps = 1000
+#mp.dps = 500
 
 
 class LinfPGDAttack:
@@ -44,11 +44,12 @@ class LinfPGDAttack:
       loss = model.xent
 
     self.grad = tf.gradients(loss, model.x_input)[0]
-    self.param = np.load('lagrange_weights.h5')
+#    self.param = np.load('lagrange_weights.npy')
 
   def perturb(self, x_nat, y, org_img, order, sess, targeted):
     """Given a set of examples (x_nat, y), returns a set of adversarial
        examples within epsilon of x_nat in l_infinity norm."""
+#    mp.dps = 1000
     if self.rand:
       x = x_nat + np.random.uniform(-self.epsilon, self.epsilon, x_nat.shape)
       x = np.clip(x, 0, 1) # ensure valid pixel range
@@ -60,13 +61,13 @@ class LinfPGDAttack:
                                             self.model.y_input: y})
 
       sign = np.ones(grad)
-      for t in range(grad.shape[0]):
-        for l in range(grad.shape[1]):
-          for p in range(grad.shape[2]):
-            for q in range(grad.shape[3]):
-              v = mpf(grad[t,l,p,q])
-              tmp = sum([j*(v**(j-1))*self.param[n-j-1] if (n-1)%2 == j%2 else -1*j*(v**(j-1))*self.param[n-j-1] for j in range(1, n)])
-              sign[t,l,p,q] = int(np.sign(tmp))
+ #     for t in range(grad.shape[0]):
+ #       for l in range(grad.shape[1]):
+ #         for p in range(grad.shape[2]):
+ #           for q in range(grad.shape[3]):
+ #             v = mpf(grad[t,l,p,q])
+ #             tmp = sum([j*(v**(j-1))*self.param[n-j-1] if (n-1)%2 == j%2 else -1*j*(v**(j-1))*self.param[n-j-1] for j in range(1, n)])
+ #             sign[t,l,p,q] = int(np.sign(tmp))
 
       if targeted:
         x -= self.a*sign
