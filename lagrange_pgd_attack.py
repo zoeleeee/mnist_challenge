@@ -10,8 +10,8 @@ from __future__ import print_function
 import tensorflow as tf
 import numpy as np
 from utils import load_data
-
-
+from mpmath import *
+mp.dps = 1000
 class LinfPGDAttack:
   def __init__(self, model, epsilon, k, a, random_start, loss_func, nb_labels):
     """Attack parameter initialization. The attack performs k steps of
@@ -56,8 +56,10 @@ class LinfPGDAttack:
     for i in range(self.k):
       grad = sess.run(self.grad, feed_dict={self.model.x_input: x,
                                             self.model.y_input: y})
-
-
+      print(grad.shape)
+      n = 256
+      grad = [[[[sum([(v**j)*self.param[n-j-1] if (n-1)%2 == j%2 else -1*(v**j)*self.param[n-j-1] for j in range(n)]) for v in a] for a in b] for b in c] for c in grad]
+      print(min(grad), max(grad))
       # x += self.a * np.sign(grad)
       if targeted:
         x -= self.a*np.sign(grad)
