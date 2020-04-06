@@ -56,8 +56,6 @@ class LinfPGDAttack:
     for i in range(self.k):
       grad = sess.run(self.grad, feed_dict={self.model.x_input: x,
                                             self.model.y_input: y})
-
-
       # x += self.a * np.sign(grad)
       if targeted:
         x -= self.a*np.sign(grad)
