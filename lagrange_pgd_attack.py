@@ -8,9 +8,12 @@ from __future__ import division
 from __future__ import print_function
 
 import tensorflow as tf
-import minpy.numpy as np
+import numpy as np
+import minpy.numpy as mnp
+from minpy.core import grad as gradient
 from utils import load_data
 from mpmath import *
+
 mp.dps = 1000
 class LinfPGDAttack:
   def __init__(self, model, epsilon, k, a, random_start, loss_func, nb_labels):
@@ -44,6 +47,10 @@ class LinfPGDAttack:
     self.grad = tf.gradients(loss, model.x_input)[0]
     self.param = np.load('lagrange_weights.npy')
 
+    def perm(val):
+      return sum([(v**j)*self.param[n-j-1] if (n-1)%2 == j%2 else -1*(v**j)*self.param[n-j-1] for j in range(n)])
+    self.grad_func = gradient(perm)
+
   def perturb(self, x_nat, y, org_img, order, sess, targeted=False):
     """Given a set of examples (x_nat, y), returns a set of adversarial
        examples within epsilon of x_nat in l_infinity norm."""
@@ -58,7 +65,7 @@ class LinfPGDAttack:
                                             self.model.y_input: y})
       print(grad.shape)
       n = 256
-      grad = [[[[sum([(v**j)*self.param[n-j-1] if (n-1)%2 == j%2 else -1*(v**j)*self.param[n-j-1] for j in range(n)]) for v in a] for a in b] for b in c] for c in grad]
+      grad = [[[[self.grad_func(v).asnumpy() for v in a] for a in b] for b in c] for c in grad]
       print(min(grad), max(grad))
 
       # x += self.a * np.sign(grad)
