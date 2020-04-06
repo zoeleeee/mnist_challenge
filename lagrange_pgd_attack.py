@@ -13,7 +13,7 @@ import minpy.numpy as mnp
 from minpy.core import grad as gradient
 from utils import load_data
 from mpmath import *
-
+import time
 mp.dps = 1000
 class LinfPGDAttack:
   def __init__(self, model, epsilon, k, a, random_start, loss_func, nb_labels):
@@ -53,7 +53,7 @@ class LinfPGDAttack:
       sign = 1 if (n-1)%2 == j%2 else -1
       res += sign * j * tmp * self.param[n-j-1]
       tmp *= v
-    return res
+    return np.sign(res)
       # return sum([(v**j)*self.param[n-j-1] if (n-1)%2 == j%2 else -1*(v**j)*self.param[n-j-1] for j in range(n)])
     # self.grad_func = gradient(perm)
 
@@ -65,21 +65,23 @@ class LinfPGDAttack:
       x = np.clip(x, 0, 1) # ensure valid pixel range
     else:
       x = np.copy(x_nat)
-
+    st = time.time()
     for i in range(self.k):
+      print(time.time()-st)
+      st = time.time()
       grad = sess.run(self.grad, feed_dict={self.model.x_input: x,
                                             self.model.y_input: y})
       print(grad.shape)
       
-      grad = [[[[self.grad_perm(v) for v in a] for a in b] for b in c] for c in grad]
-      print(min(grad), max(grad))
+      sign_grad = [[[[self.grad_perm(v) for v in a] for a in b] for b in c] for c in grad]
+#      print(min(grad), max(grad))
 
       # x += self.a * np.sign(grad)
       if targeted:
-        x -= self.a*np.sign(grad)
+        x -= self.a*np.array(sign_grad)#np.sign(grad)
 
       else:
-        x += self.a*np.sign(grad)
+        x += self.a*np.array(sign_grad)#np.sign(grad)
 
 
       x = np.clip(x, x_nat - self.epsilon, x_nat + self.epsilon) 
@@ -159,6 +161,7 @@ if __name__ == '__main__':
 
 
     for ibatch in range(num_batches):
+      print('batch:',ibatch)
       bstart = ibatch * eval_batch_size
       bend = min(bstart + eval_batch_size, num_eval_examples)
       print('batch size: {}'.format(bend - bstart))
