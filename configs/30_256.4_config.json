@@ -22,7 +22,8 @@
   "random_start": true,
   "loss_func": "bce",
 
-  "store_adv_path": "advs/256.4_pgd_attack.npy",
+  "store_adv_path": "advs/target_30_256.4_pgd_attack.npy",
+
 
   "permutation": "permutation/256_256.4_permutation.npy",
   "num_labels": 30

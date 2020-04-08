@@ -12,6 +12,7 @@
 
   "_comment": "===== EVAL CONFIGURATION =====",
   "num_eval_examples": 10000,
+
   "eval_batch_size": 20,
   "eval_on_cpu": false,
 
@@ -22,7 +23,8 @@
   "random_start": true,
   "loss_func": "bce",
 
-  "store_adv_path": "advs/target_30_256.16_pgd_attack.npy",
+  "store_adv_path": "advs/30_256.16_pgd_attack.npy",
+
   "permutation": "permutation/256_256.16_permutation.npy",
   "num_labels": 30
 

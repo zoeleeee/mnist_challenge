@@ -1,10 +1,10 @@
 {
   "_comment": "===== MODEL CONFIGURATION =====",
-  "model_dir": "models/256.2_mnist_30",
+  "model_dir": "models/256.16_mnist_25_75",
 
   "_comment": "===== TRAINING CONFIGURATION =====",
   "random_seed": 2395306,
-  "max_num_training_steps": 150000,
+  "max_num_training_steps": 200000,
   "num_output_steps": 100,
   "num_summary_steps": 100,
   "num_checkpoint_steps": 300,
@@ -12,7 +12,7 @@
 
   "_comment": "===== EVAL CONFIGURATION =====",
   "num_eval_examples": 10000,
-  "eval_batch_size": 20,
+  "eval_batch_size": 50,
   "eval_on_cpu": false,
 
   "_comment": "=====ADVERSARIAL EXAMPLES CONFIGURATION=====",
@@ -22,11 +22,8 @@
   "random_start": true,
   "loss_func": "bce",
 
-
-
-
-  "store_adv_path": "advs/target_30_256.2_pgd_attack.npy",
-  "permutation": "permutation/256_256.2_permutation.npy",
-  "num_labels": 30
-
+  "store_adv_path": "advs/75_25_256.16_pgd_attack.npy",
+  "permutation": "permutation/256_256.16_permutation.npy",
+  "num_labels": 25,
+  "start_label":75
 }
