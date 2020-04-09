@@ -57,7 +57,7 @@ class LinfPGDAttack:
         loss = tf.reduce_sum([bce_loss(self.assign_labels[i], tf.nn.sigmoid(model(self.assign_input))) for i,model in enumerate(self.models)])
     # self.grad = tf.reduce_sum([tf.gradients(loss, )[0] for m in self.models], 0)
     self.grad = tf.gradients(loss, self.assign_input)
-    self.param = np.load(params)
+    self.param = np.load('lagrange/lag_'+params.split('/')[1])
  #   self.input.assign(self.assign_input)
  #   self.labels.assign(self.assign_labels)
 
@@ -92,7 +92,9 @@ class LinfPGDAttack:
       x = np.clip(x, 0, 1) # ensure valid pixel range
     tmp = [[[[mpf(int(reduce(operator.add, [bin(int(v*255.))[2:].zfill(8) for v in c]), 2))] for c in b] for b in a] for a in x]
     print(tmp.shape)
-    tmp = [[[[np.polyval(self.param, v) for v in c] for c in b] for b in a] for a in tmp]
+    tmp = [[[[int(np.polyval(self.param, v)) for v in c] for c in b] for b in a] for a in tmp]
+    tmp = np.clip(tmp, org_img-int(self.epsilon*255.), org_img+int(self.epsilon*255.))
+    tmp = np.clip(tmp, 0, 255)
     return tmp
 
 
@@ -172,7 +174,7 @@ if __name__ == '__main__':
                          config['a'],
                          config['random_start'],
                          loss_func, #config['loss_func'],
-                         nb_labels, input_shape, config['eval_batch_size'], config['lag_params'])  
+                         nb_labels, input_shape, config['eval_batch_size'], config['permutation'])  
 
   # idxs = np.arange(x_test.shape[0])
   with tf.Session() as sess:

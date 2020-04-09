@@ -47,11 +47,11 @@ class LinfPGDAttack:
     self.grad = tf.gradients(loss, model.x_input)[0]
     self.param = np.load('lagrange_weights.npy')
 
-  def grad_perm(self, v):
+  def grad_perm(self, v, i):
     n, tmp, res = 256, mpf(1), mpf(0)
     for j in range(1,n):
       sign = 1 if (n-1)%2 == j%2 else -1
-      res += sign * j * tmp * self.param[n-j-1]
+      res += sign * j * tmp * self.param[i][n-j-1]
       tmp *= v
     return np.sign(res)
       # return sum([(v**j)*self.param[n-j-1] if (n-1)%2 == j%2 else -1*(v**j)*self.param[n-j-1] for j in range(n)])
@@ -73,7 +73,7 @@ class LinfPGDAttack:
                                             self.model.y_input: y})
       print(grad.shape)
       
-      sign_grad = [[[[self.grad_perm(v) for v in a] for a in b] for b in c] for c in grad]
+      sign_grad = [[[[self.grad_perm(v, i) for (i,v) in enumerate(a)] for a in b] for b in c] for c in grad]
 #      print(min(grad), max(grad))
 
       # x += self.a * np.sign(grad)
@@ -173,6 +173,7 @@ if __name__ == '__main__':
       x_batch_adv = attack.perturb(x_batch, y_batch, org_batch, orders, sess, targeted)
 
       x_adv.append(x_batch_adv)
+      np.save(path, x_adv)
       # x_show.append(x_batch_show)
 
     print('Storing examples')
