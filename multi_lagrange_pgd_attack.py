@@ -14,6 +14,8 @@ from utils import load_data
 import time
 from mpmath import *
 mp.dps = 1000
+from functools import reduce
+import operator
 
 class LinfPGDAttack:
   def __init__(self, model, epsilon, k, a, random_start, loss_func, nb_labels, input_shape, batch_size, params):
@@ -74,13 +76,13 @@ class LinfPGDAttack:
       x = np.clip(x, 0, 1) # ensure valid pixel range
     else:
       x = np.copy(x_nat)
-
+    st = time.time()
     for i in range(self.k):
       # tt = dict([(m.x_input,x) for m in self.models]+[(self.models[i].y_input:y[i] for i in range(len(self.models)))])
       grad = sess.run(self.grad, feed_dict={self.assign_input:x, self.assign_labels:y})
       grad = np.array(grad)[0]
 
-      print(grad.shape, np.sum(np.sign(grad)==0), np.sum(np.sign(grad)>0))
+#      print(grad.shape, np.sum(np.sign(grad)==0), np.sum(np.sign(grad)>0))
 
       # x += self.a * np.sign(grad)
       if targeted:
@@ -91,8 +93,9 @@ class LinfPGDAttack:
       # x = np.clip(x, x_nat - self.epsilon, x_nat + self.epsilon) 
       x = np.clip(x, 0, 1) # ensure valid pixel range
     tmp = [[[[mpf(int(reduce(operator.add, [bin(int(v*255.))[2:].zfill(8) for v in c]), 2))] for c in b] for b in a] for a in x]
-    print(tmp.shape)
+    print(np.array(tmp).shape)
     tmp = [[[[int(np.polyval(self.param, v)) for v in c] for c in b] for b in a] for a in tmp]
+    print(time.time()-st, min(999, max(tmp)), min(999,max(-1, min(tmp))))
     tmp = np.clip(tmp, org_img-int(self.epsilon*255.), org_img+int(self.epsilon*255.))
     tmp = np.clip(tmp, 0, 255)
     return tmp
@@ -198,7 +201,7 @@ if __name__ == '__main__':
     for ibatch in range(num_batches):
       bstart = ibatch * eval_batch_size
       bend = min(bstart + eval_batch_size, num_eval_examples)
-      print('batch size: {}'.format(bend - bstart))
+      print('{}# batch size: {}'.format(ibatch, bend - bstart))
 
       x_batch = x_test[bstart:bend, :]
       y_batch = y_test[:,bstart:bend,:]
@@ -210,9 +213,9 @@ if __name__ == '__main__':
       # x_adv.append(x_batch_adv)
       x_show.append(x_batch_show)
 
-    print('Storing examples')
+  #  print('Storing examples')
     # x_adv = np.concatenate(x_adv, axis=0)
     # np.save(path, x_adv)
-    x_adv = np.concatenate(x_show, axis=0)
-    np.save(path[:-10]+'show.npy', x_adv)
+      x_adv = np.concatenate(x_show, axis=0)
+      np.save(path[:-10]+'show.npy', x_adv)
     print('Examples stored in {}'.format(path))
