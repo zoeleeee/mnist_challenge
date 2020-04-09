@@ -176,6 +176,7 @@ if __name__ == '__main__':
       x_batch_adv = attack.perturb(x_batch, y_batch, org_batch, orders, sess, targeted)
 
       x_adv.append(x_batch_adv)
+      np.save(path, x_adv)
       # x_show.append(x_batch_show)
 
     print('Storing examples')

@@ -11,10 +11,12 @@ import tensorflow as tf
 from tensorflow import keras
 import numpy as np
 from utils import load_data
-
+import time
+from mpmath import *
+mp.dps = 1000
 
 class LinfPGDAttack:
-  def __init__(self, model, epsilon, k, a, random_start, loss_func, nb_labels, input_shape, batch_size):
+  def __init__(self, model, epsilon, k, a, random_start, loss_func, nb_labels, input_shape, batch_size, params):
     """Attack parameter initialization. The attack performs k steps of
        size a, while always staying within epsilon from the initial
        point."""
@@ -55,8 +57,7 @@ class LinfPGDAttack:
         loss = tf.reduce_sum([bce_loss(self.assign_labels[i], tf.nn.sigmoid(model(self.assign_input))) for i,model in enumerate(self.models)])
     # self.grad = tf.reduce_sum([tf.gradients(loss, )[0] for m in self.models], 0)
     self.grad = tf.gradients(loss, self.assign_input)
-    self.param = np.load('lagrange_weights.h5')
-
+    self.param = np.load('lagrange/lag_'+params.split('/')[1])
  #   self.input.assign(self.assign_input)
  #   self.labels.assign(self.assign_labels)
 
@@ -77,44 +78,24 @@ class LinfPGDAttack:
     for i in range(self.k):
       # tt = dict([(m.x_input,x) for m in self.models]+[(self.models[i].y_input:y[i] for i in range(len(self.models)))])
       grad = sess.run(self.grad, feed_dict={self.assign_input:x, self.assign_labels:y})
-      
-      grad = np.array(grad[0])
+      grad = np.array(grad)[0]
 
       print(grad.shape, np.sum(np.sign(grad)==0), np.sum(np.sign(grad)>0))
 
       # x += self.a * np.sign(grad)
       if targeted:
-        x_upd = x-self.a*np.sign(grad)
+        x -= self.a*np.sign(grad)
 
       else:
-        x_upd = x+self.a*np.sign(grad)
-
-      tmp = np.zeros(org_img.shape)
-      for t in range(x.shape[0]):
-        for j in range(x.shape[1]):
-          for p in range(x.shape[2]):
-              min_idx = np.max([0, org_img[t,j,p,0]-int(self.epsilon*255)])
-              max_idx = np.min([255, org_img[t,j,p,0]+int(self.epsilon*255)+1])
-
-              if targeted:
-                sign_neighbors = np.sign(-order[min_idx:max_idx]+np.repeat([x[t,j,p,:]], max_idx-min_idx, axis=0))
-              else:
-                sign_neighbors = np.sign(order[min_idx:max_idx]-np.repeat([x[t,j,p,:]], max_idx-min_idx, axis=0))
-              matches = np.sum(np.repeat([np.sign(grad[t,j,p,:])], max_idx-min_idx, axis=0) == sign_neighbors, axis=-1)
-
-              idxs = np.arange(len(matches))[matches==np.max(matches)]
-              _x = np.repeat([x_upd[t,j,p,:]], len(idxs), axis=0)
-              dist = np.sum(np.abs(_x-order[idxs+min_idx]), axis=-1)
-              # print(dist.shape)
-
-              tmp[t,j,p,0] = int(idxs[np.argmin(dist)]+min_idx)
-              # print(tmp[t,j,p,0])
-              x[t,j,p,:] = order[int(tmp[t,j,p,0])]
-
+        x += self.a*np.sign(grad)
       # x = np.clip(x, x_nat - self.epsilon, x_nat + self.epsilon) 
-      # x = np.clip(x, 0, 1) # ensure valid pixel range
-
-    return x, tmp
+      x = np.clip(x, 0, 1) # ensure valid pixel range
+    tmp = [[[[mpf(int(reduce(operator.add, [bin(int(v*255.))[2:].zfill(8) for v in c]), 2))] for c in b] for b in a] for a in x]
+    print(tmp.shape)
+    tmp = [[[[int(np.polyval(self.param, v)) for v in c] for c in b] for b in a] for a in tmp]
+    tmp = np.clip(tmp, org_img-int(self.epsilon*255.), org_img+int(self.epsilon*255.))
+    tmp = np.clip(tmp, 0, 255)
+    return tmp
 
 
 if __name__ == '__main__':
@@ -193,7 +174,7 @@ if __name__ == '__main__':
                          config['a'],
                          config['random_start'],
                          loss_func, #config['loss_func'],
-                         nb_labels, input_shape, config['eval_batch_size'])  
+                         nb_labels, input_shape, config['eval_batch_size'], config['permutation'])  
 
   # idxs = np.arange(x_test.shape[0])
   with tf.Session() as sess:
@@ -223,9 +204,10 @@ if __name__ == '__main__':
       y_batch = y_test[:,bstart:bend,:]
       org_batch = org_imgs[bstart:bend, :]
 
-      x_batch_adv, x_batch_show = attack.perturb(x_batch, y_batch, org_batch, sess, orders, targeted)
+      # x_batch_adv, x_batch_show = attack.perturb(x_batch, y_batch, org_batch, sess, orders, targeted)
+      x_batch_show = attack.perturb(x_batch, y_batch, org_batch, sess, orders, targeted)
 
-      x_adv.append(x_batch_adv)
+      # x_adv.append(x_batch_adv)
       x_show.append(x_batch_show)
 
     print('Storing examples')
