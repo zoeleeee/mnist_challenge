@@ -12,8 +12,9 @@ np.random.seed(777)
 x = range(n)
 y = list(np.load('permutation/256_256.1_permutation.npy'))
 
-xx = np.array([mpf(val) for val in x]) / 255.
-yy = np.array([mpf(str(val)) for val in y]) / 255.
+xx = np.array([mpf(val) for val in x])
+yy = np.array([mpf(str(val)) for val in y])
+
 
 coef, s = [], []
 #256*256
