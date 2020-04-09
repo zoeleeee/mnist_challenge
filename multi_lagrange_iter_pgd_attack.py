@@ -16,6 +16,7 @@ from mpmath import *
 mp.dps = 1000
 from functools import reduce
 import operator
+import copy
 
 class LinfPGDAttack:
   def __init__(self, model, epsilon, k, a, random_start, loss_func, nb_labels, input_shape, batch_size, params):
@@ -71,6 +72,7 @@ class LinfPGDAttack:
   def perturb(self, x_nat, y, org_img, sess, order, targeted=False):
     """Given a set of examples (x_nat, y), returns a set of adversarial
        examples within epsilon of x_nat in l_infinity norm."""
+    tmp = copy.deepcopy(org_img)
     if self.rand:
       x = x_nat + np.random.uniform(-self.epsilon, self.epsilon, x_nat.shape)
       x = np.clip(x, 0, 1) # ensure valid pixel range
@@ -81,23 +83,23 @@ class LinfPGDAttack:
       # tt = dict([(m.x_input,x) for m in self.models]+[(self.models[i].y_input:y[i] for i in range(len(self.models)))])
       grad = sess.run(self.grad, feed_dict={self.assign_input:x, self.assign_labels:y})
       grad = np.array(grad)[0]
+      grad = [[[[mpf(int(reduce(operator.add, [bin(int(v*255.))[2:].zfill(8) for v in c]), 2))] for c in b] for b in a] for a in grad]
+      grad = [[[[int(np.polyval(self.param, v)) for v in c] for c in b] for b in a] for a in grad]
+      print(grad.shape, np.sum(np.sign(grad)==0), np.sum(np.sign(grad)>0))
 
-#      print(grad.shape, np.sum(np.sign(grad)==0), np.sum(np.sign(grad)>0))
-
-      # x += self.a * np.sign(grad)
       if targeted:
-        x -= self.a*np.sign(grad)
-
+        tmp -= self.a*255*np.sign(grad)
       else:
-        x += self.a*np.sign(grad)
-      # x = np.clip(x, x_nat - self.epsilon, x_nat + self.epsilon) 
-      x = np.clip(x, 0, 1) # ensure valid pixel range
-    tmp = [[[[mpf(int(reduce(operator.add, [bin(int(v*255.))[2:].zfill(8) for v in c]), 2))] for c in b] for b in a] for a in x]
-    print(np.array(tmp).shape)
-    tmp = [[[[int(np.polyval(self.param, v)) for v in c] for c in b] for b in a] for a in tmp]
-    print(time.time()-st, min(999, max(tmp)), min(999,max(-1, min(tmp))))
-    tmp = np.clip(tmp, org_img-int(self.epsilon*255.), org_img+int(self.epsilon*255.))
-    tmp = np.clip(tmp, 0, 255)
+        tmp += self.a*255*np.sign(grad)
+      tmp = np.clip(tmp, org_img - (self.epsilon*255), org_img + (255*self.epsilon))
+      tmp = np.clip(tmp, 0, 255) # ensure valid pixel range
+      x = np.array([[[order[int(v[0])] for v in b] for b in a] for a in tmp])
+    # tmp = [[[[mpf(int(reduce(operator.add, [bin(int(v*255.))[2:].zfill(8) for v in c]), 2))] for c in b] for b in a] for a in x]
+    # print(np.array(tmp).shape)
+    # tmp = [[[[int(np.polyval(self.param, v)) for v in c] for c in b] for b in a] for a in tmp]
+    # print(time.time()-st, min(999, max(tmp)), min(999,max(-1, min(tmp))))
+    # tmp = np.clip(tmp, org_img-int(self.epsilon*255.), org_img+int(self.epsilon*255.))
+    # tmp = np.clip(tmp, 0, 255)
     return tmp
 
 

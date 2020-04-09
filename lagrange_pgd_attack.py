@@ -72,7 +72,7 @@ class LinfPGDAttack:
       grad = sess.run(self.grad, feed_dict={self.model.x_input: x,
                                             self.model.y_input: y})
       print(grad.shape)
-      
+      # sign = np.sign(grad)
       sign_grad = [[[[self.grad_perm(v, i) for (i,v) in enumerate(a)] for a in b] for b in c] for c in grad]
 #      print(min(grad), max(grad))
 
@@ -83,9 +83,12 @@ class LinfPGDAttack:
       else:
         x += self.a*np.array(sign_grad)#np.sign(grad)
 
-
       x = np.clip(x, x_nat - self.epsilon, x_nat + self.epsilon) 
-      x = np.clip(x, 0, 1) # ensure valid pixel range
+      x = (np.clip(x, 0, 1)*255).astype(np.int) # ensure valid pixel range
+
+
+    sign_grad = [[[[self.grad_perm(v, i) for (i,v) in enumerate(a)] for a in b] for b in c] for c in x]
+    # x = np.clip(x, x_nat - self.epsilon, x_nat + self.epsilon) 
 
     return x
 
