@@ -76,7 +76,7 @@ for t in range(yyy.shape[0]):
 	param = [param[i]*(n-i-1) for i in range(n-1)]
 	res.append(param)
  
-np.save('lagrange/lag_'+file.split('/')[1], param)
+np.save('lagrange/lag_iter_'+file.split('/')[1], param)
 
 #np.save('lagrange_weights_sign.h5', np.sign(param))
 # print(param)
