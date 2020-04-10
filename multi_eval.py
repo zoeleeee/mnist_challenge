@@ -38,7 +38,7 @@ rep = np.load('2_label_permutation.npy')[:nb_labels].T
 imgs, labels, input_shape = load_data(config['permutation'], config['num_labels'])
 labels = np.array([rep[i] for i in labels]).astype(np.float32)
 x_train, y_train = imgs[:60000], labels[:60000]
-x_test, y_test = imgs[60000:60120], labels[60000:60120]
+x_test, y_test = imgs[60000:], labels[60000:]
 if dataset != 'origin.npy':
   x_test = np.load(dataset)
   if dataset.endswith('show.npy'):

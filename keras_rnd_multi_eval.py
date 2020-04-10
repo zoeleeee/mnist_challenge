@@ -64,7 +64,7 @@ for i in range(nb_models):
 
 tot_advs_acc = np.zeros(len(y_test))
 tot_amt = 0
-rnd_imgs = np.zeros(imgs[-nb_imgs:].shape)
+rnd_imgs = np.zeros(imgs[-nb_imgs-st_imgs:-st_imgs].shape)
 print(rnd_imgs.shape, x_test.shape)
 while True:
   if np.mean(tot_advs_acc) == 1.: 
