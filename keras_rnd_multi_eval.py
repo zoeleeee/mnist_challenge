@@ -19,6 +19,7 @@ conf = sys.argv[-1]
 nb_models = int(sys.argv[-2])
 t = int(sys.argv[-3])
 nb_imgs = int(sys.argv[-4])
+st_imgs = int(sys.argv[-5])
 #dataset = sys.argv[-2]
 # Global constants
 with open(conf) as config_file:
@@ -37,7 +38,7 @@ imgs = np.load('data/mnist_data.npy').transpose((0,2,3,1))
 permut = np.load(config['permutation'])
 # labels = np.array([rep[i] for i in labels]).astype(np.float32)
 x_train, y_train = imgs[:60000], labels[:60000]
-x_test, y_test = imgs[-nb_imgs:], labels[-nb_imgs:]
+x_test, y_test = imgs[-nb_imgs-st_imgs:-st_imgs], labels[-nb_imgs-st_imgs:-st_imgs]
 
 if len(x_test.shape) == 3:
   x_test = x_test.reshape(x_test.shape[0], x_test.shape[1], x_test.shape[2], 1)
@@ -64,20 +65,22 @@ for i in range(nb_models):
 tot_advs_acc = np.zeros(len(y_test))
 tot_amt = 0
 rnd_imgs = np.zeros(imgs[-nb_imgs:].shape)
+print(rnd_imgs.shape, x_test.shape)
 while True:
   if np.mean(tot_advs_acc) == 1.: 
     print(tot_amt, 'totally attacked succeed!')
     break
   elif tot_amt == 1e5:
     print(tot_amt, 'total adversarial acc:', tot_advs_acc)
+    break
   else:
     tot_amt += 1
     noise = np.clip(np.random.randint(0, int(config['epsilon']*255), x_test.shape)+x_test, 0, 255).astype(np.int)
     samples = np.array([[[permut[d[0]] for d in c] for c in b] for b in noise])
-    x_test = samples.astype(np.float32) / 255.
+    x_input = samples.astype(np.float32) / 255.
     scores = []
     for i in range(nb_models):
-      scores.append(models[i].predict(x_test, batch_size=eval_batch_size))
+      scores.append(models[i].predict(x_input, batch_size=eval_batch_size))
     scores = np.hstack(scores)
     nat_labels = np.zeros(scores.shape)
     nat_labels[scores>=0.5] = 1.
@@ -97,7 +100,8 @@ while True:
     preds = np.array(preds)
     preds_dist = np.array(preds_dist)
     tot_advs_acc[error_idxs[preds_dist[preds!=y_test]<= t]] = 1.
-    rnd_imgs[error_idxs[preds_dist[preds!=y_test]<= t] = noise[error_idxs[preds_dist[preds!=y_test]<= t]
+    print(rnd_imgs.shape, noise.shape)
+    rnd_imgs[error_idxs[preds_dist[preds!=y_test]<= t]] = noise[error_idxs[preds_dist[preds!=y_test]<= t]]
     if tot_amt % 100 == 0:
       np.save('advs/rnd_100_25_256.32.npy', rnd_imgs)
     print('{} natural: {:.2f}%; total adversarial acc:{}'.format(tot_amt, np.sum(preds_dist[preds!=y_test] <= t), np.mean(tot_advs_acc)))
