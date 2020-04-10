@@ -68,7 +68,13 @@ class LinfPGDAttack:
     # self.setup.append(self.input.assign(self.assign_input))
     # self.setup.append(self.labels.assign(self.assign_labels))
     # self.init = tf.variables_initializer(var_list=)
-
+  def grad_perm(self, v, i):
+    n, tmp, res = 256, mpf(1), mpf(0)
+    for j in range(1,n):
+      sign = 1 if (n-1)%2 == j%2 else -1
+      res += sign * j * tmp * self.param[i][n-j-1]
+      tmp *= v
+    return np.sign(res)
   def perturb(self, x_nat, y, org_img, sess, order, targeted=False):
     """Given a set of examples (x_nat, y), returns a set of adversarial
        examples within epsilon of x_nat in l_infinity norm."""
@@ -83,16 +89,15 @@ class LinfPGDAttack:
       # tt = dict([(m.x_input,x) for m in self.models]+[(self.models[i].y_input:y[i] for i in range(len(self.models)))])
       grad = sess.run(self.grad, feed_dict={self.assign_input:x, self.assign_labels:y})
       grad = np.array(grad)[0]
-      grad = [[[[mpf(int(reduce(operator.add, [bin(int(v*255.))[2:].zfill(8) for v in c]), 2))] for c in b] for b in a] for a in grad]
-      grad = [[[[int(np.polyval(self.param, v)) for v in c] for c in b] for b in a] for a in grad]
-      print(np.array(grad).shape, np.sum(np.sign(grad)==0), np.sum(np.sign(grad)>0))
-
+      sub_grad = np.array([np.polyval(self.param[j], tmp) for j in range(self.param.shape[0])]).transpose((1,2,3,0))
+      grad = np.sum(sub_grad*grad, axis=-1)
+      # print(np.array(grad).shape, np.sum(np.sign(grad)==0), np.sum(np.sign(grad)>0))
       if targeted:
-        tmp -= self.a*255*np.sign(grad).astype(np.float32)
+        tmp -= self.a*np.sign(grad).astype(np.float32)
       else:
-        tmp += self.a*255*np.sign(grad).astype(np.float32)
-      tmp = np.clip(tmp, org_img - (self.epsilon*255), org_img + (255*self.epsilon))
-      tmp = np.clip(tmp, 0, 255) # ensure valid pixel range
+        tmp += self.a*np.sign(grad).astype(np.float32)
+      tmp = np.clip(tmp, org_img - self.epsilon, org_img + self.epsilon)
+      tmp = np.clip(tmp, 0, 1) # ensure valid pixel range
       x = np.array([[[order[int(v[0])] for v in b] for b in a] for a in tmp])
     # tmp = [[[[mpf(int(reduce(operator.add, [bin(int(v*255.))[2:].zfill(8) for v in c]), 2))] for c in b] for b in a] for a in x]
     # print(np.array(tmp).shape)
@@ -160,7 +165,7 @@ if __name__ == '__main__':
 
   permutation_path = config['permutation']
   path = config['store_adv_path'].split('/')[0] + '/sign_'+config['store_adv_path'].split('/')[1]
-  org_imgs = np.load('data/mnist_data.npy').transpose((0,2,3,1))[60000:]
+  org_imgs = np.load('data/mnist_data.npy').transpose((0,2,3,1))[60000:] / 255.
   # org_labs = np.load('data/mnist_labels.npy')[60000:]
   imgs, labs, input_shape = load_data(permutation_path)
   x_test = imgs[60000:]
