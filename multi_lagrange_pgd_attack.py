@@ -62,11 +62,25 @@ class LinfPGDAttack:
     self.param = np.load('lagrange/lag_'+params.split('/')[1])
  #   self.input.assign(self.assign_input)
  #   self.labels.assign(self.assign_labels)
-
+  def grad_perm(self, v, i):
+    n, tmp, res = 256, mpf(1), mpf(0)
+    for j in range(1,n):
+      sign = 1 if (n-1)%2 == j%2 else -1
+      res += sign * j * tmp * self.param[i][n-j-1]
+      tmp *= v
+    return np.sign(res)
     # self.setup = []
     # self.setup.append(self.input.assign(self.assign_input))
     # self.setup.append(self.labels.assign(self.assign_labels))
     # self.init = tf.variables_initializer(var_list=)
+
+  def grad_perm(self, v, i):
+    n, tmp, res = 256, mpf(1), mpf(0)
+    for j in range(1,n):
+      # sign = 1 if (n-1)%2 == j%2 else -1
+      res += sign * j * tmp * self.param[i][n-j-1]
+      tmp *= v
+    return np.sign(res)
 
   def perturb(self, x_nat, y, org_img, sess, order, targeted=False):
     """Given a set of examples (x_nat, y), returns a set of adversarial
@@ -92,12 +106,14 @@ class LinfPGDAttack:
         x += self.a*np.sign(grad)
       # x = np.clip(x, x_nat - self.epsilon, x_nat + self.epsilon) 
       x = np.clip(x, 0, 1) # ensure valid pixel range
-    tmp = [[[[mpf(int(reduce(operator.add, [bin(int(v*255.))[2:].zfill(8) for v in c]), 2))] for c in b] for b in a] for a in x]
-    print(np.array(tmp).shape)
-    tmp = [[[[int(np.polyval(self.param, v)) for v in c] for c in b] for b in a] for a in tmp]
-    print(time.time()-st, min(999, max(tmp)), min(999,max(-1, min(tmp))))
-    tmp = np.clip(tmp, org_img-int(self.epsilon*255.), org_img+int(self.epsilon*255.))
-    tmp = np.clip(tmp, 0, 255)
+      tmp = [[[[mpf(int(reduce(operator.add, [bin(int(v*255.))[2:].zfill(8) for v in c]), 2))] for c in b] for b in a] for a in x]
+      print(np.array(tmp).shape)
+      tmp = [[[[float(np.polyval(self.param, v)) for v in c] for c in b] for b in a] for a in tmp]
+      print(time.time()-st, np.max(tmp), np.min(tmp), np.median(tmp))
+      tmp = np.clip(tmp, org_img-int(self.epsilon*255.), org_img+int(self.epsilon*255.)).astype(np.int)
+      tmp = np.clip(tmp, 0, 255)
+      x = [[[order[int(v[0])] for v in c] for c in b] for b in tmp]
+      
     return tmp
 
 
@@ -116,7 +132,7 @@ if __name__ == '__main__':
   models, y_test = [], []
   lab_permutation = np.load('2_label_permutation.npy')
   if targeted:
-    y_lab = np.load('advs_targeted_labels.npy')
+    y_lab = np.load('non_repeat_advs_targeted_labels.npy')
   else:
     y_lab = np.load('data/mnist_labels.npy')[60000:]
 
@@ -217,5 +233,5 @@ if __name__ == '__main__':
     # x_adv = np.concatenate(x_adv, axis=0)
     # np.save(path, x_adv)
       x_adv = np.concatenate(x_show, axis=0)
-      np.save(path[:-10]+'show.npy', x_adv)
+      np.save(path[:-10]+'_lag_show.npy', x_adv)
     print('Examples stored in {}'.format(path))
