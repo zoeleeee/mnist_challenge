@@ -71,6 +71,10 @@ class LinfPGDAttack:
   def perturb(self, x_nat, y, org_img, sess, order, targeted=False):
     """Given a set of examples (x_nat, y), returns a set of adversarial
        examples within epsilon of x_nat in l_infinity norm."""
+    
+    tmp = [[[[mpf(int(reduce(operator.add, [bin(int(v*255.))[2:].zfill(8) for v in c]), 2))] for c in b] for b in a] for a in x_nat]
+    tmp = [[[[float(np.polyval(self.param, v)) for v in c] for c in b] for b in a] for a in tmp]
+    print(np.max(tmp), np.min(tmp), np.median(tmp))
     if self.rand:
       x = x_nat + np.random.uniform(-self.epsilon, self.epsilon, x_nat.shape)
       x = np.clip(x, 0, 1) # ensure valid pixel range
