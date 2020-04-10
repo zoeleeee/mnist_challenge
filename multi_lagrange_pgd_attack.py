@@ -116,7 +116,7 @@ if __name__ == '__main__':
   models, y_test = [], []
   lab_permutation = np.load('2_label_permutation.npy')
   if targeted:
-    y_lab = np.load('advs_targeted_labels.npy')
+    y_lab = np.load('non_repeat_advs_targeted_labels.npy')
   else:
     y_lab = np.load('data/mnist_labels.npy')[60000:]
 
