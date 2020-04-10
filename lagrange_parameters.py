@@ -14,9 +14,9 @@ x = range(n)
 file = sys.argv[-1]
 y = np.load(file).reshape(256,-1)
 
-xx = np.array([mpf(val) for val in x])
+yy = np.array([mpf(val) for val in x])
 # yy = np.array([mpf(str(val)) for val in y])
-yy = [mpf(int(reduce(operator.add, [bin(int(v))[2:].zfill(8) for v in c]), 2)) for c in y]
+xx = [mpf(int(reduce(operator.add, [bin(int(v))[2:].zfill(8) for v in c]), 2)) for c in y]
 
 
 coef, s = [], []
@@ -39,7 +39,11 @@ for j, v in enumerate(xx):
 	tmp = sum([(v**i)*param[n-i-1] if (n-1)%2 == i%2 else -1*(v**i)*param[n-i-1] for i in range(n)])
 	print(tmp==yy[j], tmp, float(tmp)-float(yy[j]))
 
-param = [param[i]*(n-i-1) for i in range(n-1)]
+param = [param[i]*-1 if (n-1)%2==i%2 else param[i] for i in range(n)]
+for j, v in enumerate(xx):
+    tmp = np.polyval(param, v)
+    print(tmp==yy[j], tmp, float(tmp)-float(yy[j]))
+#param = [param[i]*(n-i-1) if (n-1)%2==i%2 else -1*param[i]*(n-i-1) for i in range(n-1)]
 # with open("lagrange_weights.txt", "w") as f:
 #     for s in param:
 #         f.write(str(s) +"\n")

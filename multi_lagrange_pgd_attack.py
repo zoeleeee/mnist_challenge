@@ -94,9 +94,9 @@ class LinfPGDAttack:
       x = np.clip(x, 0, 1) # ensure valid pixel range
     tmp = [[[[mpf(int(reduce(operator.add, [bin(int(v*255.))[2:].zfill(8) for v in c]), 2))] for c in b] for b in a] for a in x]
     print(np.array(tmp).shape)
-    tmp = [[[[int(np.polyval(self.param, v)) for v in c] for c in b] for b in a] for a in tmp]
-    print(time.time()-st, min(999, max(tmp)), min(999,max(-1, min(tmp))))
-    tmp = np.clip(tmp, org_img-int(self.epsilon*255.), org_img+int(self.epsilon*255.))
+    tmp = [[[[float(np.polyval(self.param, v)) for v in c] for c in b] for b in a] for a in tmp]
+    print(time.time()-st, np.max(tmp), np.min(tmp), np.median(tmp))
+    tmp = np.clip(tmp, org_img-int(self.epsilon*255.), org_img+int(self.epsilon*255.)).astype(np.int)
     tmp = np.clip(tmp, 0, 255)
     return tmp
 
@@ -217,5 +217,5 @@ if __name__ == '__main__':
     # x_adv = np.concatenate(x_adv, axis=0)
     # np.save(path, x_adv)
       x_adv = np.concatenate(x_show, axis=0)
-      np.save(path[:-10]+'show.npy', x_adv)
+      np.save(path[:-10]+'_lag_show.npy', x_adv)
     print('Examples stored in {}'.format(path))
