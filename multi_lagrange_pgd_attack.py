@@ -217,5 +217,5 @@ if __name__ == '__main__':
     # x_adv = np.concatenate(x_adv, axis=0)
     # np.save(path, x_adv)
       x_adv = np.concatenate(x_show, axis=0)
-      np.save(path[:-10]+'show.npy', x_adv)
+      np.save(path[:-10]+'_lag_show.npy', x_adv)
     print('Examples stored in {}'.format(path))
