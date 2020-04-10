@@ -60,7 +60,7 @@ class LinfPGDAttack:
         loss = tf.reduce_sum([bce_loss(self.assign_labels[i], tf.nn.sigmoid(model(self.assign_input))) for i,model in enumerate(self.models)])
     # self.grad = tf.reduce_sum([tf.gradients(loss, )[0] for m in self.models], 0)
     self.grad = tf.gradients(loss, self.assign_input)
-    self.param = np.load('lagrange/lag_'+params.split('/')[1])
+    self.param = np.load('lagrange/lag_iter_'+params.split('/')[1])
  #   self.input.assign(self.assign_input)
  #   self.labels.assign(self.assign_labels)
 
@@ -224,5 +224,5 @@ if __name__ == '__main__':
     # x_adv = np.concatenate(x_adv, axis=0)
     # np.save(path, x_adv)
       x_adv = np.concatenate(x_show, axis=0)
-      np.save(path[:-10]+'show.npy', x_adv)
+      np.save(path[:-10]+'_lag_iter_show.npy', x_adv)
     print('Examples stored in {}'.format(path))
