@@ -17,7 +17,7 @@ rep = np.load('2_label_permutation.npy')[:scores.shape[-1]].T
 imgs, labels, input_shape = load_data(config['permutation'], nb_labels)
 labels = labels[60000:]
 
-advs_label = np.load('advs_targeted_labels.npy')
+advs_label = np.load('non_repeat_advs_targeted_labels.npy')
 
 nat_labs = np.zeros(scores.shape).astype(np.float32)
 nat_labs[scores>=0.5] = 1.
