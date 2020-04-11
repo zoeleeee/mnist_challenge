@@ -49,7 +49,7 @@ class LinfPGDAttack:
 
     if loss_func == 'hinge':
         hinge_loss = tf.keras.losses.Hinge()
-        loss = tf.reduce_sum([hinge_loss(self.assign_labels[i], model(self.assign_input)) for i, model in enumerate(self.models)])
+        loss = tf.reduce_sum([hinge_loss(self.assign_labels[i], tf.nn.sigmoid(model(self.assign_input))) for i, model in enumerate(self.models)])
     elif loss_func == 'bce':
         bce_loss = keras.losses.BinaryCrossentropy()
         loss = tf.reduce_sum([bce_loss(self.assign_labels[i], tf.nn.sigmoid(model(self.assign_input))) for i,model in enumerate(self.models)])

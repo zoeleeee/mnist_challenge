@@ -41,7 +41,7 @@ if dataset != 'origin.npy':
 if len(x_test.shape) == 3:
   x_test = x_test.reshape(x_test.shape[0], x_test.shape[1], x_test.shape[2], 1)
 print(x_test.shape, len(x_test))
-
+y_test = y_test[:len(x_test)]
 def custom_loss():
   def loss(y_true, y_pred):
     if config['loss_func'] == 'bce':
