@@ -171,7 +171,7 @@ if __name__ == '__main__':
 
 
   permutation_path = config['permutation']
-  path = config['store_adv_path'].split('/')[0] + '/sign_'+config['store_adv_path'].split('/')[1]
+  path = config['store_adv_path'].split('/')[0] + '/sign_'+loss_func+'_'+config['store_adv_path'].split('/')[1]
   org_imgs = np.load('data/mnist_data.npy').transpose((0,2,3,1))[60000:]
   # org_labs = np.load('data/mnist_labels.npy')[60000:]
   imgs, labs, input_shape = load_data(permutation_path)
@@ -179,7 +179,7 @@ if __name__ == '__main__':
   # x_test, y_test = imgs[60000:], labs[60000:]
   if targeted:
     path = path.split('/')[0] + '/target_'+path.split('/')[1]
-
+  
   orders = np.load(permutation_path).astype(np.float32)
   orders /= int(permutation_path.split('/')[-1].split('_')[1].split('.')[0])-1
   # mnist = input_data.read_data_sets('MNIST_data', one_hot=False)

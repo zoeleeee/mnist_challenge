@@ -12,7 +12,7 @@ np.random.seed(777)
 
 x = range(n)
 file = sys.argv[-1]
-y = np.load(file).reshape(256,-1)
+y = np.load(file).reshape(256,-1).transpose((1,0))
 
 # xx = np.array([mpf(val) for val in x])
 # yy = np.array([mpf(val) for val in x])
@@ -70,13 +70,13 @@ for t in range(yyy.shape[0]):
 	coef = np.array(coef)
 	param = [sum(coef[i] * coef[0]) if i!=0 else sum(coef[0]) for i in range(len(coef))]
 	param = [param[i]*-1 if (n-1)%2==i%2 else param[i] for i in range(n)]
-	for i, v in enumerate(xx):
+	for j, v in enumerate(xx):
 		tmp = np.polyval(param, v)
-		print(tmp==yy[j], tmp, float(tmp)-float(yy[j]))
+		print(float(tmp)-float(yy[j]))
 	param = [param[i]*(n-i-1) for i in range(n-1)]
 	res.append(param)
  
-np.save('lagrange/lag_iter_'+file.split('/')[1], param)
+np.save('lagrange/lag_iter_'+file.split('/')[1], res)
 
 #np.save('lagrange_weights_sign.h5', np.sign(param))
 # print(param)
