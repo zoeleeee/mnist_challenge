@@ -70,10 +70,10 @@ print(rnd_imgs.shape, x_test.shape)
 while True:
   if np.mean(tot_advs_acc) == 1.: 
     print(tot_amt, 'totally attacked succeed!')
-    np.save('preds/rnd_'+model_dir+'.npy', change_advs_acc)
+    np.save('preds/rnd_'+model_dir.split('/')[-1]+'.npy', change_advs_acc)
     break
   elif tot_amt == 1e5:
-    np.save('preds/rnd_'+model_dir+'.npy', change_advs_acc)
+    np.save('preds/rnd_'+model_dir.split('/')[-1]+'.npy', change_advs_acc)
     print(tot_amt, 'total adversarial acc:', tot_advs_acc)
     break
   else:
@@ -106,6 +106,6 @@ while True:
     print(rnd_imgs.shape, noise.shape)
     rnd_imgs[error_idxs[preds_dist[preds!=y_test]<= t]] = noise[error_idxs[preds_dist[preds!=y_test]<= t]]
     change_advs_acc.append(np.mean(tot_advs_acc))
-    if tot_amt % 100 == 0:
-      np.save('advs/rnd_'+model_dir+'.npy', rnd_imgs)
+    if tot_amt % 1000 == 0:
+      np.save('advs/rnd_'+model_dir.split('/')[-1]+'.npy', rnd_imgs)
     print('{} natural: {:.2f}%; total adversarial acc:{}'.format(tot_amt, np.sum(preds_dist[preds!=y_test] <= t), np.mean(tot_advs_acc)))
