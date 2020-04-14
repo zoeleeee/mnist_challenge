@@ -64,18 +64,21 @@ for i in range(nb_models):
 
 tot_advs_acc = np.zeros(len(y_test))
 tot_amt = 0
+change_advs_acc = []
 rnd_imgs = np.zeros(imgs[-nb_imgs-st_imgs:-st_imgs].shape)
 print(rnd_imgs.shape, x_test.shape)
 while True:
   if np.mean(tot_advs_acc) == 1.: 
     print(tot_amt, 'totally attacked succeed!')
+    np.save('preds/rnd_'+model_dir+'.npy', change_advs_acc)
     break
   elif tot_amt == 1e5:
+    np.save('preds/rnd_'+model_dir+'.npy', change_advs_acc)
     print(tot_amt, 'total adversarial acc:', tot_advs_acc)
     break
   else:
     tot_amt += 1
-    noise = np.clip(np.random.randint(0, int(config['epsilon']*255), x_test.shape)+x_test, 0, 255).astype(np.int)
+    noise = np.clip(np.random.randint(-1*int(config['epsilon']*255), int(config['epsilon']*255), x_test.shape)+x_test, 0, 255).astype(np.int)
     samples = np.array([[[permut[d[0]] for d in c] for c in b] for b in noise])
     x_input = samples.astype(np.float32) / 255.
     scores = []
@@ -102,6 +105,7 @@ while True:
     tot_advs_acc[error_idxs[preds_dist[preds!=y_test]<= t]] = 1.
     print(rnd_imgs.shape, noise.shape)
     rnd_imgs[error_idxs[preds_dist[preds!=y_test]<= t]] = noise[error_idxs[preds_dist[preds!=y_test]<= t]]
+    change_advs_acc.append(np.mean(tot_advs_acc))
     if tot_amt % 100 == 0:
-      np.save('advs/rnd_100_25_256.32.npy', rnd_imgs)
+      np.save('advs/rnd_'+model_dir+'.npy', rnd_imgs)
     print('{} natural: {:.2f}%; total adversarial acc:{}'.format(tot_amt, np.sum(preds_dist[preds!=y_test] <= t), np.mean(tot_advs_acc)))
