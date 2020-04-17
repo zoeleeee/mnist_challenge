@@ -6,10 +6,10 @@ from utils import load_data
 
 def hamming_idxs(scores, config):
 	res = []
-	nb_labels = config['num_labels']
-	rep = np.load('2_label_permutation.npy')[:scores.shape[-1]].T
+	#nb_labels = config['num_labels']
+	rep = np.load('2_label_permutation.npy')[config['start_label']:config['start_label']+scores.shape[-1]].T
 
-	imgs, labels, input_shape = load_data(config['permutation'], nb_labels)
+	imgs, labels, input_shape = load_data(config['permutation'], scores.shape[-1])
 	labels = labels[60000:60000+len(scores)]
 
 	nat_labels = np.zeros(scores.shape).astype(np.float32)
@@ -39,7 +39,7 @@ if __name__ == '__main__':
 	with open(sys.argv[-1]) as config_file:
 	  config = json.load(config_file)
 	name = sys.argv[-2].split('/')[-1][5:]
-	model_dir = config['model_dir']
+	#model_dir = config['model_dir']
 	scores = np.load('preds/pred_{}'.format(name))
 	# labels = np.load('preds/labels_{}'.format(name))
 	print(scores.shape)
