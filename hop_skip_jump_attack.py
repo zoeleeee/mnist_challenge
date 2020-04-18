@@ -272,6 +272,8 @@ class HopSkipJumpAttack(Attack):
         prob.append(prob_i)
       prob = np.concatenate(prob, axis=0)
       pred_label = predict(prob)
+      print(pred_label.shape, original_label.shape)
+      print(pred_label!=original_label)
       if target_label is None:
         return pred_label != original_label
       else:
