@@ -263,6 +263,7 @@ class HopSkipJumpAttack(Attack):
       Decision function output 1 on the desired side of the boundary,
       0 otherwise.
       """
+      print(images.shape)
       images = extend_data('permutation/256_256.16_permutation.npy', images)
       images = clip_image(images, self.clip_min, self.clip_max)
       prob = []
@@ -275,9 +276,10 @@ class HopSkipJumpAttack(Attack):
       print(pred_label.shape, original_label.shape)
       print(pred_label!=original_label)
       if target_label is None:
-        return pred_label != original_label
+        res = pred_label != original_label[:pred_label.shape[0]]
       else:
-        return pred_label == target_label
+        res =  pred_label == target_label[:pred_label.shape[0]]
+      if res
       # if target_label is None:
       #   return np.argmax(prob, axis=1) != original_label
       # else:
