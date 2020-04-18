@@ -24,7 +24,7 @@ bapp_params = {
         'num_iterations': 10,
         'verbose': True,
     }
-x_adv = self.attack.generate_np(x_val, **bapp_params)
+x_adv = attack.generate_np(x_val, **bapp_params)
 orig_labs = np.argmax(model.predict(x_val), axis=1)
 new_labs = np.argmax(model.predict(x_adv), axis=1)
 print(np.max(np.absolute(x_adv-x_val)))
