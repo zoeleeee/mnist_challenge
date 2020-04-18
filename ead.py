@@ -12,7 +12,7 @@ model.load_weights('models/mnist.h5')
 x_val = np.load('data/mnist_data.npy')[60000:].transpose((0,2,3,1)).astype(np.float32) / 255.
 labels = np.load('data/mnist_labels.npy')[60000:]
 
-from cleverhans.attacks import HopSkipJumpAttack
+from cleverhans.attacks import ElasticNetMethod
 from cleverhans.utils_keras import KerasModelWrapper
 keras.backend.set_learning_phase(0)
 sess = keras.backend.get_session()
