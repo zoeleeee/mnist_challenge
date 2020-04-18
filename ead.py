@@ -21,7 +21,7 @@ attack = ElasticNetMethod(KerasModelWrapper(model), sess=sess)
 x_adv = attack.generate_np(x_val, max_iterations=100,
                                     binary_search_steps=3,
                                     initial_const=1,
-                                    clip_min=-5, clip_max=5,
+                                    clip_min=0, clip_max=1,
                                     batch_size=10)
 orig_labs = np.argmax(model.predict(x_val), axis=1)
 new_labs = np.argmax(model.predict(x_adv), axis=1)
