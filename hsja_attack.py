@@ -19,7 +19,7 @@ sess = keras.backend.get_session()
 
 attack = HopSkipJumpAttack(KerasModelWrapper(model), sess=sess)
 bapp_params = {
-        'constraint': 'l2',
+        'constraint': 'linf',
         'stepsize_search': 'geometric_progression',
         'num_iterations': 10,
         'verbose': True,
