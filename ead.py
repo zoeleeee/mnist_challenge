@@ -25,7 +25,7 @@ x_adv = attack.generate_np(x_val, max_iterations=100,
                                     batch_size=10)
 orig_labs = np.argmax(model.predict(x_val), axis=1)
 new_labs = np.argmax(model.predict(x_adv), axis=1)
-l2dist = np.linalg.norm(x_val-x_adv, ord=1, axis=-1)
+l1dist = np.linalg.norm(x_val-x_adv, ord=1, axis=-1)
 # l1dist = np.sum(np.absolute(x_adv-x_val, axis=-1))
 print(np.mean(l1dist), np.max(l1dist), np.min(l1dist))
 print('normal mnist model acc:', np.mean(orig_labs==labels))
