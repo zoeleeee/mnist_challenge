@@ -1,97 +1,38 @@
-## test_attack.py -- sample code to test attack procedure
-##
-## Copyright (C) 2016, Nicholas Carlini <nicholas@carlini.com>.
-##
-## This program is licenced under the BSD 2-Clause licence,
-## contained in the LICENCE file in this directory.
-
-import tensorflow as tf
-import numpy as np
-import time
-import sys
 import json
-from mpmath import *
-mp.dps = 1000
+import tensorflow as tf 
 from tensorflow import keras
-from keras.models import Sequential
-from keras.layers import Lambda, RepeatVector, Permute
-from l2_attack import CarliniL2
-# from l0_attack import CarliniL0
-# from li_attack import CarliniLi
+import numpy as np
 
+with open('models/mnist.json') as file:
+    json_model = file.read()
 
-def show(img):
-    """
-    Show MNSIT digits in the console.
-    """
-    remap = "  .*#"+"#"*100
-    img = (img.flatten()+.5)*3
-    if len(img) != 784: return
-    print("START")
-    for i in range(28):
-        print("".join([remap[int(round(x))] for x in img[i*28:i*28+28]]))
+model = keras.models.model_from_json(json_model)
+model.load_weights('models/mnist.h5')
 
-class Model:
-    def __init__(sess, restore, param, session=None):
-        def custom_loss():
-            def loss(y_true, y_pred):
-                if config['loss_func'] == 'bce':
-                    _loss = keras.losses.BinaryCrossentropy()
-                    return _loss(y_true, tf.nn.sigmoid(y_pred))
-                elif config['loss_func'] == 'xent':
-                    _loss = keras.losses.SparseCategoricalCrossentropy()
-                    return _loss(y_true, tf.nn.softmax(y_pred))
-            return loss
-        #   keras.losses.custom_loss = custom_loss
-            #model_file = tf.train.latest_checkpoint(config['model_dir'])
-        premodel = keras.models.load_model(restore+'.h5', custom_objects={ 'custom_loss': custom_loss(), 'loss':custom_loss() }, compile=False)
-        self.param = param
-        def lagrange(x):
-            
-            for i in range(self.param.shape[0]):
-                tf.math.polyval(self.param[i], x)
-            return 
-        def lagrange_output_shape(input_shape):
-            return input_shape
+x_val = np.load('data/mnist_data.npy')[60000:].transpose((0,2,3,1)).astype(np.float32) / 255.
+labels = np.load('data/mnist_labels.npy')[60000:]
 
-        model = Sequential()
-        model.add(RepeatVector(param.shape[0]))
-        model.add(Permute((2,3,1)))
-        model.add(Lambda(lagrange, output_shape=lagrange_output_shape))
-        model.add(premodel)
-        self.model = model
+from cleverhans.attacks import CarliniWagnerL2
+from cleverhans.utils_keras import KerasModelWrapper
+keras.backend.set_learning_phase(0)
+sess = keras.backend.get_session()
 
-    def predict(self, data):
-        self.model(data)
+attack = CarliniWagnerL2(KerasModelWrapper(model), sess=sess)
+x_adv = attack.generate_np(x_val, max_iterations=100,
+                                    binary_search_steps=3,
+                                    initial_const=1,
+                                    clip_min=0, clip_max=1,
+                                    batch_size=10)
+orig_labs = np.argmax(model.predict(x_val), axis=1)
+new_labs = np.argmax(model.predict(x_adv), axis=1)
+l2dist = np.linalg.norm(x_val-x_adv, axis=-1)
+print(np.mean(l2dist), np.max(l2dist), np.min(l2dist))
+print('normal mnist model acc:', np.mean(orig_labs==labels))
+print('advs mnist model acc:', np.mean(new_labs==labels))
+print('advs acc:', new_labs[orig_labs==labels] != labels[orig_labs==labels])
 
-if __name__ == "__main__":
-    import json
-    conf = sys.argv[-1]
-    with open(conf) as config_file:
-        config = json.load(config_file)
-
-    with tf.Session() as sess:
-        model = Model()
-        data, model =  MNIST(), MNISTModel("models/mnist", sess)
-        #data, model =  CIFAR(), CIFARModel("models/cifar", sess)
-        attack = CarliniL2(sess, model, batch_size=9, max_iterations=1000, confidence=0)
-        #attack = CarliniL0(sess, model, max_iterations=1000, initial_const=10,
-        #                   largest_const=15)
-
-        inputs, targets = generate_data(data, samples=1, targeted=True,
-                                        start=0, inception=False)
-        timestart = time.time()
-        adv = attack.attack(inputs, targets)
-        timeend = time.time()
-        
-        print("Took",timeend-timestart,"seconds to run",len(inputs),"samples.")
-
-        # for i in range(len(adv)):
-        #     print("Valid:")
-        #     show(inputs[i])
-        #     print("Adversarial:")
-        #     show(adv[i])
-            
-        #     print("Classification:", model.model.predict(adv[i:i+1]))
-
-        #     print("Total distortion:", np.sum((adv[i]-inputs[i])**2)**.5)
+# x_adv = self.attack.generate_np(x_val, max_iterations=100,
+#                                     binary_search_steps=3,
+#                                     initial_const=1,
+#                                     clip_min=-5, clip_max=5,
+#                                     batch_size=100, y_target=feed_labs)
