@@ -7,6 +7,7 @@ from warnings import warn
 from cleverhans.attacks import Attack
 from cleverhans.model import CallableModelWrapper, Model, wrapper_warning_logits
 from cleverhans import utils, utils_tf
+from utils import extend_data
 
 np_dtype = np.dtype('float32')
 tf_dtype = tf.as_dtype('float32')
@@ -92,7 +93,7 @@ class HopSkipJumpAttack(Attack):
     # Construct input placeholder and output for decision function.
     self.input_ph = tf.placeholder(
         tf_dtype, [None] + list(self.shape), name='input_image')
-    self.logits = self.model.get_logits(self.input_ph)
+    self.logits = self.model.get_logits(extend_data('permutation/256_256.16_permutation.npy', self.input_ph))
 
     def hsja_wrap(x, original_label, target_label, target_image):
       """ Wrapper to use tensors as input and output. """
@@ -257,6 +258,7 @@ class HopSkipJumpAttack(Attack):
       Decision function output 1 on the desired side of the boundary,
       0 otherwise.
       """
+      images = extend_data('permutation/256_256.16_permutation.npy', images)
       images = clip_image(images, self.clip_min, self.clip_max)
       prob = []
       for i in range(0, len(images), self.batch_size):

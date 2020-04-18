@@ -3,16 +3,33 @@ import tensorflow as tf
 from tensorflow import keras
 import numpy as np
 
-with open('models/mnist.json') as file:
-    json_model = file.read()
+# with open('models/mnist.json') as file:
+#     json_model = file.read()
+# model = keras.models.model_from_json(json_model)
+# model.load_weights('models/mnist.h5')
+import sys
+conf = sys.argv[-1]
+with open(conf) as config_file:
+    config = json.load(config_file)
+    
+def custom_loss():
+    def loss(y_true, y_pred):
+        if config['loss_func'] == 'bce':
+            _loss = keras.losses.BinaryCrossentropy()
+            return _loss(y_true, tf.nn.sigmoid(y_pred))
+        elif config['loss_func'] == 'xent':
+            _loss = keras.losses.SparseCategoricalCrossentropy()
+            return _loss(y_true, tf.nn.softmax(y_pred))
+    return loss
+#   keras.losses.custom_loss = custom_loss
+    #model_file = tf.train.latest_checkpoint(config['model_dir'])
+model = keras.models.load_model(config['model_dir']+'.h5', custom_objects={ 'custom_loss': custom_loss(), 'loss':custom_loss() }, compile=False)
 
-model = keras.models.model_from_json(json_model)
-model.load_weights('models/mnist.h5')
 
 x_val = np.load('data/mnist_data.npy')[60000:].transpose((0,2,3,1)).astype(np.float32) / 255.
 labels = np.load('data/mnist_labels.npy')[60000:]
 
-from cleverhans.attacks import HopSkipJumpAttack
+from hop_skip_jump_attack import HopSkipJumpAttack
 from cleverhans.utils_keras import KerasModelWrapper
 keras.backend.set_learning_phase(0)
 sess = keras.backend.get_session()
