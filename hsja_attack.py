@@ -11,7 +11,7 @@ import sys
 conf = sys.argv[-1]
 with open(conf) as config_file:
     config = json.load(config_file)
-    
+
 def custom_loss():
     def loss(y_true, y_pred):
         if config['loss_func'] == 'bce':
@@ -40,6 +40,7 @@ bapp_params = {
         'stepsize_search': 'geometric_progression',
         'num_iterations': 10,
         'verbose': True,
+        'original_label': labels,
     }
 x_adv = attack.generate_np(x_val, **bapp_params)
 orig_labs = np.argmax(model.predict(x_val), axis=1)
