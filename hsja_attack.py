@@ -17,7 +17,7 @@ from cleverhans.utils_keras import KerasModelWrapper
 keras.backend.set_learning_phase(0)
 sess = keras.backend.get_session()
 
-attack = MomentumIterativeMethod(HopSkipJumpAttack(model), sess=sess)
+attack = HopSkipJumpAttack(KerasModelWrapper(model), sess=sess)
 bapp_params = {
         'constraint': 'l2',
         'stepsize_search': 'geometric_progression',
