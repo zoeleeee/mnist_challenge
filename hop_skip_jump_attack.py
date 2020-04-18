@@ -174,7 +174,8 @@ class HopSkipJumpAttack(Attack):
                    verbose=True,
                    clip_min=0,
                    clip_max=1,
-                   label_rep=None):
+                   label_rep=None,
+                   original_label=None):
     """
     :param y: A tensor of shape (1, nb_classes) for true labels.
     :param y_target:  A tensor of shape (1, nb_classes) for target labels.
@@ -216,6 +217,7 @@ class HopSkipJumpAttack(Attack):
     self.clip_max = clip_max
     self.verbose = verbose
     self.label_rep = label_rep
+    self.original_label = original_label
 
   def _hsja(self, sample, original_label, target_label, target_image):
     """
