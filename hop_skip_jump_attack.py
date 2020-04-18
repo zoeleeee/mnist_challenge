@@ -244,7 +244,9 @@ class HopSkipJumpAttack(Attack):
     if target_label is not None:
       target_label = np.argmax(target_label)
 
-    def predict(nat_labels):
+    def predict(scores):
+      nat_labels = np.zeros(scores.shape).astype(np.float32)
+      nat_labels[scores>=0.5] = 1.
       preds = []
       for i in range(len(nat_labels)):
         tmp = np.repeat([nat_labels[i]], self.label_rep.shape[0], axis=0)
