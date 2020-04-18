@@ -253,7 +253,7 @@ class HopSkipJumpAttack(Attack):
         dists = np.sum(np.absolute(tmp-self.label_rep), axis=-1)
         min_dist = np.min(dists)
         pred_labels = np.arange(len(dists))[dists==min_dist]
-        pred_scores = [np.sum([scores[i][k] if label_rep[j][k]==1 else 1-scores[i][k] for k in np.arange(len(scores[i]))]) for j in pred_labels]
+        pred_scores = [np.sum([scores[i][k] if self.label_rep[j][k]==1 else 1-scores[i][k] for k in np.arange(len(scores[i]))]) for j in pred_labels]
         pred_label = pred_labels[np.argmax(pred_scores)]
         preds.append(pred_label)
       return np.array(preds)
