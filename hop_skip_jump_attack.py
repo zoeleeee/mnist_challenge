@@ -59,6 +59,7 @@ class HopSkipJumpAttack(Attack):
         'verbose',
         'gamma',
         'original_label',
+        'label_rep',
     ]
 
   def generate(self, x, **kwargs):
