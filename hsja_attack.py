@@ -28,6 +28,7 @@ model = keras.models.load_model(config['model_dir']+'.h5', custom_objects={ 'cus
 
 x_val = np.load('data/mnist_data.npy')[60000:].transpose((0,2,3,1)).astype(np.float32) / 255.
 labels = np.load('data/mnist_labels.npy')[60000:]
+label_rep = rep = np.load('2_label_permutation.npy')[config['start_label']:config['start_label']+config['num_labels']].T
 
 from hop_skip_jump_attack import HopSkipJumpAttack
 from cleverhans.utils_keras import KerasModelWrapper
@@ -41,6 +42,7 @@ bapp_params = {
         'num_iterations': 10,
         'verbose': True,
         'original_label': labels,
+        'label_rep': label_rep,
     }
 x_adv = attack.generate_np(x_val, **bapp_params)
 orig_labs = np.argmax(model.predict(x_val), axis=1)
