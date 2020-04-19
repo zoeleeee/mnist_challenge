@@ -33,16 +33,19 @@ class HopSkipJumpAttack(Attack):
   see parse_params for details.
   """
 
-  def __init__(self, model, sess, dtypestr='float32', **kwargs):
+  def __init__(self, models, sess, dtypestr='float32', **kwargs):
     """
     Note: the model parameter should be an instance of the
     cleverhans.model.Model abstraction provided by CleverHans.
     """
-    if not isinstance(model, Model):
-      wrapper_warning_logits()
-      model = CallableModelWrapper(model, 'logits')
+    self.models = []
+    for model in models:
+      if not isinstance(model, Model):
+        wrapper_warning_logits()
+        model = CallableModelWrapper(model, 'logits')
+        self.models.append(model)
 
-    super(HopSkipJumpAttack, self).__init__(model, sess,
+    super(HopSkipJumpAttack, self).__init__(self.models[0], sess,
                                                  dtypestr, **kwargs)
 
     self.feedable_kwargs = ('y_target', 'image_target', 'original_label')
@@ -93,7 +96,11 @@ class HopSkipJumpAttack(Attack):
     # Construct input placeholder and output for decision function.
     self.input_ph = tf.placeholder(tf_dtype, [None, 28, 28, 16], name='input_image')
 #        tf_dtype, [None] + list(self.shape), name='input_image')
-    self.logits = self.model.get_output(self.input_ph)#extend_data('permutation/256_256.16_permutation.npy', self.input_ph))
+    logits = []
+    for model in models:
+      logits.append(model.get_output(self.input_ph))
+      
+    self.logits = np.hstack(self.model.get_output(self.input_ph))#extend_data('permutation/256_256.16_permutation.npy', self.input_ph))
 
     def hsja_wrap(x, original_label, target_label, target_image):
       """ Wrapper to use tensors as input and output. """

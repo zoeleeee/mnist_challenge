@@ -21,21 +21,28 @@ if conf.endswith('.py'):
     }
 else:    
     from hop_skip_jump_attack import HopSkipJumpAttack
-    with open(conf) as config_file:
-        config = json.load(config_file)
-    label_rep = rep = np.load('2_label_permutation.npy')[config['start_label']:config['start_label']+config['num_labels']].T
-    image_target = np.load('advs/normal_mnist_MIM_advs_0.5_show.npy')
-    def custom_loss():
-        def loss(y_true, y_pred):
-            if config['loss_func'] == 'bce':
-                _loss = keras.losses.BinaryCrossentropy()
-                return _loss(y_true, tf.nn.sigmoid(y_pred))
-            elif config['loss_func'] == 'xent':
-                _loss = keras.losses.SparseCategoricalCrossentropy()
-                return _loss(y_true, tf.nn.softmax(y_pred))
-        return loss
-    #   keras.losses.custom_loss = custom_loss
-        #model_file = tf.train.latest_checkpoint(config['model_dir'])
+    nb_models = int(sys.argv[-2])
+    models = []
+    for i in range(nb_models):
+        with open(conf) as config_file:
+            config = json.load(config_file)
+        label_rep = rep = np.load('2_label_permutation.npy')[config['start_label']:config['start_label']+config['num_labels']*len(models)].T
+        idxs = np.arange(len(labels))
+        while np.sum(idxs == labels) != 0:
+            idxs[idxs==labels] = np.random.permutation(idxs[idxs==labels])
+        image_target = x_val[idxs]
+        def custom_loss():
+            def loss(y_true, y_pred):
+                if config['loss_func'] == 'bce':
+                    _loss = keras.losses.BinaryCrossentropy()
+                    return _loss(y_true, tf.nn.sigmoid(y_pred))
+                elif config['loss_func'] == 'xent':
+                    _loss = keras.losses.SparseCategoricalCrossentropy()
+                    return _loss(y_true, tf.nn.softmax(y_pred))
+            return loss
+        model = keras.models.load_model(config['model_dir']+'.h5', custom_objects={ 'custom_loss': custom_loss(), 'loss':custom_loss() }, compile=False)
+        conf = conf[:conf.find(conf.split('_')[-1])]+str(nb_labels*(i+1))+'.json'
+        models.append(model)
     bapp_params = {
         'constraint': 'linf',
         'stepsize_search': 'geometric_progression',
@@ -47,14 +54,14 @@ else:
         'clip_min': 0,
         'clip_max':255,
     }
-    model = keras.models.load_model(config['model_dir']+'.h5', custom_objects={ 'custom_loss': custom_loss(), 'loss':custom_loss() }, compile=False)
 
 
 from cleverhans.utils_keras import KerasModelWrapper
 keras.backend.set_learning_phase(0)
 sess = keras.backend.get_session()
 
-attack = HopSkipJumpAttack(KerasModelWrapper(model), sess=sess)
+models = [KerasModelWrapper(model) for model in models]
+attack = HopSkipJumpAttack(models, sess=sess)
 
 x_adv = attack.generate_np(x_val, **bapp_params)
 orig_labs = np.argmax(model.predict(x_val), axis=1)
