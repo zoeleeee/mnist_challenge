@@ -282,9 +282,9 @@ class HopSkipJumpAttack(Attack):
       # print(pred_label.shape, original_label.shape)
       # print(pred_label!=original_label)
       if target_label is None:
-        res = pred_label != original_label[:pred_label.shape[0]]
+        res = pred_label != original_label
       else:
-        res =  pred_label == target_label[:pred_label.shape[0]]
+        res =  pred_label == target_label
       return res
       # if target_label is None:
       #   return np.argmax(prob, axis=1) != original_label
