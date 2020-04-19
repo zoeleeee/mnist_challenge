@@ -24,7 +24,7 @@ else:
     with open(conf) as config_file:
         config = json.load(config_file)
     label_rep = rep = np.load('2_label_permutation.npy')[config['start_label']:config['start_label']+config['num_labels']].T
-    
+    image_target = np.load('advs/normal_mnist_MIM_advs_0.5_show.npy')
     def custom_loss():
         def loss(y_true, y_pred):
             if config['loss_func'] == 'bce':
@@ -43,6 +43,7 @@ else:
         'verbose': True,
         'original_label': labels,
         'label_rep': label_rep,
+        'image_target': image_target,
     }
     model = keras.models.load_model(config['model_dir']+'.h5', custom_objects={ 'custom_loss': custom_loss(), 'loss':custom_loss() }, compile=False)
 
