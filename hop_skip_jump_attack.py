@@ -146,7 +146,7 @@ class HopSkipJumpAttack(Attack):
     else:
       y_target = None
     if 'original_label' in kwargs and kwargs['original_label'] is not None:
-      original_label = np.copy(kwargs['original_label'])
+      original_label = np.copy(kwargs['original_label']).reshape(-1, 1)
     else:
       original_label = None
 
@@ -159,7 +159,7 @@ class HopSkipJumpAttack(Attack):
         single_y_target = np.expand_dims(y_target[i], axis=0)
         kwargs['y_target'] = single_y_target
       if original_label is not None:
-        single_org_lab = [original_label[i]]
+        single_org_lab = original_label[i]
         kwargs['original_label'] = single_org_lab
 
       adv_img = super(HopSkipJumpAttack,
