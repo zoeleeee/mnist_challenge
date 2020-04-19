@@ -159,7 +159,7 @@ class HopSkipJumpAttack(Attack):
         single_y_target = np.expand_dims(y_target[i], axis=0)
         kwargs['y_target'] = single_y_target
       if original_label is not None:
-        single_org_lab = original_label[i]
+        single_org_lab = [original_label[i]]
         kwargs['original_label'] = single_org_lab
 
       adv_img = super(HopSkipJumpAttack,
@@ -278,8 +278,8 @@ class HopSkipJumpAttack(Attack):
         prob_i = self.sess.run(self.logits, feed_dict={self.input_ph: batch})
         prob.append(prob_i)
       prob = np.concatenate(prob, axis=0)
-      pred_label = predict(prob)[0]
-      # print(pred_label.shape, original_label.shape)
+      pred_label = predict(prob)
+      print(pred_label.shape, original_label.shape)
       # print(pred_label!=original_label)
       if target_label is None:
         res = pred_label != original_label
