@@ -43,7 +43,7 @@ class HopSkipJumpAttack(Attack):
       if not isinstance(model, Model):
         wrapper_warning_logits()
         model = CallableModelWrapper(model, 'logits')
-        self.models.append(model)
+      self.models.append(model)
 
     super(HopSkipJumpAttack, self).__init__(self.models[0], sess,
                                                  dtypestr, **kwargs)
