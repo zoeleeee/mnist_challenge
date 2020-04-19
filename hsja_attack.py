@@ -44,6 +44,8 @@ else:
         'original_label': labels,
         'label_rep': label_rep,
         'image_target': image_target,
+        'clip_min': 0,
+        'clip_max':255,
     }
     model = keras.models.load_model(config['model_dir']+'.h5', custom_objects={ 'custom_loss': custom_loss(), 'loss':custom_loss() }, compile=False)
 
