@@ -269,9 +269,10 @@ class HopSkipJumpAttack(Attack):
       Decision function output 1 on the desired side of the boundary,
       0 otherwise.
       """
-      print(images.shape)
-      images = extend_data('permutation/256_256.16_permutation.npy', images)
       images = clip_image(images, self.clip_min, self.clip_max)
+      print(images.shape)
+      images = extend_data('permutation/256_256.16_permutation.npy', images.astype(np.int))
+      
       prob = []
       for i in range(0, len(images), self.batch_size):
         batch = images[i:i+self.batch_size]
@@ -309,10 +310,9 @@ class HopSkipJumpAttack(Attack):
     dist = compute_distance(perturbed, sample, self.constraint)
 
     for j in np.arange(self.num_iterations):
-      current_iteration = j + 1
-
+    
       # Choose delta.
-      delta = select_delta(dist_post_update, current_iteration,
+      delta = select_delta(dist_post_update, current_iteration, 
                            self.clip_max, self.clip_min, self.d,
                            self.theta, self.constraint)
 
