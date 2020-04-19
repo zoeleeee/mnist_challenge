@@ -310,7 +310,8 @@ class HopSkipJumpAttack(Attack):
     dist = compute_distance(perturbed, sample, self.constraint)
 
     for j in np.arange(self.num_iterations):
-    
+      current_iteration = j + 1
+      
       # Choose delta.
       delta = select_delta(dist_post_update, current_iteration, 
                            self.clip_max, self.clip_min, self.d,
