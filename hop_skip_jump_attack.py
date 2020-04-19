@@ -103,19 +103,19 @@ class HopSkipJumpAttack(Attack):
     if self.y_target is not None:
       # targeted attack that requires target label and image.
       wrap = tf.py_func(hsja_wrap,
-                        [x[0], self.original_label, self.y_target[0], self.image_target[0]],
+                        [x[0], self.original_label[0], self.y_target[0], self.image_target[0]],
                         self.tf_dtype)
     else:
       if self.image_target is not None:
         # untargeted attack with an initialized image.
         wrap = tf.py_func(lambda x, target_image: hsja_wrap(x, original_label,
                                                             None, target_image),
-                          [x[0], self.original_label, self.image_target[0]],
+                          [x[0], self.original_label[0], self.image_target[0]],
                           self.tf_dtype)
       else:
         # untargeted attack without an initialized image.
         wrap = tf.py_func(lambda x: hsja_wrap(x, original_label, None, None),
-                          [x[0], self.original_label], 
+                          [x[0], self.original_label[0]], 
                           self.tf_dtype)
 
     wrap.set_shape(x.get_shape())
@@ -274,14 +274,14 @@ class HopSkipJumpAttack(Attack):
         prob_i = self.sess.run(self.logits, feed_dict={self.input_ph: batch})
         prob.append(prob_i)
       prob = np.concatenate(prob, axis=0)
-      pred_label = predict(prob)
-      print(pred_label.shape, original_label.shape)
-      print(pred_label!=original_label)
+      pred_label = predict(prob)[0]
+      # print(pred_label.shape, original_label.shape)
+      # print(pred_label!=original_label)
       if target_label is None:
         res = pred_label != original_label[:pred_label.shape[0]]
       else:
         res =  pred_label == target_label[:pred_label.shape[0]]
-      if res
+      return res
       # if target_label is None:
       #   return np.argmax(prob, axis=1) != original_label
       # else:
