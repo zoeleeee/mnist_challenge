@@ -26,7 +26,7 @@ else:
     for i in range(nb_models):
         with open(conf) as config_file:
             config = json.load(config_file)
-        label_rep = rep = np.load('2_label_permutation.npy')[config['start_label']:config['start_label']+config['num_labels']*len(models)].T
+        
         idxs = np.arange(len(labels))
         while np.sum(idxs == labels) != 0:
             idxs[idxs==labels] = np.random.permutation(idxs[idxs==labels])
@@ -43,6 +43,7 @@ else:
         model = keras.models.load_model(config['model_dir']+'.h5', custom_objects={ 'custom_loss': custom_loss(), 'loss':custom_loss() }, compile=False)
         conf = conf[:conf.find(conf.split('_')[-1])]+str(nb_labels*(i+1))+'.json'
         models.append(model)
+    label_rep = rep = np.load('2_label_permutation.npy')[0:config['num_labels']*len(models)].T
     bapp_params = {
         'constraint': 'linf',
         'stepsize_search': 'geometric_progression',
