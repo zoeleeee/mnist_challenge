@@ -19,13 +19,12 @@ if conf.endswith('.py'):
         'num_iterations': 10,
         'verbose': True,
     }
-else:
-    label_rep = rep = np.load('2_label_permutation.npy')[config['start_label']:config['start_label']+config['num_labels']].T
-    
+else:    
     from hop_skip_jump_attack import HopSkipJumpAttack
     with open(conf) as config_file:
         config = json.load(config_file)
-
+    label_rep = rep = np.load('2_label_permutation.npy')[config['start_label']:config['start_label']+config['num_labels']].T
+    
     def custom_loss():
         def loss(y_true, y_pred):
             if config['loss_func'] == 'bce':
