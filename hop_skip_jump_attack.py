@@ -45,7 +45,7 @@ class HopSkipJumpAttack(Attack):
     super(HopSkipJumpAttack, self).__init__(model, sess,
                                                  dtypestr, **kwargs)
 
-    self.feedable_kwargs = ('y_target', 'image_target')
+    self.feedable_kwargs = ('y_target', 'image_target', 'original_label')
 
     self.structural_kwargs = [
         'stepsize_search',
@@ -58,7 +58,6 @@ class HopSkipJumpAttack(Attack):
         'batch_size',
         'verbose',
         'gamma',
-        'original_label',
         'label_rep',
     ]
 
@@ -109,14 +108,14 @@ class HopSkipJumpAttack(Attack):
     else:
       if self.image_target is not None:
         # untargeted attack with an initialized image.
-        wrap = tf.py_func(lambda x, target_image: hsja_wrap(x, self.original_label,
+        wrap = tf.py_func(lambda x, target_image: hsja_wrap(x, original_label,
                                                             None, target_image),
-                          [x[0], self.image_target[0]],
+                          [x[0], self.original_label, self.image_target[0]],
                           self.tf_dtype)
       else:
         # untargeted attack without an initialized image.
-        wrap = tf.py_func(lambda x: hsja_wrap(x, self.original_label, None, None),
-                          [x[0]],
+        wrap = tf.py_func(lambda x: hsja_wrap(x, original_label, None, None),
+                          [x[0], self.original_label], 
                           self.tf_dtype)
 
     wrap.set_shape(x.get_shape())
@@ -155,6 +154,9 @@ class HopSkipJumpAttack(Attack):
       if y_target is not None:
         single_y_target = np.expand_dims(y_target[i], axis=0)
         kwargs['y_target'] = single_y_target
+      if original_label is not None:
+        single_org_lab = original_label[i]
+        kwargs['original_label'] = single_org_lab
 
       adv_img = super(HopSkipJumpAttack,
                       self).generate_np(img, **kwargs)

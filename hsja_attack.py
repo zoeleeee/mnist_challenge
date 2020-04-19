@@ -6,34 +6,34 @@ import sys
 
 conf = sys.argv[-1]
 if conf.endswith('.py'):
-	from cleverhans.attacks import HopSkipJumpAttack
-	with open('models/mnist.json') as file:
-	    json_model = file.read()
-	model = keras.models.model_from_json(json_model)
-	model.load_weights('models/mnist.h5')
-	bapp_params = {
+    from cleverhans.attacks import HopSkipJumpAttack
+    with open('models/mnist.json') as file:
+        json_model = file.read()
+    model = keras.models.model_from_json(json_model)
+    model.load_weights('models/mnist.h5')
+    bapp_params = {
         'constraint': 'linf',
         'stepsize_search': 'geometric_progression',
         'num_iterations': 10,
         'verbose': True,
     }
 else:
-	from hop_skip_jump_attack import HopSkipJumpAttack
-	with open(conf) as config_file:
-	    config = json.load(config_file)
+    from hop_skip_jump_attack import HopSkipJumpAttack
+    with open(conf) as config_file:
+        config = json.load(config_file)
 
-	def custom_loss():
-	    def loss(y_true, y_pred):
-	        if config['loss_func'] == 'bce':
-	            _loss = keras.losses.BinaryCrossentropy()
-	            return _loss(y_true, tf.nn.sigmoid(y_pred))
-	        elif config['loss_func'] == 'xent':
-	            _loss = keras.losses.SparseCategoricalCrossentropy()
-	            return _loss(y_true, tf.nn.softmax(y_pred))
-	    return loss
-	#   keras.losses.custom_loss = custom_loss
-	    #model_file = tf.train.latest_checkpoint(config['model_dir'])
-	bapp_params = {
+    def custom_loss():
+        def loss(y_true, y_pred):
+            if config['loss_func'] == 'bce':
+                _loss = keras.losses.BinaryCrossentropy()
+                return _loss(y_true, tf.nn.sigmoid(y_pred))
+            elif config['loss_func'] == 'xent':
+                _loss = keras.losses.SparseCategoricalCrossentropy()
+                return _loss(y_true, tf.nn.softmax(y_pred))
+        return loss
+    #   keras.losses.custom_loss = custom_loss
+        #model_file = tf.train.latest_checkpoint(config['model_dir'])
+    bapp_params = {
         'constraint': 'linf',
         'stepsize_search': 'geometric_progression',
         'num_iterations': 10,
@@ -41,8 +41,8 @@ else:
         'original_label': labels,
         'label_rep': label_rep,
     }
-	model = keras.models.load_model(config['model_dir']+'.h5', custom_objects={ 'custom_loss': custom_loss(), 'loss':custom_loss() }, compile=False)
-	label_rep = rep = np.load('2_label_permutation.npy')[config['start_label']:config['start_label']+config['num_labels']].T
+    model = keras.models.load_model(config['model_dir']+'.h5', custom_objects={ 'custom_loss': custom_loss(), 'loss':custom_loss() }, compile=False)
+    label_rep = rep = np.load('2_label_permutation.npy')[config['start_label']:config['start_label']+config['num_labels']].T
 
 
 x_val = np.load('data/mnist_data.npy')[60000:].transpose((0,2,3,1)).astype(np.float32) / 255.
