@@ -4,6 +4,8 @@ from tensorflow import keras
 import numpy as np
 import sys
 
+x_val = np.load('data/mnist_data.npy')[60000:].transpose((0,2,3,1)).astype(np.float32) / 255.
+labels = np.load('data/mnist_labels.npy')[60000:]
 conf = sys.argv[-1]
 if conf.endswith('.py'):
     from cleverhans.attacks import HopSkipJumpAttack
@@ -18,6 +20,8 @@ if conf.endswith('.py'):
         'verbose': True,
     }
 else:
+    label_rep = rep = np.load('2_label_permutation.npy')[config['start_label']:config['start_label']+config['num_labels']].T
+    
     from hop_skip_jump_attack import HopSkipJumpAttack
     with open(conf) as config_file:
         config = json.load(config_file)
@@ -42,11 +46,6 @@ else:
         'label_rep': label_rep,
     }
     model = keras.models.load_model(config['model_dir']+'.h5', custom_objects={ 'custom_loss': custom_loss(), 'loss':custom_loss() }, compile=False)
-    label_rep = rep = np.load('2_label_permutation.npy')[config['start_label']:config['start_label']+config['num_labels']].T
-
-
-x_val = np.load('data/mnist_data.npy')[60000:].transpose((0,2,3,1)).astype(np.float32) / 255.
-labels = np.load('data/mnist_labels.npy')[60000:]
 
 
 from cleverhans.utils_keras import KerasModelWrapper
