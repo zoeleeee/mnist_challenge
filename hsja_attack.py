@@ -4,7 +4,7 @@ from tensorflow import keras
 import numpy as np
 import sys
 
-x_val = np.load('data/mnist_data.npy')[60000:].transpose((0,2,3,1)).astype(np.float32) / 255.
+x_val = np.load('data/mnist_data.npy')[60000:].transpose((0,2,3,1)).astype(np.float32)
 labels = np.load('data/mnist_labels.npy')[60000:]
 conf = sys.argv[-1]
 if conf.endswith('.py'):
@@ -41,7 +41,7 @@ else:
                     return _loss(y_true, tf.nn.softmax(y_pred))
             return loss
         model = keras.models.load_model(config['model_dir']+'.h5', custom_objects={ 'custom_loss': custom_loss(), 'loss':custom_loss() }, compile=False)
-        conf = conf[:conf.find(conf.split('_')[-1])]+str(nb_labels*(i+1))+'.json'
+        conf = conf[:conf.find(conf.split('_')[-1])]+str(config['num_labels']*(i+1))+'.json'
         models.append(model)
     label_rep = rep = np.load('2_label_permutation.npy')[0:config['num_labels']*len(models)].T
     bapp_params = {

@@ -97,10 +97,10 @@ class HopSkipJumpAttack(Attack):
     self.input_ph = tf.placeholder(tf_dtype, [None, 28, 28, 16], name='input_image')
 #        tf_dtype, [None] + list(self.shape), name='input_image')
     logits = []
-    for model in models:
+    for model in self.models:
       logits.append(model.get_output(self.input_ph))
       
-    self.logits = np.hstack(self.model.get_output(self.input_ph))#extend_data('permutation/256_256.16_permutation.npy', self.input_ph))
+    self.logits = tf.concat(logits,1)#extend_data('permutation/256_256.16_permutation.npy', self.input_ph))
 
     def hsja_wrap(x, original_label, target_label, target_image):
       """ Wrapper to use tensors as input and output. """
@@ -277,6 +277,7 @@ class HopSkipJumpAttack(Attack):
       0 otherwise.
       """
       images = clip_image(images, self.clip_min, self.clip_max)
+      print(np.min(images), np.max(images))
       print(images.shape)
       images = extend_data('permutation/256_256.16_permutation.npy', images.astype(np.int))
       
