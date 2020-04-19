@@ -145,6 +145,10 @@ class HopSkipJumpAttack(Attack):
       y_target = np.copy(kwargs['y_target'])
     else:
       y_target = None
+    if 'original_label' in kwargs and kwargs['original_label'] is not None:
+      original_label = np.copy(kwargs['original_label'])
+    else:
+      original_label = None
 
     for i, x_single in enumerate(x):
       img = np.expand_dims(x_single, axis=0)
