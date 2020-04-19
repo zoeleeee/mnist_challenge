@@ -115,7 +115,7 @@ class HopSkipJumpAttack(Attack):
       else:
         # untargeted attack without an initialized image.
         wrap = tf.py_func(lambda x: hsja_wrap(x, original_label, None, None),
-                          [x[0], self.original_label[0]], 
+                          [x[0], self.original_label], 
                           self.tf_dtype)
 
     wrap.set_shape(x.get_shape())
