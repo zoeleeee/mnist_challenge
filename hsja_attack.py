@@ -28,8 +28,10 @@ else:
             config = json.load(config_file)
         
         idxs = np.arange(len(labels))
-        while np.sum(idxs == labels) != 0:
-            idxs[idxs==labels] = np.random.permutation(idxs[idxs==labels])
+        while np.sum(labels[idxs] == labels) != 0:
+            if np.sum(labels[idxs]==labels) == 1:
+                idxs = np.random.permutation(np.arange(labels))
+            idxs[labels[idxs]==labels] = np.random.permutation(idxs[labels[idxs]==labels])
         image_target = x_val[idxs]
         def custom_loss():
             def loss(y_true, y_pred):
@@ -49,9 +51,9 @@ else:
         'stepsize_search': 'geometric_progression',
         'num_iterations': 10,
         'verbose': True,
-        'original_label': labels,
+        'original_label': labels[:100],
         'label_rep': label_rep,
-        'image_target': image_target,
+        'image_target': image_target[:100],
         'clip_min': 0,
         'clip_max':255,
     }
@@ -64,14 +66,14 @@ sess = keras.backend.get_session()
 models = [KerasModelWrapper(model) for model in models]
 attack = HopSkipJumpAttack(models, sess=sess)
 
-x_adv = attack.generate_np(x_val, **bapp_params)
+x_adv = attack.generate_np(x_val[:100], **bapp_params)
 orig_labs = np.argmax(model.predict(x_val), axis=1)
 new_labs = np.argmax(model.predict(x_adv), axis=1)
 print(np.max(np.absolute(x_adv-x_val)))
 print('normal mnist model acc:', np.mean(orig_labs==labels))
 print('advs mnist model acc:', np.mean(new_labs==labels))
 print('advs acc:', new_labs[orig_labs==labels] != labels[orig_labs==labels])
-
+np.save('advs/'+conf[:-5]+'_hsja_show.npy', x_adv)
 # from hop_skip_jump_attack import HopSkipJumpAttack
 # import json
 # import tensorflow as tf 
@@ -94,6 +96,8 @@ print('advs acc:', new_labs[orig_labs==labels] != labels[orig_labs==labels])
 # bapp_params = {
 #         'constraint': 'linf',
 #         'stepsize_search': 'grid_search',
+#         'stepsize_search': 'grid_search',
+#         'stepsize_search': 'grid_search',
 #         'num_iterations': 10,
 #         'verbose': True,
 #     }
@@ -111,5 +115,3 @@ print('advs acc:', new_labs[orig_labs==labels] != labels[orig_labs==labels])
 #         'num_iterations': 10,
 #         'verbose': True,
 #         'y_target': y_target_ph,
-#         'image_target': image_target_ph,
-#     }
