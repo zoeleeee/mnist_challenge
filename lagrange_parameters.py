@@ -49,7 +49,7 @@ y = np.load(file).reshape(256,-1).transpose((1,0))
 #     for s in param:
 #         f.write(str(s) +"\n")
 # np.save('lagrange_weights.npy', param)
-
+#xx = np.arange(256)/255.
 xx = np.array([mpf(val) for val in x]) / 255.
 yyy = np.array([mpf(str(val)) for val in y.reshape(-1)]).reshape(y.shape) / 255.
 res, params = [], []

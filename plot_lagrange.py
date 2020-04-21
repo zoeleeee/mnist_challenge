@@ -10,11 +10,11 @@ mp.dps = 1000
 a = np.load('lagrange/lag_'+file.split('/')[1]) [0]
 b = np.load('lagrange/lag_iter_'+file.split('/')[1])[0]
 
-x = np.arange(nb_values)/nb_values
-xx = np.arange(255)/255.
+x = np.array([mpf(val) for val in range(nb_values)])/nb_values
+xx = np.array([mpf(val) for val in range(256)])/255.
 y = np.polyval(a, x)
 yx = np.polyval(a, xx)
-print((yx*255).astype(np.int))
+print(len(yx), [int(v*255) for v in yx])
 yy = np.polyval(b, x)
 yyxx = np.polyval(b, xx)
 
