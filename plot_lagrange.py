@@ -14,9 +14,11 @@ x = np.arange(nb_values)/nb_values
 xx = np.arange(255)/255.
 y = np.polyval(a, x)
 yx = np.polyval(a, xx)
+print(int(yx*255))
 yy = np.polyval(b, x)
 yyxx = np.polyval(b, xx)
 
+plt.ylim(-1,2)
 plt.plot(x, y, color='plum')
 plt.scatter(xx, yx, color='lavender')
 plt.xticks(np.arange(0,1,15/255), ['15/255', '30/255', '45/255', '60/255', '75/255', '90/255', '105/255', '120/255', '135/255', '150/255', '165/255', '180/255', '195/255', '210/255', '225/255', '240/255'])
@@ -25,6 +27,8 @@ plt.yticks(np.arange(0,1,15/255), ['15/255', '30/255', '45/255', '60/255', '75/2
 plt.grid(linestyle='-.')
 plt.savefig('lagrange/plot_lagrange.png')
 plt.clf()
+
+plt.ylim(-1,2)
 plt.plot(x, yy, color='plum')
 plt.scatter(xx, yyxx, color='lavender')
 plt.xticks(np.arange(0,1,15/255), ['15/255', '30/255', '45/255', '60/255', '75/255', '90/255', '105/255', '120/255', '135/255', '150/255', '165/255', '180/255', '195/255', '210/255', '225/255', '240/255'])
