@@ -14,7 +14,7 @@ x = np.arange(nb_values)/nb_values
 xx = np.arange(255)/255.
 y = np.polyval(a, x)
 yx = np.polyval(a, xx)
-print(int(yx*255))
+print((yx*255).astype(np.int))
 yy = np.polyval(b, x)
 yyxx = np.polyval(b, xx)
 
