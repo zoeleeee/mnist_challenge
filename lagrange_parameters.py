@@ -3,7 +3,7 @@ import numpy as np
 from functools import reduce
 import operator
 import sys
-mp.dps = 5000
+mp.dps = 1000
 n = 256
 
 np.random.seed(777)
@@ -54,6 +54,7 @@ xx = np.array([mpf(val) for val in x]) / 255.
 yyy = np.array([mpf(str(val)) for val in y.reshape(-1)]).reshape(y.shape) / 255.
 res, params = [], []
 for t in range(yyy.shape[0]):
+    print('Iteration:', t)
     coef, s = [], []
     yy = yyy[t]
     coef.append([yy[i] / reduce(operator.mul, [xx[i]-xx[j] if i!=j else 1 for j in range(len(xx))]) for i in range(len(xx))])
@@ -74,8 +75,8 @@ for t in range(yyy.shape[0]):
     #param = [param[i]*(n-i-1) for i in range(n-1)]
     for j, v in enumerate(xx):
         tmp = np.polyval(param, v)
-        if int(tmp*255) != y[t][j]:
-            print(y[t][j], int(tmp*255))
+        if np.around(tmp*255) != y[t][j]:
+            print(y[t][j], np.around(tmp*255))
         # print(int(tmp*255), int(tmp*255)==y[t][j])#(float(tmp)-float(yy[j]))
     param = [param[i]*(n-i-1)*-1 if (n-1)%2==i%2 else param[i]*(n-i-1) for i in range(n-1)]
     res.append(param)
