@@ -52,7 +52,7 @@ y = np.load(file).reshape(256,-1).transpose((1,0))
 
 xx = np.array([mpf(val) for val in x]) / 255.
 yyy = np.array([mpf(str(val)) for val in y.reshape(-1)]).reshape(y.shape) / 255.
-res = []
+res, params = [], []
 for t in range(yyy.shape[0]):
 	coef, s = [], []
 	yy = yyy[t]
@@ -69,14 +69,15 @@ for t in range(yyy.shape[0]):
 
 	coef = np.array(coef)
 	param = [sum(coef[i] * coef[0]) if i!=0 else sum(coef[0]) for i in range(len(coef))]
-	#param = [param[i]*-1 if (n-1)%2==i%2 else param[i] for i in range(n)]
-	param = [param[i]*(n-i-1) for i in range(n-1)]
+	param = [param[i]*-1 if (n-1)%2==i%2 else param[i] for i in range(n)]
+        params.append(param)
+	#param = [param[i]*(n-i-1) for i in range(n-1)]
 	for j, v in enumerate(xx):
 		tmp = np.polyval(param, v)
-		print(tmp)#(float(tmp)-float(yy[j]))
-	#param = [param[i]*(n-i-1) for i in range(n-1)]
+		print(int(tmp*255))#(float(tmp)-float(yy[j]))
+	param = [param[i]*(n-i-1)*-1 if (n-1)%2==i%2 else param[i]*(n-i-1) for i in range(n-1)]
 	res.append(param)
- 
+np.svae('lagrange/lag_'+file.split('/')[1], params) 
 np.save('lagrange/lag_iter_'+file.split('/')[1], res)
 #np.save('lagrange/lag_forward_'+file.split('/')[1], res)
 

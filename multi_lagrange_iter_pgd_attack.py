@@ -91,7 +91,7 @@ class LinfPGDAttack:
       grad = sess.run(self.grad, feed_dict={self.assign_input:x, self.assign_labels:y})
       grad = np.array(grad)[0]
 #      print(grad.shape, tmp.shape)
-      sub_grad = np.array([[[[np.polyval(self.param[j], c[0]) for j in range(self.param.shape[0])] for c in b] for b in a] for a in tmp])
+      sub_grad = np.polyval(self.param[j], tmp)
       grad = np.sum(sub_grad*grad, axis=-1).reshape(tmp.shape)
       # print(np.array(grad).shape, np.sum(np.sign(grad)==0), np.sum(np.sign(grad)>0))
       if targeted:
