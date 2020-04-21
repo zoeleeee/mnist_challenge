@@ -14,7 +14,7 @@ x = np.array([mpf(val) for val in range(nb_values)])/nb_values
 xx = np.array([mpf(val) for val in range(256)])/255.
 yy = np.polyval(b, x)
 yyxx = np.polyval(b, xx)
-print(len(yyxx), [float(yyxx) for v in yyxx])
+print(len(yyxx), [float(v) for v in yyxx])
 y = np.polyval(a, x)
 yx = np.polyval(a, xx)
 print(len(yx), [int(v*255) for v in yx])
