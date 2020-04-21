@@ -75,8 +75,11 @@ for t in range(yyy.shape[0]):
     #param = [param[i]*(n-i-1) for i in range(n-1)]
     for j, v in enumerate(xx):
         tmp = np.polyval(param, v)
-        if np.around(tmp*255) != y[t][j]:
-            print(y[t][j], np.around(tmp*255))
+        val = int(tmp*255)
+        if int(tmp*2550) % 10 > 5:
+            val += 1
+        if val != y[t][j]:
+            print(y[t][j], val)
         # print(int(tmp*255), int(tmp*255)==y[t][j])#(float(tmp)-float(yy[j]))
     param = [param[i]*(n-i-1)*-1 if (n-1)%2==i%2 else param[i]*(n-i-1) for i in range(n-1)]
     res.append(param)
