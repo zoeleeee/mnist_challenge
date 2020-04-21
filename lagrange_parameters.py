@@ -3,7 +3,7 @@ import numpy as np
 from functools import reduce
 import operator
 import sys
-mp.dps = 1000
+mp.dps = 5000
 n = 256
 
 np.random.seed(777)
