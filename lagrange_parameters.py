@@ -81,7 +81,7 @@ for t in range(yyy.shape[0]):
         if val != y[t][j]:
             print(y[t][j], val)
         # print(int(tmp*255), int(tmp*255)==y[t][j])#(float(tmp)-float(yy[j]))
-    param = [param[i]*(n-i-1)*-1 if (n-1)%2==i%2 else param[i]*(n-i-1) for i in range(n-1)]
+    param = [param[i]*(n-i-1) for i in range(n-1)]
     res.append(param)
 np.save('lagrange/lag_'+file.split('/')[1], params) 
 np.save('lagrange/lag_iter_'+file.split('/')[1], res)
