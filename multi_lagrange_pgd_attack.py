@@ -87,7 +87,7 @@ class LinfPGDAttack:
        examples within epsilon of x_nat in l_infinity norm."""
     
     tmp = [[[[mpf(int(reduce(operator.add, [bin(int(v*255.))[2:].zfill(8) for v in c]), 2))] for c in b] for b in a] for a in x_nat]
-    tmp = [[[[float(np.polyval(self.param, v)) for v in c] for c in b] for b in a] for a in tmp]
+    tmp = np.polyval(self.param, [[[[mpf(v) for v in c] for c in b] for b in a] for a in tmp])
     print(np.max(tmp), np.min(tmp), np.median(tmp))
     if self.rand:
       x = x_nat + np.random.uniform(-self.epsilon, self.epsilon, x_nat.shape)
@@ -112,7 +112,7 @@ class LinfPGDAttack:
       x = np.clip(x, 0, 1) # ensure valid pixel range
       tmp = [[[[mpf(int(reduce(operator.add, [bin(int(v*255.))[2:].zfill(8) for v in c]), 2))] for c in b] for b in a] for a in x]
       print(np.array(tmp).shape)
-      tmp = [[[[float(np.polyval(self.param, v)) for v in c] for c in b] for b in a] for a in tmp]
+      tmp = np.polyval(self.param, [[[[mpf(v) for v in c] for c in b] for b in a] for a in tmp])
       print(time.time()-st, np.max(tmp), np.min(tmp), np.median(tmp))
       tmp = np.clip(tmp, org_img-int(self.epsilon*255.), org_img+int(self.epsilon*255.)).astype(np.int)
       tmp = np.clip(tmp, 0, 255)
