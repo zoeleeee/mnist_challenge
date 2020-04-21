@@ -24,10 +24,12 @@ class CarliniWagnerL2(Attack):
   iterative attack that finds adversarial examples on many defenses that
   are robust to other attacks.
   Paper link: https://arxiv.org/abs/1608.04644
+
   At a high level, this attack is an iterative attack using Adam and
   a specially-chosen loss function to find adversarial examples with
   lower distortion than other attacks. This comes at the cost of speed,
   as this attack is often much slower than others.
+
   :param model: cleverhans.model.Model
   :param sess: tf.Session
   :param dtypestr: dtype of the data
@@ -57,6 +59,7 @@ class CarliniWagnerL2(Attack):
     """
     Return a tensor that constructs adversarial examples for the given
     input. Generate uses tf.py_func in order to operate over tensors.
+
     :param x: A tensor with the inputs.
     :param kwargs: See `parse_params`
     """
@@ -152,6 +155,7 @@ class CWL2(object):
     """
     Return a tensor that constructs adversarial examples for the given
     input. Generate uses tf.py_func in order to operate over tensors.
+
     :param sess: a TF session.
     :param model: a cleverhans.model.Model object.
     :param batch_size: Number of attacks to run simultaneously.
@@ -272,6 +276,7 @@ class CWL2(object):
   def attack(self, imgs, targets):
     """
     Perform the L_2 attack on the given instance for the given targets.
+
     If self.targeted is true, then the targets represents the target labels
     If self.targeted is false, then targets are the original class labels
     """
