@@ -77,7 +77,7 @@ for t in range(yyy.shape[0]):
         print(int(tmp*255), int(tmp*255)==y[t][j])#(float(tmp)-float(yy[j]))
     param = [param[i]*(n-i-1)*-1 if (n-1)%2==i%2 else param[i]*(n-i-1) for i in range(n-1)]
     res.append(param)
-np.svae('lagrange/lag_'+file.split('/')[1], params) 
+np.save('lagrange/lag_'+file.split('/')[1], params) 
 np.save('lagrange/lag_iter_'+file.split('/')[1], res)
 #np.save('lagrange/lag_forward_'+file.split('/')[1], res)
 
