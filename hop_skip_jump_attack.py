@@ -7,6 +7,7 @@ from warnings import warn
 from cleverhans.attacks import Attack
 from cleverhans.model import CallableModelWrapper, Model, wrapper_warning_logits
 from cleverhans import utils, utils_tf
+from utils import extend_data
 
 np_dtype = np.dtype('float32')
 tf_dtype = tf.as_dtype('float32')
@@ -32,19 +33,22 @@ class HopSkipJumpAttack(Attack):
   see parse_params for details.
   """
 
-  def __init__(self, model, sess, dtypestr='float32', **kwargs):
+  def __init__(self, models, sess, dtypestr='float32', **kwargs):
     """
     Note: the model parameter should be an instance of the
     cleverhans.model.Model abstraction provided by CleverHans.
     """
-    if not isinstance(model, Model):
-      wrapper_warning_logits()
-      model = CallableModelWrapper(model, 'logits')
+    self.models = []
+    for model in models:
+      if not isinstance(model, Model):
+        wrapper_warning_logits()
+        model = CallableModelWrapper(model, 'logits')
+      self.models.append(model)
 
-    super(HopSkipJumpAttack, self).__init__(model, sess,
+    super(HopSkipJumpAttack, self).__init__(self.models[0], sess,
                                                  dtypestr, **kwargs)
 
-    self.feedable_kwargs = ('y_target', 'image_target')
+    self.feedable_kwargs = ('y_target', 'image_target', 'original_label')
 
     self.structural_kwargs = [
         'stepsize_search',
@@ -57,7 +61,7 @@ class HopSkipJumpAttack(Attack):
         'batch_size',
         'verbose',
         'gamma',
-        'original_label',
+        'label_rep',
     ]
 
   def generate(self, x, **kwargs):
@@ -90,9 +94,13 @@ class HopSkipJumpAttack(Attack):
       self.theta = self.gamma / (self.d * self.d)
 
     # Construct input placeholder and output for decision function.
-    self.input_ph = tf.placeholder(
-        tf_dtype, [None] + list(self.shape), name='input_image')
-    self.logits = self.model.get_logits(self.input_ph)
+    self.input_ph = tf.placeholder(tf_dtype, [None, 28, 28, 16], name='input_image')
+#        tf_dtype, [None] + list(self.shape), name='input_image')
+    logits = []
+    for model in self.models:
+      logits.append(model.get_output(self.input_ph))
+      
+    self.logits = tf.concat(logits,1)#extend_data('permutation/256_256.16_permutation.npy', self.input_ph))
 
     def hsja_wrap(x, original_label, target_label, target_image):
       """ Wrapper to use tensors as input and output. """
@@ -107,14 +115,14 @@ class HopSkipJumpAttack(Attack):
     else:
       if self.image_target is not None:
         # untargeted attack with an initialized image.
-        wrap = tf.py_func(lambda x, target_image: hsja_wrap(x, self.original_label,
+        wrap = tf.py_func(lambda x, original_label, target_image: hsja_wrap(x, original_label,
                                                             None, target_image),
-                          [x[0], self.image_target[0]],
+                          [x[0], self.original_label, self.image_target[0]],
                           self.tf_dtype)
       else:
         # untargeted attack without an initialized image.
-        wrap = tf.py_func(lambda x: hsja_wrap(x, self.original_label, None, None),
-                          [x[0]],
+        wrap = tf.py_func(lambda x, original_label: hsja_wrap(x, original_label, None, None),
+                          [x[0], self.original_label], 
                           self.tf_dtype)
 
     wrap.set_shape(x.get_shape())
@@ -144,6 +152,10 @@ class HopSkipJumpAttack(Attack):
       y_target = np.copy(kwargs['y_target'])
     else:
       y_target = None
+    if 'original_label' in kwargs and kwargs['original_label'] is not None:
+      original_label = np.copy(kwargs['original_label']).reshape(-1, 1)
+    else:
+      original_label = None
 
     for i, x_single in enumerate(x):
       img = np.expand_dims(x_single, axis=0)
@@ -153,6 +165,9 @@ class HopSkipJumpAttack(Attack):
       if y_target is not None:
         single_y_target = np.expand_dims(y_target[i], axis=0)
         kwargs['y_target'] = single_y_target
+      if original_label is not None:
+        single_org_lab = original_label[i]
+        kwargs['original_label'] = single_org_lab
 
       adv_img = super(HopSkipJumpAttack,
                       self).generate_np(img, **kwargs)
@@ -173,7 +188,8 @@ class HopSkipJumpAttack(Attack):
                    verbose=True,
                    clip_min=0,
                    clip_max=1,
-                   label_rep=None):
+                   label_rep=None,
+                   original_label=None):
     """
     :param y: A tensor of shape (1, nb_classes) for true labels.
     :param y_target:  A tensor of shape (1, nb_classes) for target labels.
@@ -215,6 +231,7 @@ class HopSkipJumpAttack(Attack):
     self.clip_max = clip_max
     self.verbose = verbose
     self.label_rep = label_rep
+    self.original_label = original_label
 
   def _hsja(self, sample, original_label, target_label, target_image):
     """
@@ -240,14 +257,16 @@ class HopSkipJumpAttack(Attack):
     if target_label is not None:
       target_label = np.argmax(target_label)
 
-    def predict(nat_labels):
+    def predict(scores):
+      nat_labels = np.zeros(scores.shape).astype(np.float32)
+      nat_labels[scores>=0.5] = 1.
       preds = []
       for i in range(len(nat_labels)):
-        tmp = np.repeat([nat_labels[i]], label_rep.shape[0], axis=0)
-        dists = np.sum(np.absolute(tmp-label_rep), axis=-1)
+        tmp = np.repeat([nat_labels[i]], self.label_rep.shape[0], axis=0)
+        dists = np.sum(np.absolute(tmp-self.label_rep), axis=-1)
         min_dist = np.min(dists)
         pred_labels = np.arange(len(dists))[dists==min_dist]
-        pred_scores = [np.sum([scores[i][k] if rep[j][k]==1 else 1-scores[i][k] for k in np.arange(len(scores[i]))]) for j in pred_labels]
+        pred_scores = [np.sum([scores[i][k] if self.label_rep[j][k]==1 else 1-scores[i][k] for k in np.arange(len(scores[i]))]) for j in pred_labels]
         pred_label = pred_labels[np.argmax(pred_scores)]
         preds.append(pred_label)
       return np.array(preds)
@@ -258,6 +277,10 @@ class HopSkipJumpAttack(Attack):
       0 otherwise.
       """
       images = clip_image(images, self.clip_min, self.clip_max)
+      print(np.min(images), np.max(images))
+      print(images.shape)
+      images = extend_data('permutation/256_256.16_permutation.npy', images.astype(np.int))
+      
       prob = []
       for i in range(0, len(images), self.batch_size):
         batch = images[i:i+self.batch_size]
@@ -265,10 +288,13 @@ class HopSkipJumpAttack(Attack):
         prob.append(prob_i)
       prob = np.concatenate(prob, axis=0)
       pred_label = predict(prob)
+      print(pred_label.shape, original_label.shape)
+      # print(pred_label!=original_label)
       if target_label is None:
-        return pred_label != original_label
+        res = pred_label != original_label
       else:
-        return pred_label == target_label
+        res =  pred_label == target_label
+      return res
       # if target_label is None:
       #   return np.argmax(prob, axis=1) != original_label
       # else:
@@ -293,9 +319,9 @@ class HopSkipJumpAttack(Attack):
 
     for j in np.arange(self.num_iterations):
       current_iteration = j + 1
-
+      
       # Choose delta.
-      delta = select_delta(dist_post_update, current_iteration,
+      delta = select_delta(dist_post_update, current_iteration, 
                            self.clip_max, self.clip_min, self.d,
                            self.theta, self.constraint)
 
