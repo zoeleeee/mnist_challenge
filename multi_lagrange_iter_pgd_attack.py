@@ -95,7 +95,7 @@ class LinfPGDAttack:
 #      print(grad.shape, tmp.shape)
       sub_grad = np.array([np.polyval(self.param[j], [[[mpf(v[j]) for v in b] for b in a] for a in x]) for j in range(x.shape[-1])]).transpose((1,2,3,0))
       print(sub_grad.shape, grad.shape)
-      grad = np.sum(sub_grad*grad, axis=-1)
+      grad = np.sum(sub_grad*grad, axis=-1).reshape(tmp.shape)
       # print(np.array(grad).shape, np.sum(np.sign(grad)==0), np.sum(np.sign(grad)>0))
       if targeted:
         tmp -= self.a*np.sign(grad).astype(np.float32)
