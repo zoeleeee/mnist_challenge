@@ -7,6 +7,7 @@ import sys
 x_val = np.load('data/mnist_data.npy')[60000:].transpose((0,2,3,1)).astype(np.float32)
 labels = np.load('data/mnist_labels.npy')[60000:]
 conf = sys.argv[-1]
+num_iter = int(sys.argv[-2])
 if conf.endswith('.py'):
     from cleverhans.attacks import HopSkipJumpAttack
     with open('models/mnist.json') as file:
@@ -16,12 +17,12 @@ if conf.endswith('.py'):
     bapp_params = {
         'constraint': 'linf',
         'stepsize_search': 'geometric_progression',
-        'num_iterations': 10,
+        'num_iterations': num_iter,
         'verbose': True,
     }
 else:    
     from hop_skip_jump_attack import HopSkipJumpAttack
-    nb_models = int(sys.argv[-2])
+    nb_models = int(sys.argv[-3])
     models = []
     for i in range(nb_models):
         with open(conf) as config_file:
@@ -49,7 +50,7 @@ else:
     bapp_params = {
         'constraint': 'linf',
         'stepsize_search': 'geometric_progression',
-        'num_iterations': 10,
+        'num_iterations': num_iter,
         'verbose': True,
         'original_label': labels[:100],
         'label_rep': label_rep,
@@ -73,7 +74,7 @@ x_adv = attack.generate_np(x_val[:100], **bapp_params)
 #print('normal mnist model acc:', np.mean(orig_labs==labels))
 #print('advs mnist model acc:', np.mean(new_labs==labels))
 #print('advs acc:', new_labs[orig_labs==labels] != labels[orig_labs==labels])
-np.save('advs/'+conf[:-5]+'_hsja_show.npy', x_adv)
+np.save('advs/'+conf[:-5].split('/')[-1]+'_'+str(num_iter)+'_hsja_show.npy', x_adv)
 # from hop_skip_jump_attack import HopSkipJumpAttack
 # import json
 # import tensorflow as tf 
