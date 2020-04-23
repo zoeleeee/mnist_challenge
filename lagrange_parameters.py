@@ -77,7 +77,7 @@ for t in range(yyy.shape[0]):
     for j, v in enumerate(xx):
         tmp = np.polyval(param, v)
         val = int(tmp*255)
-        grads.append()
+        #grads.append()
         if int(tmp*2550) % 10 > 5:
             val += 1
         if val != y[t][j]:
