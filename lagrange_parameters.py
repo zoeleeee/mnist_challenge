@@ -87,7 +87,7 @@ for t in range(yyy.shape[0]):
     grads.append(grad)
     res.append(_param)
 np.save('lagrange/lag_'+file.split('/')[1], params) 
-np.save('lagrange/lag_grad'+file.split('/')[1], grads) 
+np.save('lagrange/lag_grad_'+file.split('/')[1], grads) 
 np.save('lagrange/lag_iter_'+file.split('/')[1], res)
 #np.save('lagrange/lag_forward_'+file.split('/')[1], res)
 

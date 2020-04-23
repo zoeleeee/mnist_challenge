@@ -60,6 +60,7 @@ class LinfPGDAttack:
     # self.grad = tf.reduce_sum([tf.gradients(loss, )[0] for m in self.models], 0)
     self.grad = tf.gradients(loss, self.assign_input)
     self.param = np.load('lagrange/lag_'+params.split('/')[1])
+    self.inv_param = np.load('lagrange/lag_iter_'+params.split('/')[1])
  #   self.input.assign(self.assign_input)
  #   self.labels.assign(self.assign_labels)
   def grad_perm(self, v, i):
@@ -86,9 +87,8 @@ class LinfPGDAttack:
     """Given a set of examples (x_nat, y), returns a set of adversarial
        examples within epsilon of x_nat in l_infinity norm."""
     
-    tmp = [[[[mpf(int(reduce(operator.add, [bin(int(v*255.))[2:].zfill(8) for v in c]), 2))] for c in b] for b in a] for a in x_nat]
-    tmp = np.polyval(self.param, [[[[mpf(v) for v in c] for c in b] for b in a] for a in tmp])
-    print(np.max(tmp), np.min(tmp), np.median(tmp))
+    # tmp = copy.deepcopy(org_img)
+    # print(np.max(tmp), np.min(tmp), np.median(tmp))
     if self.rand:
       x = x_nat + np.random.uniform(-self.epsilon, self.epsilon, x_nat.shape)
       x = np.clip(x, 0, 1) # ensure valid pixel range
@@ -96,6 +96,8 @@ class LinfPGDAttack:
       x = np.copy(x_nat)
     st = time.time()
     for i in range(self.k):
+      tmp = 
+      x = np.array((np.polyval(self.param[j], ))
       # tt = dict([(m.x_input,x) for m in self.models]+[(self.models[i].y_input:y[i] for i in range(len(self.models)))])
       grad = sess.run(self.grad, feed_dict={self.assign_input:x, self.assign_labels:y})
       grad = np.array(grad)[0]
