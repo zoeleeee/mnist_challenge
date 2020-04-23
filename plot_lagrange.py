@@ -17,6 +17,8 @@ for i in range(aa.shape[0]):
 	xx = np.array([mpf(val) for val in range(256)])/255.
 	yy = np.polyval(b, x)
 	yyxx = np.polyval(b, xx)
+        print(yyxx)
+        print(yyxx.astype(np.float32))
 	print(len(yyxx), [float(v) for v in yyxx])
 	y = np.polyval(a, x)
 	yx = np.polyval(a, xx)

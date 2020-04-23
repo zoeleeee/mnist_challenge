@@ -60,7 +60,7 @@ class LinfPGDAttack:
         loss = tf.reduce_sum([bce_loss(self.assign_labels[i], tf.nn.sigmoid(model(self.assign_input))) for i,model in enumerate(self.models)])
     # self.grad = tf.reduce_sum([tf.gradients(loss, )[0] for m in self.models], 0)
     self.grad = tf.gradients(loss, self.assign_input)
-    self.param = np.load('lagrange/lag_iter_'+params.split('/')[1], allow_pickle=True)
+    self.param = np.load('lagrange/lag_grad_'+params.split('/')[1], allow_pickle=True)
  #   self.input.assign(self.assign_input)
  #   self.labels.assign(self.assign_labels)
 
@@ -79,7 +79,7 @@ class LinfPGDAttack:
     """Given a set of examples (x_nat, y), returns a set of adversarial
        examples within epsilon of x_nat in l_infinity norm."""
     tmp = copy.deepcopy(org_img)
-    org_img /= 255.
+    org_img = org_img.astype(np.float32) / 255.
     # print(tmp.shape)
     if self.rand:
       x = x_nat + np.random.uniform(-self.epsilon, self.epsilon, x_nat.shape)
@@ -94,7 +94,7 @@ class LinfPGDAttack:
       grad = sess.run(self.grad, feed_dict={self.assign_input:x, self.assign_labels:y})
       grad = np.array(grad)[0]
 #      print(grad.shape, tmp.shape)
-      sub_grad = np.array([[[[self.param[j][v[j]] for v in b] for b in a] for a in x] for j in range(x.shape[-1])]).transpose((1,2,3,0))
+      sub_grad = np.array([[[[self.param[j][v[0]] for v in b] for b in a] for a in tmp] for j in range(x.shape[-1])]).transpose((1,2,3,0))
       print(sub_grad.shape, grad.shape)
       grad = np.sum(sub_grad*grad, axis=-1).reshape(tmp.shape)
       # print(np.array(grad).shape, np.sum(np.sign(grad)==0), np.sum(np.sign(grad)>0))
