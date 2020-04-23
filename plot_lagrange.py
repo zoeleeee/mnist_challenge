@@ -10,7 +10,7 @@ mp.dps = 1000
 aa = np.load('lagrange/lag_'+file.split('/')[1])
 bb = np.load('lagrange/lag_iter_'+file.split('/')[1])
 
-for i in range(a.shape[0]):
+for i in range(aa.shape[0]):
 	a, b = aa[i], bb[i]
 
 	x = np.array([mpf(val) for val in range(nb_values)])/nb_values

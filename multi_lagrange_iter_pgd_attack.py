@@ -106,7 +106,7 @@ class LinfPGDAttack:
       tmp = np.array([int(v)+1 if v%1>.5 else int(v) for v in np.clip(tmp.reshape(-1), 0, 1)*255]).reshape(org_img.shape)
 
       x = np.array([[[order[int(v[0])] for v in b] for b in a] for a in tmp])
-      tmp /= 255.
+      tmp = tmp.astype(np.float)/255.
     # tmp = [[[[mpf(int(reduce(operator.add, [bin(int(v*255.))[2:].zfill(8) for v in c]), 2))] for c in b] for b in a] for a in x]
     # print(np.array(tmp).shape)
     # tmp = [[[[int(np.polyval(self.param, v)) for v in c] for c in b] for b in a] for a in tmp]
