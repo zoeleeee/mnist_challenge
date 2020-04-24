@@ -96,11 +96,16 @@ class LinfPGDAttack:
       x = np.copy(x_nat)
     st = time.time()
     for i in range(self.k):
-      tmp = 
-      x = np.array((np.polyval(self.param[j], ))
-      # tt = dict([(m.x_input,x) for m in self.models]+[(self.models[i].y_input:y[i] for i in range(len(self.models)))])
-      grad = sess.run(self.grad, feed_dict={self.assign_input:x, self.assign_labels:y})
+      print(time.time()-st)
+      _x = [[[order[round(v[0])] for v in c] for c in b] for b in (x*255)]
+      _x = np.array([[[[mpf(v) for v in c] for c in b] for b in a] for a in _x])
+      _x = np.array([np.polyval(self.param[j], _x[:,:,:,j]) for j in range(_x.shape[-1])]).transpose((1,2,3,0)).astype(np.float64)
+      print(np.max(_x), np.min(_x))
+      grad = sess.run(self.grad, feed_dict={self.assign_input:_x, self.assign_labels:y})
       grad = np.array(grad)[0]
+
+      sub_grad = np.array([np.polyval(self.inv_param[j], x) for j in range(_x.shape[-1])]).transpose((1,2,3,0)).astype(np.float64)
+      grad = np.sum(sub_grad*grad, axis=-1).reshape(x.shape)
 
 #      print(grad.shape, np.sum(np.sign(grad)==0), np.sum(np.sign(grad)>0))
 
@@ -110,17 +115,10 @@ class LinfPGDAttack:
 
       else:
         x += self.a*np.sign(grad)
-      # x = np.clip(x, x_nat - self.epsilon, x_nat + self.epsilon) 
-      x = np.clip(x, 0, 1) # ensure valid pixel range
-      tmp = [[[[mpf(int(reduce(operator.add, [bin(int(v*255.))[2:].zfill(8) for v in c]), 2))] for c in b] for b in a] for a in x]
-      print(np.array(tmp).shape)
-      tmp = np.polyval(self.param, [[[[mpf(v) for v in c] for c in b] for b in a] for a in tmp])
-      print(time.time()-st, np.max(tmp), np.min(tmp), np.median(tmp))
-      tmp = np.clip(tmp, org_img-int(self.epsilon*255.), org_img+int(self.epsilon*255.)).astype(np.int)
-      tmp = np.clip(tmp, 0, 255)
-      x = [[[order[int(v[0])] for v in c] for c in b] for b in tmp]
-      
-    return tmp
+      x = np.clip(x, x_nat - self.epsilon, x_nat + self.epsilon) 
+      x = np.clip(x, 0, 1) # ensure valid pixel range      
+    x = np.array([[[[round(v[0])] for v in c] for c in b] for b in x*255])
+    return x
 
 
 if __name__ == '__main__':
@@ -180,10 +178,10 @@ if __name__ == '__main__':
 
   permutation_path = config['permutation']
   path = config['store_adv_path'].split('/')[0] + '/sign_'+config['store_adv_path'].split('/')[1]
-  org_imgs = np.load('data/mnist_data.npy').transpose((0,2,3,1))[60000:]
+  org_imgs = np.load('data/mnist_data.npy').transpose((0,2,3,1)).astype(np.float64)/255.
   # org_labs = np.load('data/mnist_labels.npy')[60000:]
-  imgs, labs, input_shape = load_data(permutation_path)
-  x_test = imgs[60000:]
+  # imgs, labs, input_shape = load_data(permutation_path)
+  x_test = org_imgs[60000:]
   # x_test, y_test = imgs[60000:], labs[60000:]
   if targeted:
     path = path.split('/')[0] + '/target_'+path.split('/')[1]
