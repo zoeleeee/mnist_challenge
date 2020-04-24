@@ -10,7 +10,7 @@ np.random.seed(777)
 #xx = range(n)
 #yy = np.random.permutation(xx)
 
-x = np.arange(n)
+x = np.arange(n).astype(np.float64)
 file = sys.argv[-1]
 y = np.load(file).reshape(256,-1).transpose((1,0))
 
