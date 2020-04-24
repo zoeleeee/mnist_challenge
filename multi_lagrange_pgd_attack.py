@@ -97,9 +97,9 @@ class LinfPGDAttack:
     st = time.time()
     for i in range(self.k):
       print(time.time()-st)
-      _x = [[[order[round(v[0])] for v in c] for c in b] for b in (x*255)]
-      _x = np.array([[[[mpf(v) for v in c] for c in b] for b in a] for a in _x])
-      _x = np.array([np.polyval(self.param[j], _x[:,:,:,j]) for j in range(_x.shape[-1])]).transpose((1,2,3,0)).astype(np.float64)
+      # _x = [[[order[round(v[0])] for v in c] for c in b] for b in (x*255)]
+      _x = np.array([[[[mpf(str(v)) for v in c] for c in b] for b in a] for a in x])
+      _x = np.array([[np.polyval(self.param[j], np.hstack(_x))] for j in range(order.shape[-1])]).transpose((1,2,3,0)).astype(np.float64)
       print(np.max(_x), np.min(_x))
       grad = sess.run(self.grad, feed_dict={self.assign_input:_x, self.assign_labels:y})
       grad = np.array(grad)[0]
