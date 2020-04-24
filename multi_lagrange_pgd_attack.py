@@ -178,7 +178,7 @@ if __name__ == '__main__':
 
   permutation_path = config['permutation']
   path = config['store_adv_path'].split('/')[0] + '/sign_'+config['store_adv_path'].split('/')[1]
-  org_imgs = np.load('data/mnist_data.npy').transpose((0,2,3,1)).astype(np.float64)
+  org_imgs = np.load('data/mnist_data.npy').transpose((0,2,3,1)).astype(np.float64)/255.
   # org_labs = np.load('data/mnist_labels.npy')[60000:]
   # imgs, labs, input_shape = load_data(permutation_path)
   x_test = org_imgs[60000:]
