@@ -197,7 +197,7 @@ if __name__ == '__main__':
                          config['a'],
                          config['random_start'],
                          loss_func, #config['loss_func'],
-                         nb_labels, input_shape, config['eval_batch_size'], config['permutation'])  
+                         nb_labels, orders.shape, config['eval_batch_size'], config['permutation'])  
 
   # idxs = np.arange(x_test.shape[0])
   with tf.Session() as sess:
