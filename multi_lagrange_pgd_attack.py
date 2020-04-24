@@ -99,7 +99,7 @@ class LinfPGDAttack:
       print(time.time()-st)
       # _x = [[[order[round(v[0])] for v in c] for c in b] for b in (x*255)]
       _x = np.array([[[[mpf(str(v)) for v in c] for c in b] for b in a] for a in x])
-      _x = np.array([[np.polyval(self.param[j], np.hstack(_x))] for j in range(order.shape[-1])]).transpose((1,2,3,0)).astype(np.float64)
+      _x = np.array([[np.polyval(self.param[j], np.squeeze(_x))] for j in range(order.shape[-1])]).transpose((1,2,3,0)).astype(np.float64)
       print(np.max(_x), np.min(_x))
       grad = sess.run(self.grad, feed_dict={self.assign_input:_x, self.assign_labels:y})
       grad = np.array(grad)[0]
@@ -178,7 +178,7 @@ if __name__ == '__main__':
 
   permutation_path = config['permutation']
   path = config['store_adv_path'].split('/')[0] + '/sign_'+config['store_adv_path'].split('/')[1]
-  org_imgs = np.load('data/mnist_data.npy').transpose((0,2,3,1)).astype(np.float64)/255.
+  org_imgs = np.load('data/mnist_data.npy').transpose((0,2,3,1)).astype(np.float64)
   # org_labs = np.load('data/mnist_labels.npy')[60000:]
   # imgs, labs, input_shape = load_data(permutation_path)
   x_test = org_imgs[60000:]
