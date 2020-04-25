@@ -2,6 +2,7 @@ import json
 import tensorflow as tf 
 from tensorflow import keras
 import numpy as np
+import sys
 
 conf = sys.argv[-1]
 target = int(sys.argv[-2])
@@ -30,7 +31,7 @@ else:
         config = json.load(config_file)
     orders = np.load(config['permutation']).astype(np.float64)
     orders /= int(config['permutation'].split('/')[-1].split('_')[1].split('.')[0])-1
-    label_rep = np.load('2_label_permutation.npy')[0:config['num_labels']*len(models)].T
+    label_rep = np.load('2_label_permutation.npy')[0:config['num_labels']].T#*len(models)].T
     labels = np.array([label_rep[i] for i in labels])
     bapp_params = {
         'max_iterations':100,
@@ -39,7 +40,7 @@ else:
         'clip_min':0, 
         'clip_max':1,
         'batch_size':10,
-        'rnd': order,
+        'rnd': orders,
         'y_target':labels,
     }
 
