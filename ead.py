@@ -6,8 +6,8 @@ import sys
 
 conf = sys.argv[-1]
 target = int(sys.argv[-2])
-x_val = np.load('data/mnist_data.npy')[60000:].transpose((0,2,3,1)).astype(np.float32)
-labels = (np.load('data/mnist_labels.npy')[60000:]+target)%10
+x_val = np.load('data/mnist_data.npy')[60000:60400].transpose((0,2,3,1)).astype(np.float32)
+labels = (np.load('data/mnist_labels.npy')[60000:60400]+target)%10
 
 # num_iter = int(sys.argv[-2])
 if conf.endswith('.py'):
