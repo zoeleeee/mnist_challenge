@@ -64,6 +64,7 @@ else:
         'batch_size':10,
         'rnd': orders,
         'y_target':labels,
+        'models':models
     }
 
 from cleverhans.utils_keras import KerasModelWrapper
