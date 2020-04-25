@@ -70,6 +70,7 @@ from cleverhans.utils_keras import KerasModelWrapper
 keras.backend.set_learning_phase(0)
 sess = keras.backend.get_session()
 
+models = [KerasModelWrapper(model) for model in models]
 attack = ElasticNetMethod(models, sess=sess)
 x_adv = attack.generate_np(x_val,**bapp_params)
 # orig_labs = np.argmax(model.predict(x_val), axis=1)

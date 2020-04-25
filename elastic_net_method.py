@@ -8,7 +8,7 @@ import tensorflow as tf
 import time
 from cleverhans.attacks.attack import Attack
 from cleverhans.compat import reduce_sum, reduce_max
-from cleverhans.model import Model, CallableModelWrapper, wrapper_warning_logits
+from cleverhans.model import Model, CallableModelWrapper, wrapper_warning_logits, 
 from cleverhans import utils
 
 np_dtype = np.dtype('float32')
