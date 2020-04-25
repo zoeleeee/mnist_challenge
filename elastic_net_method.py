@@ -235,7 +235,7 @@ class EAD(object):
     self.clip_max = clip_max
     self.model = model
     self.decision_rule = decision_rule
-    self.rnd = rnd
+    self.rnd = tf.constant(rnd)
 
     self.beta = beta
     self.beta_t = tf.cast(self.beta, tf_dtype)
@@ -258,8 +258,8 @@ class EAD(object):
     self.const = tf.Variable(
         np.zeros(batch_size), dtype=tf_dtype, name='const')
 
-    self.setter_z = tf.assign(self.z, tf.map_fn(lambda x: self.rnd[int(x.eval())], 
-      tf.round(tf.multiply(self.slack, tf.cast(255, tf_dtype)))))
+    self.setter_z = tf.assign(self.z, tf.reshape(tf.map_fn(lambda x: self.rnd[int(x.eval())], 
+      tf.reshape(tf.round(tf.multiply(self.slack, tf.cast(255, tf_dtype))), [-1])), list(self.z_shape)))
     self.reset_slack = tf.assign(self.slack, tf.divide(tf.argmin(tf.norm(tf.substract(
       tf.tile(tf.expand_dims(self.z, -2), [1,1,1,256,1]),
       tf.tile(self.rnd.reshape([1,1,1]+list(self.rnd.shape)), list(shape)+[1])), axis=-1), axis=-1), tf.cast(255, tf_dtype)))
