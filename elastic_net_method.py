@@ -243,8 +243,8 @@ class EAD(object):
     self.repeat = binary_search_steps >= 10
 
     self.shape = shape = tuple([batch_size] + list(shape))
-    self.z_shape = tuple([batch_size]+list(shape[:-1])+list([shape[-1]*rnd.shape[-1]]))
-    self.extend_shape = tuple([batch_size]+list(shape[:-1])+list([1, shape[-1]*rnd.shape[-1]]))
+    self.z_shape = tuple(list(shape[:-1])+list([shape[-1]*rnd.shape[-1]]))
+    self.extend_shape = tuple(list(shape[:-1])+list([1, shape[-1]*rnd.shape[-1]]))
     # these are variables to be more efficient in sending data to tf
     self.timg = tf.Variable(np.zeros(shape), dtype=tf_dtype, name='timg')
     self.newimg = tf.Variable(
