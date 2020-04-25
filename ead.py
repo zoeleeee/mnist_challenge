@@ -53,7 +53,7 @@ else:
         models.append(model)
     orders = np.load(config['permutation']).astype(np.float32)
     orders /= int(config['permutation'].split('/')[-1].split('_')[1].split('.')[0])-1
-    label_rep = np.load('2_label_permutation.npy')[0:config['num_labels']].T#*len(models)].T
+    label_rep = np.load('2_label_permutation.npy')[0:config['num_labels']*len(models)].T
     labels = np.array([label_rep[i] for i in labels])
     bapp_params = {
         'max_iterations':100,
