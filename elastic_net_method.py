@@ -307,8 +307,10 @@ class EAD(object):
     self.setter_y = tf.assign(self.slack, self.assign_slack)
 
     # prediction BEFORE-SOFTMAX of the model
-    self.output = model.get_output(self.newimg)
-    self.output_y = model.get_output(self.slack)
+    self.output = model.get_output(tf.reshape(tf.map_fn(lambda x: self.rnd[tf.cast(x, tf.int32)], 
+      tf.reshape(tf.round(tf.multiply(self.newimg, tf.cast(255, tf_dtype))), [-1])), list(self.z_shape)))
+    self.output_y = model.get_output(tf.reshape(tf.map_fn(lambda x: self.rnd[tf.cast(x, tf.int32)], 
+      tf.reshape(tf.round(tf.multiply(self.slack, tf.cast(255, tf_dtype))), [-1])), list(self.z_shape)))
 
     # distance to the input data
     self.l2dist = reduce_sum(tf.square(self.newimg-self.timg),
