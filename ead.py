@@ -27,18 +27,30 @@ if conf.endswith('.py'):
     }
 else:
     from elastic_net_method import ElasticNetMethod
-    with open(conf) as config_file:
-        config = json.load(config_file)
-    def custom_loss():
-        def loss(y_true, y_pred):
-            if config['loss_func'] == 'bce':
-                _loss = keras.losses.BinaryCrossentropy()
-                return _loss(y_true, tf.nn.sigmoid(y_pred))
-            elif config['loss_func'] == 'xent':
-                _loss = keras.losses.SparseCategoricalCrossentropy()
-                return _loss(y_true, tf.nn.softmax(y_pred))
-        return loss
-    model = keras.models.load_model(config['model_dir']+'.h5', custom_objects={ 'custom_loss': custom_loss(), 'loss':custom_loss() }, compile=False)
+    nb_models = int(sys.argv[-3])
+    models = []
+    for i in range(nb_models):
+        with open(conf) as config_file:
+            config = json.load(config_file)
+        
+        idxs = np.arange(len(labels))
+        while np.sum(labels[idxs] == labels) != 0:
+            if np.min(labels[labels[idxs]==labels]) == np.max(labels[labels[idxs]==labels]):
+                idxs = np.random.permutation(np.arange(len(labels)))
+            idxs[labels[idxs]==labels] = np.random.permutation(idxs[labels[idxs]==labels])
+        image_target = x_val[idxs]
+        def custom_loss():
+            def loss(y_true, y_pred):
+                if config['loss_func'] == 'bce':
+                    _loss = keras.losses.BinaryCrossentropy()
+                    return _loss(y_true, tf.nn.sigmoid(y_pred))
+                elif config['loss_func'] == 'xent':
+                    _loss = keras.losses.SparseCategoricalCrossentropy()
+                    return _loss(y_true, tf.nn.softmax(y_pred))
+            return loss
+        model = keras.models.load_model(config['model_dir']+'.h5', custom_objects={ 'custom_loss': custom_loss(), 'loss':custom_loss() }, compile=False)
+        conf = conf[:conf.find(conf.split('_')[-1])]+str(config['num_labels']*(i+1))+'.json'
+        models.append(model)
     orders = np.load(config['permutation']).astype(np.float32)
     orders /= int(config['permutation'].split('/')[-1].split('_')[1].split('.')[0])-1
     label_rep = np.load('2_label_permutation.npy')[0:config['num_labels']].T#*len(models)].T

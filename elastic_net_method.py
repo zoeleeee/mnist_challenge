@@ -55,7 +55,7 @@ class ElasticNetMethod(Attack):
         'beta', 'decision_rule', 'batch_size', 'confidence',
         'targeted', 'learning_rate', 'binary_search_steps',
         'max_iterations', 'abort_early', 'initial_const', 'clip_min',
-        'clip_max', 'rnd',
+        'clip_max', 'rnd', 'models',
     ]
 
   def generate(self, x, **kwargs):
@@ -78,7 +78,7 @@ class ElasticNetMethod(Attack):
                  self.binary_search_steps, self.max_iterations,
                  self.abort_early, self.initial_const, self.clip_min,
                  self.clip_max, nb_classes,
-                 x.get_shape().as_list()[1:], self.rnd)
+                 x.get_shape().as_list()[1:], self.rnd, self.models)
 
     def ead_wrap(x_val, y_val):
       return np.array(attack.attack(x_val, y_val), dtype=self.np_dtype)
@@ -101,7 +101,7 @@ class ElasticNetMethod(Attack):
                    abort_early=False,
                    initial_const=1e-3,
                    clip_min=0,
-                   clip_max=1, rnd=None):
+                   clip_max=1, rnd=None, models=None):
     """
     :param y: (optional) A tensor with the true labels for an untargeted
               attack. If None (and y_target is None) then use the
@@ -161,13 +161,14 @@ class ElasticNetMethod(Attack):
     self.clip_min = clip_min
     self.clip_max = clip_max
     self.rnd = rnd
+    self.models = models
 
 
 class EAD(object):
   def __init__(self, sess, model, beta, decision_rule, batch_size,
                confidence, targeted, learning_rate, binary_search_steps,
                max_iterations, abort_early, initial_const, clip_min,
-               clip_max, num_labels, shape, rnd):
+               clip_max, num_labels, shape, rnd, models):
     """
     EAD Attack
 
@@ -236,6 +237,7 @@ class EAD(object):
     self.model = model
     self.decision_rule = decision_rule
     self.rnd = tf.constant(rnd)
+    self.models = models
 
     self.beta = beta
     self.beta_t = tf.cast(self.beta, tf_dtype)
@@ -307,9 +309,11 @@ class EAD(object):
     self.setter_y = tf.assign(self.slack, self.assign_slack)
 
     # prediction BEFORE-SOFTMAX of the model
-    self.output = model.get_output(tf.reshape(tf.map_fn(lambda x: self.rnd[tf.cast(x, tf.int32)], 
-      tf.reshape(tf.round(tf.multiply(self.newimg, tf.cast(255, tf_dtype))), [-1])), list(self.z_shape)))
-    self.output_y = model.get_output(self.z)
+    self.tmp = tf.reshape(tf.map_fn(lambda x: self.rnd[tf.cast(x, tf.int32)], 
+      tf.reshape(tf.round(tf.multiply(self.newimg, tf.cast(255, tf_dtype))), [-1])), list(self.z_shape))
+    
+    self.output = tf.concat([model.get_output(self.tmp) for model in self.models], 1)
+    self.output_y = tf.concat([model.get_output(self.z) for model in self.models], 1)
 
     # distance to the input data
     self.l2dist = reduce_sum(tf.square(self.newimg-self.timg),
@@ -423,17 +427,10 @@ class EAD(object):
     """
 
     def compare(x, y):
-      if not isinstance(x, (float, int, np.int64)):
-        x = np.copy(x)
-        if self.TARGETED:
-          x[y] -= self.CONFIDENCE
-        else:
-          x[y] += self.CONFIDENCE
-        x = np.argmax(x)
       if self.TARGETED:
-        return x == y
+        return np.sum((x-y) != 0) == 0
       else:
-        return x != y
+        return np.sum((x-y) == 0) == 0
 
     batch_size = self.batch_size
 
@@ -505,7 +502,7 @@ class EAD(object):
 
         # adjust the best result found so far
         for e, (dst, sc, ii) in enumerate(zip(crit, scores, nimg)):
-          lab = np.argmax(batchlab[e])
+          lab = batchlab[e]#np.argmax(batchlab[e])
           if dst < bestdst[e] and compare(sc, lab):
             bestdst[e] = dst
             bestscore[e] = np.argmax(sc)
@@ -516,7 +513,8 @@ class EAD(object):
 
       # adjust the constant as needed
       for e in range(batch_size):
-        if compare(bestscore[e], np.argmax(batchlab[e])) and \
+        # if compare(bestscore[e], np.argmax(batchlab[e])) and \
+        if compare(bestscore[e], batchlab[e]) and \
            bestscore[e] != -1:
           # success, divide const by two
           upper_bound[e] = min(upper_bound[e], CONST[e])
