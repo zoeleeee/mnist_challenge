@@ -29,6 +29,16 @@ else:
     from elastic_net_method import ElasticNetMethod
     with open(conf) as config_file:
         config = json.load(config_file)
+    def custom_loss():
+        def loss(y_true, y_pred):
+            if config['loss_func'] == 'bce':
+                _loss = keras.losses.BinaryCrossentropy()
+                return _loss(y_true, tf.nn.sigmoid(y_pred))
+            elif config['loss_func'] == 'xent':
+                _loss = keras.losses.SparseCategoricalCrossentropy()
+                return _loss(y_true, tf.nn.softmax(y_pred))
+        return loss
+    model = keras.models.load_model(config['model_dir']+'.h5', custom_objects={ 'custom_loss': custom_loss(), 'loss':custom_loss() }, compile=False)
     orders = np.load(config['permutation']).astype(np.float64)
     orders /= int(config['permutation'].split('/')[-1].split('_')[1].split('.')[0])-1
     label_rep = np.load('2_label_permutation.npy')[0:config['num_labels']].T#*len(models)].T
