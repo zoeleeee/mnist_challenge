@@ -342,8 +342,8 @@ class EAD(object):
 
     if self.TARGETED:
       # if targeted, optimize for making the other class most likely
-      loss1 = tf.reduce_mean(tf.reduce_sum(tf.nn.sigmoid_cross_entropy_with_logits(self.output, self.tlab), axis=-1))
-      loss1_y = tf.reduce_mean(tf.reduce_sum(tf.nn.sigmoid_cross_entropy_with_logits(self.output_y, self.tlab), axis=-1))
+      loss1 = tf.reduce_mean(tf.reduce_sum(tf.nn.sigmoid_cross_entropy_with_logits(logits=self.output, labels=self.tlab), axis=-1))
+      loss1_y = tf.reduce_mean(tf.reduce_sum(tf.nn.sigmoid_cross_entropy_with_logits(logits=self.output_y, labels=self.tlab), axis=-1))
       # loss1_y = tf.maximum(ZERO(), other_y - real_y + self.CONFIDENCE)
     else:
       # if untargeted, optimize for making this class least likely.
