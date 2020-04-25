@@ -43,9 +43,15 @@ class ElasticNetMethod(Attack):
     Note: the model parameter should be an instance of the
     cleverhans.model.Model abstraction provided by CleverHans.
     """
-    if not isinstance(model, Model):
-      wrapper_warning_logits()
-      model = CallableModelWrapper(model, 'logits')
+    self.models = []
+    for model in models:
+      if not isinstance(model, Model):
+        wrapper_warning_logits()
+        model = CallableModelWrapper(model, 'logits')
+      self.models.append(model)
+    # if not isinstance(model, Model):
+    #   wrapper_warning_logits()
+    #   model = CallableModelWrapper(model, 'logits')
 
     super(ElasticNetMethod, self).__init__(model, sess, dtypestr, **kwargs)
 
