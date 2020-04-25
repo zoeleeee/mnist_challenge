@@ -23,7 +23,7 @@ if conf.endswith('.py'):
         'initial_const':1,
         'clip_min':0, 
         'clip_max':1,
-        'batch_size':10,
+        'batch_size':100,
     }
 else:
     from elastic_net_method import ElasticNetMethod
@@ -61,7 +61,7 @@ else:
         'initial_const':1,
         'clip_min':0, 
         'clip_max':1,
-        'batch_size':10,
+        'batch_size':100,
         'rnd': orders,
         'y_target':labels,
     }
