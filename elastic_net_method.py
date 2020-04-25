@@ -262,7 +262,7 @@ class EAD(object):
       tf.reshape(tf.round(tf.multiply(self.slack, tf.cast(255, tf_dtype))), [-1])), list(self.z_shape)))
     self.reset_slack = tf.assign(self.slack, tf.divide(tf.argmin(tf.norm(tf.subtract(
       tf.tile(tf.expand_dims(self.z, -2), [1,1,1,256,1]),
-      tf.tile(self.rnd.reshape([1,1,1]+list(self.rnd.shape)), list(shape)+[1])), axis=-1), axis=-1), tf.cast(255, tf_dtype)))
+      tf.tile(tf.reshape(self.rnd, [1,1,1]+list(rnd.shape)), list(shape)+[1])), axis=-1), axis=-1), tf.cast(255, tf_dtype)))
 
     # and here's what we use to assign them
     self.assign_timg = tf.placeholder(tf_dtype, shape, name='assign_timg')
