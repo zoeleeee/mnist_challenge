@@ -38,7 +38,7 @@ class ElasticNetMethod(Attack):
   :param kwargs: passed through to super constructor
   """
 
-  def __init__(self, model, sess, dtypestr='float32', **kwargs):
+  def __init__(self, models, sess, dtypestr='float32', **kwargs):
     """
     Note: the model parameter should be an instance of the
     cleverhans.model.Model abstraction provided by CleverHans.
@@ -61,7 +61,7 @@ class ElasticNetMethod(Attack):
         'beta', 'decision_rule', 'batch_size', 'confidence',
         'targeted', 'learning_rate', 'binary_search_steps',
         'max_iterations', 'abort_early', 'initial_const', 'clip_min',
-        'clip_max', 'rnd', 'models',
+        'clip_max', 'rnd',
     ]
 
   def generate(self, x, **kwargs):
@@ -78,13 +78,13 @@ class ElasticNetMethod(Attack):
 
     labels, nb_classes = self.get_or_guess_labels(x, kwargs)
 
-    attack = EAD(self.sess, self.model, self.beta,
+    attack = EAD(self.sess, self.models, self.beta,
                  self.decision_rule, self.batch_size, self.confidence,
                  'y_target' in kwargs, self.learning_rate,
                  self.binary_search_steps, self.max_iterations,
                  self.abort_early, self.initial_const, self.clip_min,
                  self.clip_max, nb_classes,
-                 x.get_shape().as_list()[1:], self.rnd, self.models)
+                 x.get_shape().as_list()[1:], self.rnd)
 
     def ead_wrap(x_val, y_val):
       return np.array(attack.attack(x_val, y_val), dtype=self.np_dtype)
@@ -107,7 +107,7 @@ class ElasticNetMethod(Attack):
                    abort_early=False,
                    initial_const=1e-3,
                    clip_min=0,
-                   clip_max=1, rnd=None, models=None):
+                   clip_max=1, rnd=None):
     """
     :param y: (optional) A tensor with the true labels for an untargeted
               attack. If None (and y_target is None) then use the
@@ -167,14 +167,13 @@ class ElasticNetMethod(Attack):
     self.clip_min = clip_min
     self.clip_max = clip_max
     self.rnd = rnd
-    self.models = models
 
 
 class EAD(object):
-  def __init__(self, sess, model, beta, decision_rule, batch_size,
+  def __init__(self, sess, models, beta, decision_rule, batch_size,
                confidence, targeted, learning_rate, binary_search_steps,
                max_iterations, abort_early, initial_const, clip_min,
-               clip_max, num_labels, shape, rnd, models):
+               clip_max, num_labels, shape, rnd):
     """
     EAD Attack
 
@@ -240,7 +239,7 @@ class EAD(object):
     self.batch_size = batch_size
     self.clip_min = clip_min
     self.clip_max = clip_max
-    self.model = model
+    # self.model = model
     self.decision_rule = decision_rule
     self.rnd = tf.constant(rnd)
     self.models = models
