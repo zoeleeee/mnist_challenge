@@ -88,23 +88,25 @@ class LinfPGDAttack:
        examples within epsilon of x_nat in l_infinity norm."""
     
     # tmp = copy.deepcopy(org_img)
-    # print(np.max(tmp), np.min(tmp), np.median(tmp))
+  #  print(np.max(x_nat*255), np.min(x_nat*255), np.median(x_nat*255))
     if self.rand:
       x = x_nat + np.random.uniform(-self.epsilon, self.epsilon, x_nat.shape)
       x = np.clip(x, 0, 1) # ensure valid pixel range
     else:
       x = np.copy(x_nat)
+      print(np.max(x_nat*255), np.min(x_nat*255), np.median(x_nat*255))
     st = time.time()
     for i in range(self.k):
       print(time.time()-st)
       # _x = [[[order[round(v[0])] for v in c] for c in b] for b in (x*255)]
-      _x = np.array([[[[mpf(str(v)) for v in c] for c in b] for b in a] for a in x])
-      _x = np.array([np.polyval(self.param[j], np.squeeze(_x))] for j in range(order.shape[-1])).transpose((1,2,3,0)).astype(np.float64)
-      print(np.max(_x), np.min(_x))
+      _x = np.array([[[mpf(v[0]) for v in b] for b in a] for a in x])
+      sub_grad = np.array([np.polyval(self.inv_param[j], _x) for j in range(order.shape[-1])]).transpose((1,2,3,0)).astype(np.float64)
+      _x = np.array([np.polyval(self.param[j], _x) for j in range(order.shape[-1])]).transpose((1,2,3,0)).astype(np.float64)
+      print(_x.shape, np.max(_x), np.min(_x))
       grad = sess.run(self.grad, feed_dict={self.assign_input:_x, self.assign_labels:y})
       grad = np.array(grad)[0]
 
-      sub_grad = np.array([np.polyval(self.inv_param[j], x) for j in range(_x.shape[-1])]).transpose((1,2,3,0)).astype(np.float64)
+#      sub_grad = np.array([np.polyval(self.inv_param[j], _x) for j in range(_x.shape[-1])]).transpose((1,2,3,0)).astype(np.float64)
       grad = np.sum(sub_grad*grad, axis=-1).reshape(x.shape)
 
 #      print(grad.shape, np.sum(np.sign(grad)==0), np.sum(np.sign(grad)>0))
@@ -178,7 +180,7 @@ if __name__ == '__main__':
 
   permutation_path = config['permutation']
   path = config['store_adv_path'].split('/')[0] + '/sign_'+config['store_adv_path'].split('/')[1]
-  org_imgs = np.load('data/mnist_data.npy').transpose((0,2,3,1)).astype(np.float64)
+  org_imgs = np.load('data/mnist_data.npy').transpose((0,2,3,1)).astype(np.float64)/255.
   # org_labs = np.load('data/mnist_labels.npy')[60000:]
   # imgs, labs, input_shape = load_data(permutation_path)
   x_test = org_imgs[60000:]

@@ -3,7 +3,7 @@ import tensorflow as tf
 from tensorflow import keras
 import numpy as np
 import sys
-
+np.random.seed(777)
 x_val = np.load('data/mnist_data.npy')[60000:].transpose((0,2,3,1)).astype(np.float32)
 labels = np.load('data/mnist_labels.npy')[60000:]
 conf = sys.argv[-1]
@@ -52,9 +52,9 @@ else:
         'stepsize_search': 'geometric_progression',
         'num_iterations': num_iter,
         'verbose': True,
-        'original_label': labels[:100],
+        'original_label': labels[:10],
         'label_rep': label_rep,
-        'image_target': image_target[:100],
+        'image_target': image_target[:10],
         'clip_min': 0,
         'clip_max':255,
     }
@@ -67,7 +67,7 @@ sess = keras.backend.get_session()
 models = [KerasModelWrapper(model) for model in models]
 attack = HopSkipJumpAttack(models, sess=sess)
 
-x_adv = attack.generate_np(x_val[:100], **bapp_params)
+x_adv = attack.generate_np(x_val[:10], **bapp_params)
 #orig_labs = np.argmax(model.predict(x_val), axis=1)
 #new_labs = np.argmax(model.predict(x_adv), axis=1)
 #print(np.max(np.absolute(x_adv-x_val)))
