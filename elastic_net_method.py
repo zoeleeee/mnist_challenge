@@ -260,7 +260,7 @@ class EAD(object):
 
     self.setter_z = tf.assign(self.z, tf.reshape(tf.map_fn(lambda x: self.rnd[tf.cast(x, tf.int32)], 
       tf.reshape(tf.round(tf.multiply(self.slack, tf.cast(255, tf_dtype))), [-1])), list(self.z_shape)))
-    self.reset_slack = tf.assign(self.slack, tf.divide(tf.argmin(tf.norm(tf.substract(
+    self.reset_slack = tf.assign(self.slack, tf.divide(tf.argmin(tf.norm(tf.subtract(
       tf.tile(tf.expand_dims(self.z, -2), [1,1,1,256,1]),
       tf.tile(self.rnd.reshape([1,1,1]+list(self.rnd.shape)), list(shape)+[1])), axis=-1), axis=-1), tf.cast(255, tf_dtype)))
 
