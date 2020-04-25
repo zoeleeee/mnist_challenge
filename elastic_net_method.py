@@ -309,8 +309,7 @@ class EAD(object):
     # prediction BEFORE-SOFTMAX of the model
     self.output = model.get_output(tf.reshape(tf.map_fn(lambda x: self.rnd[tf.cast(x, tf.int32)], 
       tf.reshape(tf.round(tf.multiply(self.newimg, tf.cast(255, tf_dtype))), [-1])), list(self.z_shape)))
-    self.output_y = model.get_output(tf.reshape(tf.map_fn(lambda x: self.rnd[tf.cast(x, tf.int32)], 
-      tf.reshape(tf.round(tf.multiply(self.slack, tf.cast(255, tf_dtype))), [-1])), list(self.z_shape)))
+    self.output_y = model.get_output(self.z)
 
     # distance to the input data
     self.l2dist = reduce_sum(tf.square(self.newimg-self.timg),
@@ -474,12 +473,13 @@ class EAD(object):
           })
       self.sess.run(self.setter, {self.assign_newimg: batch})
       self.sess.run(self.setter_y, {self.assign_slack: batch})
+      self.sess.run([self.setter_z])
       prev = 1e6
       for iteration in range(self.MAX_ITERATIONS):
         # perform the attack
-        self.sess.run([self.setter_z])
         self.sess.run([self.train])
         self.sess.run([self.reset_slack])
+        self.sess.run([self.setter_z])
         self.sess.run([self.setter, self.setter_y])
         l, l2s, l1s, crit, scores, nimg = self.sess.run([self.loss,
                                                          self.l2dist,
