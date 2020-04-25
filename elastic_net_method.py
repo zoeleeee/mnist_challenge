@@ -258,7 +258,8 @@ class EAD(object):
     self.const = tf.Variable(
         np.zeros(batch_size), dtype=tf_dtype, name='const')
 
-    self.setter_z = tf.assign(self.z, tf.map_fn(lambda x: self.rnd[x], tf.round(tf.multiply(self.slack, tf.cast(255, tf_dtype)))))
+    self.setter_z = tf.assign(self.z, tf.map_fn(lambda x: self.rnd[x], 
+      tf.cast(tf.round(tf.multiply(self.slack, tf.cast(255, tf_dtype))), tf.int32)))
     self.reset_slack = tf.assign(self.slack, tf.divide(tf.argmin(tf.norm(tf.substract(
       tf.tile(tf.expand_dims(self.z, -2), [1,1,1,256,1]),
       tf.tile(self.rnd.reshape([1,1,1]+list(self.rnd.shape)), list(shape)+[1])), axis=-1), axis=-1), tf.cast(255, tf_dtype)))
