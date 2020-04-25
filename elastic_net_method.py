@@ -11,8 +11,8 @@ from cleverhans.compat import reduce_sum, reduce_max
 from cleverhans.model import Model, CallableModelWrapper, wrapper_warning_logits
 from cleverhans import utils
 
-np_dtype = np.dtype('float64')
-tf_dtype = tf.as_dtype('float64')
+np_dtype = np.dtype('float32')
+tf_dtype = tf.as_dtype('float32')
 
 _logger = utils.create_logger("cleverhans.attacks.elastic_net_method")
 _logger.setLevel(logging.INFO)
