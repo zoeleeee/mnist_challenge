@@ -12,8 +12,8 @@ from tensorflow import keras
 import numpy as np
 from utils import load_data
 import time
-from mpmath import *
-mp.dps = 1000
+# from mpmath import *
+# mp.dps = 1000
 from functools import reduce
 import operator
 import copy
@@ -60,7 +60,7 @@ class LinfPGDAttack:
         loss = tf.reduce_sum([bce_loss(self.assign_labels[i], tf.nn.sigmoid(model(self.assign_input))) for i,model in enumerate(self.models)])
     # self.grad = tf.reduce_sum([tf.gradients(loss, )[0] for m in self.models], 0)
     self.grad = tf.gradients(loss, self.assign_input)
-    self.param = np.load('lagrange/lag_iter_'+params.split('/')[1], allow_pickle=True)
+    self.param = np.load('lagrange/lag_grad_'+params.split('/')[1], allow_pickle=True)
  #   self.input.assign(self.assign_input)
  #   self.labels.assign(self.assign_labels)
 
@@ -78,7 +78,8 @@ class LinfPGDAttack:
   def perturb(self, x_nat, y, org_img, sess, order, targeted=False):
     """Given a set of examples (x_nat, y), returns a set of adversarial
        examples within epsilon of x_nat in l_infinity norm."""
-    tmp = copy.deepcopy(org_img.astype(np.float32))
+    tmp = copy.deepcopy(org_img)
+    org_img = org_img.astype(np.float32) / 255.
     # print(tmp.shape)
     if self.rand:
       x = x_nat + np.random.uniform(-self.epsilon, self.epsilon, x_nat.shape)
@@ -93,20 +94,21 @@ class LinfPGDAttack:
       grad = sess.run(self.grad, feed_dict={self.assign_input:x, self.assign_labels:y})
       grad = np.array(grad)[0]
 #      print(grad.shape, tmp.shape)
-      sub_grad = np.array([np.polyval(self.param[j], [[[mpf(v[j]) for v in b] for b in a] for a in x]) for j in range(x.shape[-1])]).transpose((1,2,3,0))
+      sub_grad = np.array([[[[self.param[j][v[0]] for v in b] for b in a] for a in tmp] for j in range(x.shape[-1])]).transpose((1,2,3,0))
       print(sub_grad.shape, grad.shape)
-      grad = np.sum(sub_grad*grad, axis=-1)
+      grad = np.sum(sub_grad*grad, axis=-1).reshape(tmp.shape)
       # print(np.array(grad).shape, np.sum(np.sign(grad)==0), np.sum(np.sign(grad)>0))
       if targeted:
-        tmp -= self.a*np.sign(grad).astype(np.float32)
+        tmp = tmp.astype(np.float32)/255 - self.a*np.sign(grad).astype(np.float32)
       else:
-        tmp += self.a*np.sign(grad).astype(np.float32)
+        tmp = tmp.astype(np.float32)/255 + self.a*np.sign(grad).astype(np.float32)
 
       tmp = np.clip(tmp, org_img - self.epsilon, org_img + self.epsilon)
       tmp = np.array([int(v)+1 if v%1>.5 else int(v) for v in np.clip(tmp.reshape(-1), 0, 1)*255]).reshape(org_img.shape)
 
       x = np.array([[[order[int(v[0])] for v in b] for b in a] for a in tmp])
-      tmp /= 255.
+   
+
     # tmp = [[[[mpf(int(reduce(operator.add, [bin(int(v*255.))[2:].zfill(8) for v in c]), 2))] for c in b] for b in a] for a in x]
     # print(np.array(tmp).shape)
     # tmp = [[[[int(np.polyval(self.param, v)) for v in c] for c in b] for b in a] for a in tmp]
@@ -173,7 +175,7 @@ if __name__ == '__main__':
 
   permutation_path = config['permutation']
   path = config['store_adv_path'].split('/')[0] + '/sign_'+config['store_adv_path'].split('/')[1]
-  org_imgs = np.load('data/mnist_data.npy').transpose((0,2,3,1))[60000:] / 255.
+  org_imgs = np.load('data/mnist_data.npy').transpose((0,2,3,1))[60000:]
   # org_labs = np.load('data/mnist_labels.npy')[60000:]
   imgs, labs, input_shape = load_data(permutation_path)
   x_test = imgs[60000:]

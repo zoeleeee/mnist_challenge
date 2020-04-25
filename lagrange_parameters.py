@@ -10,7 +10,7 @@ np.random.seed(777)
 #xx = range(n)
 #yy = np.random.permutation(xx)
 
-x = range(n)
+x = np.arange(n).astype(np.float64)
 file = sys.argv[-1]
 y = np.load(file).reshape(256,-1).transpose((1,0))
 
@@ -50,9 +50,9 @@ y = np.load(file).reshape(256,-1).transpose((1,0))
 #         f.write(str(s) +"\n")
 # np.save('lagrange_weights.npy', param)
 #xx = np.arange(256)/255.
-xx = np.array([mpf(val) for val in x]) / 255.
+xx = np.array([mpf(val) for val in x/255.]) 
 yyy = np.array([mpf(str(val)) for val in y.reshape(-1)]).reshape(y.shape) / 255.
-res, params = [], []
+res, params, grads = [], [], []
 for t in range(yyy.shape[0]):
     print('Iteration:', t)
     coef, s = [], []
@@ -72,18 +72,22 @@ for t in range(yyy.shape[0]):
     param = [sum(coef[i] * coef[0]) if i!=0 else sum(coef[0]) for i in range(len(coef))]
     param = [param[i]*-1 if (n-1)%2==i%2 else param[i] for i in range(n)]
     params.append(param)
-    #param = [param[i]*(n-i-1) for i in range(n-1)]
+    _param = [param[i]*(n-i-1) for i in range(n-1)]
+    grad = []
     for j, v in enumerate(xx):
         tmp = np.polyval(param, v)
         val = int(tmp*255)
+        #grads.append()
         if int(tmp*2550) % 10 > 5:
             val += 1
         if val != y[t][j]:
             print(y[t][j], val)
-        # print(int(tmp*255), int(tmp*255)==y[t][j])#(float(tmp)-float(yy[j]))
-    param = [param[i]*(n-i-1) for i in range(n-1)]
-    res.append(param)
+            break
+        grad.append(float(np.polyval(_param,v)))
+    grads.append(grad)
+    res.append(_param)
 np.save('lagrange/lag_'+file.split('/')[1], params) 
+np.save('lagrange/lag_grad_'+file.split('/')[1], grads) 
 np.save('lagrange/lag_iter_'+file.split('/')[1], res)
 #np.save('lagrange/lag_forward_'+file.split('/')[1], res)
 
