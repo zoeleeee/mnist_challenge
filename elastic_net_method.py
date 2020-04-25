@@ -5,7 +5,7 @@ import logging
 
 import numpy as np
 import tensorflow as tf
-
+import time
 from cleverhans.attacks.attack import Attack
 from cleverhans.compat import reduce_sum, reduce_max
 from cleverhans.model import Model, CallableModelWrapper, wrapper_warning_logits
@@ -472,7 +472,10 @@ class EAD(object):
       self.sess.run(self.setter_y, {self.assign_slack: batch})
       self.sess.run([self.setter_z])
       prev = 1e6
+      st = time.time()
       for iteration in range(self.MAX_ITERATIONS):
+        print(time.time()-st)
+        st = time.time()
         # perform the attack
         self.sess.run([self.train])
         self.sess.run([self.reset_slack])
