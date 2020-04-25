@@ -17,12 +17,12 @@ if conf.endswith('.py'):
     model = keras.models.model_from_json(json_model)
     model.load_weights('models/mnist.h5')
     bapp_params = {
-        'max_iterations'=100,
-        'binary_search_steps'=3,
-        'initial_const'=1,
-        'clip_min'=0, 
-        'clip_max'=1,
-        'batch_size'=10,
+        'max_iterations':100,
+        'binary_search_steps':3,
+        'initial_const':1,
+        'clip_min':0, 
+        'clip_max':1,
+        'batch_size':10,
     }
 else:
     from elastic_net_method import ElasticNetMethod
@@ -33,14 +33,14 @@ else:
     label_rep = np.load('2_label_permutation.npy')[0:config['num_labels']*len(models)].T
     labels = np.array([label_rep[i] for i in labels])
     bapp_params = {
-        'max_iterations'=100,
-        'binary_search_steps'=3,
-        'initial_const'=1,
-        'clip_min'=0, 
-        'clip_max'=1,
-        'batch_size'=10,
-        'rnd'= order,
-        'y_target'=labels,
+        'max_iterations':100,
+        'binary_search_steps':3,
+        'initial_const':1,
+        'clip_min':0, 
+        'clip_max':1,
+        'batch_size':10,
+        'rnd': order,
+        'y_target':labels,
     }
 
 from cleverhans.utils_keras import KerasModelWrapper
