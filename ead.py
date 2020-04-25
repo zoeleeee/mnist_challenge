@@ -3,34 +3,61 @@ import tensorflow as tf
 from tensorflow import keras
 import numpy as np
 
-with open('models/mnist.json') as file:
-    json_model = file.read()
+conf = sys.argv[-1]
+target = int(sys.argv[-2])
+x_val = np.load('data/mnist_data.npy')[60000:].transpose((0,2,3,1)).astype(np.float32)
+labels = (np.load('data/mnist_labels.npy')[60000:]+target)%10
 
-model = keras.models.model_from_json(json_model)
-model.load_weights('models/mnist.h5')
+# num_iter = int(sys.argv[-2])
+if conf.endswith('.py'):
+    from cleverhans.attacks import ElasticNetMethod
+    with open('models/mnist.json') as file:
+        json_model = file.read()
 
-x_val = np.load('data/mnist_data.npy')[60000:].transpose((0,2,3,1)).astype(np.float32) / 255.
-labels = np.load('data/mnist_labels.npy')[60000:]
+    model = keras.models.model_from_json(json_model)
+    model.load_weights('models/mnist.h5')
+    bapp_params = {
+        'max_iterations'=100,
+        'binary_search_steps'=3,
+        'initial_const'=1,
+        'clip_min'=0, 
+        'clip_max'=1,
+        'batch_size'=10,
+    }
+else:
+    from elastic_net_method import ElasticNetMethod
+    with open(conf) as config_file:
+        config = json.load(config_file)
+    orders = np.load(config['permutation']).astype(np.float64)
+    orders /= int(config['permutation'].split('/')[-1].split('_')[1].split('.')[0])-1
+    label_rep = np.load('2_label_permutation.npy')[0:config['num_labels']*len(models)].T
+    labels = np.array([label_rep[i] for i in labels])
+    bapp_params = {
+        'max_iterations'=100,
+        'binary_search_steps'=3,
+        'initial_const'=1,
+        'clip_min'=0, 
+        'clip_max'=1,
+        'batch_size'=10,
+        'rnd'= order,
+        'y_target'=labels,
+    }
 
-from cleverhans.attacks import ElasticNetMethod
 from cleverhans.utils_keras import KerasModelWrapper
 keras.backend.set_learning_phase(0)
 sess = keras.backend.get_session()
 
 attack = ElasticNetMethod(KerasModelWrapper(model), sess=sess)
-x_adv = attack.generate_np(x_val, max_iterations=100,
-                                    binary_search_steps=3,
-                                    initial_const=1,
-                                    clip_min=0, clip_max=1,
-                                    batch_size=10)
-orig_labs = np.argmax(model.predict(x_val), axis=1)
-new_labs = np.argmax(model.predict(x_adv), axis=1)
+x_adv = attack.generate_np(x_val,**bapp_params)
+# orig_labs = np.argmax(model.predict(x_val), axis=1)
+# new_labs = np.argmax(model.predict(x_adv), axis=1)
 l1dist = np.linalg.norm(x_val-x_adv, ord=1, axis=-1)
 # l1dist = np.sum(np.absolute(x_adv-x_val, axis=-1))
 print(np.mean(l1dist), np.max(l1dist), np.min(l1dist))
-print('normal mnist model acc:', np.mean(orig_labs==labels))
-print('advs mnist model acc:', np.mean(new_labs==labels))
-print('advs acc:', new_labs[orig_labs==labels] != labels[orig_labs==labels])
+# print('normal mnist model acc:', np.mean(orig_labs==labels))
+# print('advs mnist model acc:', np.mean(new_labs==labels))
+# print('advs acc:', new_labs[orig_labs==labels] != labels[orig_labs==labels])
+np.save('advs/'+conf[:-5].split('/')[-1]+'_'+str(num_iter)+'_ead_show.npy', x_adv)
 
 # x_adv = self.attack.generate_np(x_val, max_iterations=100,
 #                                     binary_search_steps=3,

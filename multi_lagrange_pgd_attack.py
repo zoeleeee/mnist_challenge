@@ -186,7 +186,7 @@ if __name__ == '__main__':
   if targeted:
     path = path.split('/')[0] + '/target_'+path.split('/')[1]
 
-  orders = np.load(permutation_path).astype(np.float32)
+  orders = np.load(permutation_path).astype(np.float64)
   orders /= int(permutation_path.split('/')[-1].split('_')[1].split('.')[0])-1
   # mnist = input_data.read_data_sets('MNIST_data', one_hot=False)
 
