@@ -19,9 +19,11 @@ keras.backend.set_learning_phase(0)
 sess = keras.backend.get_session()
 
 attack = CarliniWagnerL2(KerasModelWrapper(model), sess=sess)
-x_adv = attack.generate_np(x_val, y=_labels, max_iterations=100,
-                                    binary_search_steps=3,
-                                    initial_const=1,
+x_adv = attack.generate_np(x_val, y=_labels, max_iterations=1000,
+                                    abort_early=True,
+                                    learning_rate=1e-2,
+                                    binary_search_steps=9,
+                                    initial_const=1e-3,
                                     clip_min=0, clip_max=1,
                                     batch_size=10)#, y_target=advs_label)
 orig_labs = np.argmax(model.predict(x_val), axis=1)
