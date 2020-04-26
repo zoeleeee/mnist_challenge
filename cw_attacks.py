@@ -76,7 +76,7 @@ keras.backend.set_learning_phase(0)
 sess = keras.backend.get_session()
 
 models = [KerasModelWrapper(model) for model in models]
-attack = CarliniWagnerL2(models[0], sess=sess)
+attack = CarliniWagnerL2(models, sess=sess)
 x_adv = attack.generate_np(x_val, **bapp_params)#, y_target=advs_label)
 # orig_labs = np.argmax(model.predict(x_val), axis=1)
 # new_labs = np.argmax(model.predict(x_adv), axis=1)
