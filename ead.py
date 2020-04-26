@@ -23,7 +23,7 @@ if conf.endswith('.py'):
         'initial_const':1,
         'clip_min':0, 
         'clip_max':1,
-        'batch_size':10,
+        'batch_size':100,
     }
 else:
     from elastic_net_method import ElasticNetMethod
@@ -61,7 +61,7 @@ else:
         'initial_const':1,
         'clip_min':0, 
         'clip_max':1,
-        'batch_size':10,
+        'batch_size':100,
         'rnd': orders,
         'y_target':labels,
     }
@@ -81,7 +81,7 @@ print(np.mean(l1dist), np.max(l1dist), np.min(l1dist))
 # print('normal mnist model acc:', np.mean(orig_labs==labels))
 # print('advs mnist model acc:', np.mean(new_labs==labels))
 # print('advs acc:', new_labs[orig_labs==labels] != labels[orig_labs==labels])
-np.save('advs/'+conf[:-5].split('/')[-1]+'_'+str(num_iter)+'_ead_show.npy', x_adv)
+np.save('advs/'+conf[:-5].split('/')[-1]+'_'+str(target)+'_ead_show.npy', x_adv)
 
 # x_adv = self.attack.generate_np(x_val, max_iterations=100,
 #                                     binary_search_steps=3,
