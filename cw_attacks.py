@@ -2,10 +2,11 @@ import json
 import tensorflow as tf 
 from tensorflow import keras
 import numpy as np
+import sys
 
 conf = sys.argv[-1]
 target = int(sys.argv[-2])
-x_val = np.load('data/mnist_data.npy')[60000:60400].transpose((0,2,3,1)).astype(np.float32)
+x_val = np.load('data/mnist_data.npy')[60000:60400].transpose((0,2,3,1)).astype(np.float32) / 255.
 labels = (np.load('data/mnist_labels.npy')[60000:60400]+target)%10
 if conf.endswith('.py'):
     from cleverhans.attacks import CarliniWagnerL2
@@ -58,7 +59,7 @@ else:
     label_rep = np.load('2_label_permutation.npy')[0:config['num_labels']*len(models)].T
     labels = np.array([label_rep[i] for i in labels])
     bapp_params = {
-        'y_target':_labels, 
+        'y_target':labels, 
         'max_iterations':1000,
         'abort_early':True,
         'learning_rate':1e-2,
@@ -75,7 +76,7 @@ keras.backend.set_learning_phase(0)
 sess = keras.backend.get_session()
 
 models = [KerasModelWrapper(model) for model in models]
-attack = CarliniWagnerL2(KerasModelWrapper(models[0]), sess=sess)
+attack = CarliniWagnerL2(models[0], sess=sess)
 x_adv = attack.generate_np(x_val, **bapp_params)#, y_target=advs_label)
 # orig_labs = np.argmax(model.predict(x_val), axis=1)
 # new_labs = np.argmax(model.predict(x_adv), axis=1)

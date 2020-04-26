@@ -207,7 +207,7 @@ class CWL2(object):
     self.clip_min = clip_min
     self.clip_max = clip_max
     self.model = model
-    self.rnd = rnd
+    self.rnd = tf.constant(rnd)
 
     self.repeat = binary_search_steps >= 10
 
@@ -219,6 +219,7 @@ class CWL2(object):
     self.z = tf.Variable(np.zeros(self.z_shape), dtype=tf_dtype, name='z')
     # these are variables to be more efficient in sending data to tf
     self.timg = tf.Variable(np.zeros(shape), dtype=tf_dtype, name='timg')
+    self.newimg = tf.Variable(np.zeros(shape), dtype=tf_dtype, name='newimg')
     self.tlab = tf.Variable(
         np.zeros((batch_size, num_labels)), dtype=tf_dtype, name='tlab')
     self.const = tf.Variable(
@@ -246,8 +247,8 @@ class CWL2(object):
     # self.newimg = self.newimg * (clip_max - clip_min) + clip_min
 
     # prediction BEFORE-SOFTMAX of the model
-     self.z = tf.reshape(tf.map_fn(lambda x: self.rnd[tf.cast(x, tf.int32)], 
-      tf.reshape(tf.round(tf.multiply(self.newimg, tf.cast(255, tf_dtype))), [-1])), list(self.z_shape))
+    #self.z = tf.reshape(tf.map_fn(lambda x: self.rnd[tf.cast(x, tf.int32)], 
+    #  tf.reshape(tf.round(tf.multiply(self.newimg, tf.cast(255, tf_dtype))), [-1])), list(self.z_shape))
     self.output = model.get_output(self.z)
 
     # distance to the input data
