@@ -9,8 +9,8 @@ with open('models/mnist.json') as file:
 model = keras.models.model_from_json(json_model)
 model.load_weights('models/mnist.h5')
 
-x_val = np.load('data/mnist_data.npy')[60000:].transpose((0,2,3,1)).astype(np.float32) / 255.
-labels = np.load('data/mnist_labels.npy')[60000:]
+x_val = np.load('data/mnist_data.npy')[60000:60010].transpose((0,2,3,1)).astype(np.float32) / 255.
+labels = np.load('data/mnist_labels.npy')[60000:60010]
 advs_label = keras.utils.to_categorical(np.load('non_repeat_advs_targeted_labels.npy'), num_classes=10)
 from cleverhans.attacks import CarliniWagnerL2
 from cleverhans.utils_keras import KerasModelWrapper
@@ -19,10 +19,10 @@ sess = keras.backend.get_session()
 
 attack = CarliniWagnerL2(KerasModelWrapper(model), sess=sess)
 x_adv = attack.generate_np(x_val, max_iterations=100,
-                                    binary_search_steps=5,
-                                    initial_const=10,
+                                    binary_search_steps=3,
+                                    initial_const=1,
                                     clip_min=0, clip_max=1,
-                                    batch_size=100)#, y_target=advs_label)
+                                    batch_size=10)#, y_target=advs_label)
 orig_labs = np.argmax(model.predict(x_val), axis=1)
 new_labs = np.argmax(model.predict(x_adv), axis=1)
 l2dist = np.linalg.norm(x_val-x_adv, axis=-1)
