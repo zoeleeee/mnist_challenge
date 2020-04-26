@@ -37,14 +37,17 @@ class CarliniWagnerL2(Attack):
   :param kwargs: passed through to super constructor
   """
 
-  def __init__(self, model, sess, dtypestr='float32', **kwargs):
+  def __init__(self, models, sess, dtypestr='float32', **kwargs):
     """
     Note: the model parameter should be an instance of the
     cleverhans.model.Model abstraction provided by CleverHans.
     """
-    if not isinstance(model, Model):
-      wrapper_warning_logits()
-      model = CallableModelWrapper(model, 'logits')
+    self.models = []
+    for model in models:
+      if not isinstance(model, Model):
+        wrapper_warning_logits()
+        model = CallableModelWrapper(model, 'logits')
+      self.models.append(model)
 
     super(CarliniWagnerL2, self).__init__(model, sess, dtypestr, **kwargs)
 
@@ -70,7 +73,7 @@ class CarliniWagnerL2(Attack):
 
     labels, nb_classes = self.get_or_guess_labels(x, kwargs)
 
-    attack = CWL2(self.sess, self.model, self.batch_size, self.confidence,
+    attack = CWL2(self.sess, self.models, self.batch_size, self.confidence,
                   'y_target' in kwargs, self.learning_rate,
                   self.binary_search_steps, self.max_iterations,
                   self.abort_early, self.initial_const, self.clip_min,
@@ -150,7 +153,7 @@ def ZERO():
 
 
 class CWL2(object):
-  def __init__(self, sess, model, batch_size, confidence, targeted,
+  def __init__(self, sess, models, batch_size, confidence, targeted,
                learning_rate, binary_search_steps, max_iterations,
                abort_early, initial_const, clip_min, clip_max, num_labels,
                shape, rnd):
@@ -206,7 +209,7 @@ class CWL2(object):
     self.batch_size = batch_size
     self.clip_min = clip_min
     self.clip_max = clip_max
-    self.model = model
+    self.models = models
     self.rnd = tf.constant(rnd)
 
     self.repeat = binary_search_steps >= 10
@@ -249,7 +252,7 @@ class CWL2(object):
     # prediction BEFORE-SOFTMAX of the model
     #self.z = tf.reshape(tf.map_fn(lambda x: self.rnd[tf.cast(x, tf.int32)], 
     #  tf.reshape(tf.round(tf.multiply(self.newimg, tf.cast(255, tf_dtype))), [-1])), list(self.z_shape))
-    self.output = model.get_output(self.z)
+    self.output = tf.concat([model.get_output(self.z) for model in self.models], 1)
 
     # distance to the input data
     # self.other = (tf.tanh(self.timg) + 1) / \
