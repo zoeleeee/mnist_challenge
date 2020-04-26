@@ -3,6 +3,7 @@
 # pylint: disable=missing-docstring
 import logging
 
+import time
 import numpy as np
 import tensorflow as tf
 
@@ -52,7 +53,7 @@ class CarliniWagnerL2(Attack):
     self.structural_kwargs = [
         'batch_size', 'confidence', 'targeted', 'learning_rate',
         'binary_search_steps', 'max_iterations', 'abort_early',
-        'initial_const', 'clip_min', 'clip_max'
+        'initial_const', 'clip_min', 'clip_max', 'rnd'
     ]
 
   def generate(self, x, **kwargs):
@@ -74,7 +75,7 @@ class CarliniWagnerL2(Attack):
                   self.binary_search_steps, self.max_iterations,
                   self.abort_early, self.initial_const, self.clip_min,
                   self.clip_max, nb_classes,
-                  x.get_shape().as_list()[1:])
+                  x.get_shape().as_list()[1:], self.rnd)
 
     def cw_wrap(x_val, y_val):
       return np.array(attack.attack(x_val, y_val), dtype=self.np_dtype)
@@ -95,7 +96,7 @@ class CarliniWagnerL2(Attack):
                    abort_early=True,
                    initial_const=1e-2,
                    clip_min=0,
-                   clip_max=1):
+                   clip_max=1, rnd=None):
     """
     :param y: (optional) A tensor with the true labels for an untargeted
               attack. If None (and y_target is None) then use the
@@ -141,6 +142,7 @@ class CarliniWagnerL2(Attack):
     self.initial_const = initial_const
     self.clip_min = clip_min
     self.clip_max = clip_max
+    self.rnd = rnd
 
 
 def ZERO():
@@ -151,7 +153,7 @@ class CWL2(object):
   def __init__(self, sess, model, batch_size, confidence, targeted,
                learning_rate, binary_search_steps, max_iterations,
                abort_early, initial_const, clip_min, clip_max, num_labels,
-               shape):
+               shape, rnd):
     """
     Return a tensor that constructs adversarial examples for the given
     input. Generate uses tf.py_func in order to operate over tensors.
@@ -205,14 +207,16 @@ class CWL2(object):
     self.clip_min = clip_min
     self.clip_max = clip_max
     self.model = model
+    self.rnd = rnd
 
     self.repeat = binary_search_steps >= 10
 
     self.shape = shape = tuple([batch_size] + list(shape))
-
+    self.z_shape = tuple(list(shape[:-1])+list([shape[-1]*rnd.shape[-1]]))
+    self.extend_shape = tuple(list(shape[:-1])+list([1, shape[-1]*rnd.shape[-1]]))
     # the variable we're going to optimize over
-    modifier = tf.Variable(np.zeros(shape, dtype=np_dtype))
-
+    # modifier = tf.Variable(np.zeros(shape, dtype=np_dtype))
+    self.z = tf.Variable(np.zeros(self.z_shape), dtype=tf_dtype, name='z')
     # these are variables to be more efficient in sending data to tf
     self.timg = tf.Variable(np.zeros(shape), dtype=tf_dtype, name='timg')
     self.tlab = tf.Variable(
@@ -229,29 +233,42 @@ class CWL2(object):
 
     # the resulting instance, tanh'd to keep bounded from clip_min
     # to clip_max
-    self.newimg = (tf.tanh(modifier + self.timg) + 1) / 2
-    self.newimg = self.newimg * (clip_max - clip_min) + clip_min
+    self.setter_z = tf.assign(self.z, tf.reshape(tf.map_fn(lambda x: self.rnd[tf.cast(x, tf.int32)], 
+      tf.reshape(tf.round(tf.multiply(self.newimg, tf.cast(255, tf_dtype))), [-1])), list(self.z_shape)))
+    self.reset_newimg = tf.assign(self.newimg, tf.reshape(tf.divide(tf.cast(tf.argmin(tf.norm(tf.subtract(
+      tf.tile(tf.expand_dims(self.z, -2), [1,1,1,256,1]),
+      tf.tile(tf.reshape(self.rnd, [1,1,1]+list(rnd.shape)), list(shape)+[1])), axis=-1), axis=-1), tf_dtype), tf.cast(255, tf_dtype)), list(shape)))
+
+    # self.newimg = tf.reshape(tf.divide(tf.cast(tf.argmin(tf.norm(tf.subtract(
+    #   tf.tile(tf.expand_dims(self.z, -2), [1,1,1,256,1]),
+    #   tf.tile(tf.reshape(self.rnd, [1,1,1]+list(rnd.shape)), list(shape)+[1])), axis=-1), axis=-1), tf_dtype), tf.cast(255, tf_dtype)), list(shape))
+    # self.newimg = (tf.tanh(self.newimg) + 1) / 2
+    # self.newimg = self.newimg * (clip_max - clip_min) + clip_min
 
     # prediction BEFORE-SOFTMAX of the model
-    self.output = model.get_logits(self.newimg)
+     self.z = tf.reshape(tf.map_fn(lambda x: self.rnd[tf.cast(x, tf.int32)], 
+      tf.reshape(tf.round(tf.multiply(self.newimg, tf.cast(255, tf_dtype))), [-1])), list(self.z_shape))
+    self.output = model.get_output(self.z)
 
     # distance to the input data
-    self.other = (tf.tanh(self.timg) + 1) / \
-        2 * (clip_max - clip_min) + clip_min
+    # self.other = (tf.tanh(self.timg) + 1) / \
+    #     2 * (clip_max - clip_min) + clip_min
     self.l2dist = reduce_sum(
-        tf.square(self.newimg - self.other), list(range(1, len(shape))))
+        tf.square(self.newimg - self.timg), list(range(1, len(shape))))
 
     # compute the probability of the label class versus the maximum other
-    real = reduce_sum((self.tlab) * self.output, 1)
-    other = reduce_max((1 - self.tlab) * self.output - self.tlab * 10000,
-                       1)
+    # real = reduce_sum((self.tlab) * self.output, 1)
+    # other = reduce_max((1 - self.tlab) * self.output - self.tlab * 10000,
+    #                    1)
 
     if self.TARGETED:
       # if targeted, optimize for making the other class most likely
-      loss1 = tf.maximum(ZERO(), other - real + self.CONFIDENCE)
+      loss1 = tf.reduce_mean(tf.reduce_sum(tf.nn.sigmoid_cross_entropy_with_logits(logits=self.output, labels=self.tlab), axis=-1))
+      # loss1 = tf.maximum(ZERO(), other - real + self.CONFIDENCE)
     else:
       # if untargeted, optimize for making this class least likely.
-      loss1 = tf.maximum(ZERO(), real - other + self.CONFIDENCE)
+      loss1 = tf.multiply(tf.reduce_mean(tf.reduce_sum(tf.nn.sigmoid_cross_entropy_with_logits(self.output, self.tlab), axis=-1)), tf.cast(-1, tf_dtype))
+      # loss1 = tf.maximum(ZERO(), real - other + self.CONFIDENCE)
 
     # sum up the losses
     self.loss2 = reduce_sum(self.l2dist)
@@ -261,7 +278,7 @@ class CWL2(object):
     # Setup the adam optimizer and keep track of variables we're creating
     start_vars = set(x.name for x in tf.global_variables())
     optimizer = tf.train.AdamOptimizer(self.LEARNING_RATE)
-    self.train = optimizer.minimize(self.loss, var_list=[modifier])
+    self.train = optimizer.minimize(self.loss, var_list=[self.z])
     end_vars = tf.global_variables()
     new_vars = [x for x in end_vars if x.name not in start_vars]
 
@@ -270,8 +287,8 @@ class CWL2(object):
     self.setup.append(self.timg.assign(self.assign_timg))
     self.setup.append(self.tlab.assign(self.assign_tlab))
     self.setup.append(self.const.assign(self.assign_const))
-
-    self.init = tf.variables_initializer(var_list=[modifier] + new_vars)
+    self.setup.append(self.newimg.assign(self.assign_timg))
+    self.init = tf.variables_initializer(var_list=[self.z] + new_vars)
 
   def attack(self, imgs, targets):
     """
@@ -295,30 +312,34 @@ class CWL2(object):
     Run the attack on a batch of instance and labels.
     """
 
+    # def compare(x, y):
+    #   if not isinstance(x, (float, int, np.int64)):
+    #     x = np.copy(x)
+    #     if self.TARGETED:
+    #       x[y] -= self.CONFIDENCE
+    #     else:
+    #       x[y] += self.CONFIDENCE
+    #     x = np.argmax(x)
+    #   if self.TARGETED:
+    #     return x == y
+    #   else:
+    #     return x != y
     def compare(x, y):
-      if not isinstance(x, (float, int, np.int64)):
-        x = np.copy(x)
-        if self.TARGETED:
-          x[y] -= self.CONFIDENCE
-        else:
-          x[y] += self.CONFIDENCE
-        x = np.argmax(x)
       if self.TARGETED:
-        return x == y
+        return np.sum((x-y) != 0) == 0
       else:
-        return x != y
-
+        return np.sum((x-y) == 0) == 0
     batch_size = self.batch_size
 
     oimgs = np.clip(imgs, self.clip_min, self.clip_max)
 
     # re-scale instances to be within range [0, 1]
-    imgs = (imgs - self.clip_min) / (self.clip_max - self.clip_min)
-    imgs = np.clip(imgs, 0, 1)
-    # now convert to [-1, 1]
-    imgs = (imgs * 2) - 1
-    # convert to tanh-space
-    imgs = np.arctanh(imgs * .999999)
+    # imgs = (imgs - self.clip_min) / (self.clip_max - self.clip_min)
+    # imgs = np.clip(imgs, 0, 1)
+    # # now convert to [-1, 1]
+    # imgs = (imgs * 2) - 1
+    # # convert to tanh-space
+    # imgs = np.arctanh(imgs * .999999)
 
     # set the lower and upper bounds accordingly
     lower_bound = np.zeros(batch_size)
@@ -352,15 +373,19 @@ class CWL2(object):
               self.assign_tlab: batchlab,
               self.assign_const: CONST
           })
-
+      self.sess.run([self.setter_z])
       prev = 1e6
+      st = time.time()
       for iteration in range(self.MAX_ITERATIONS):
+        print(time.time()-st)
+        st = time.time()
         # perform the attack
         _, l, l2s, scores, nimg = self.sess.run([
             self.train, self.loss, self.l2dist, self.output,
             self.newimg
         ])
-
+        self.sess.run([self.reset_newimg])
+        self.sess.run([self.setter_z])
         if iteration % ((self.MAX_ITERATIONS // 10) or 1) == 0:
           _logger.debug(("    Iteration {} of {}: loss={:.3g} " +
                          "l2={:.3g} f={:.3g}").format(
@@ -378,7 +403,7 @@ class CWL2(object):
 
         # adjust the best result found so far
         for e, (l2, sc, ii) in enumerate(zip(l2s, scores, nimg)):
-          lab = np.argmax(batchlab[e])
+          lab = batchlab[e]#np.argmax(batchlab[e])
           if l2 < bestl2[e] and compare(sc, lab):
             bestl2[e] = l2
             bestscore[e] = np.argmax(sc)
@@ -389,7 +414,7 @@ class CWL2(object):
 
       # adjust the constant as needed
       for e in range(batch_size):
-        if compare(bestscore[e], np.argmax(batchlab[e])) and \
+        if compare(bestscore[e], batchlab[e]) and \
            bestscore[e] != -1:
           # success, divide const by two
           upper_bound[e] = min(upper_bound[e], CONST[e])
