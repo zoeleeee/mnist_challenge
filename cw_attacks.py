@@ -10,7 +10,8 @@ model = keras.models.model_from_json(json_model)
 model.load_weights('models/mnist.h5')
 
 x_val = np.load('data/mnist_data.npy')[60000:60010].transpose((0,2,3,1)).astype(np.float32) / 255.
-labels = keras.utils.to_categorical(np.load('data/mnist_labels.npy')[60000:60010])
+labels = np.load('data/mnist_labels.npy')[60000:60010]
+_labels = keras.utils.to_categorical(labels, num_classes=10)
 advs_label = keras.utils.to_categorical(np.load('non_repeat_advs_targeted_labels.npy'), num_classes=10)
 from cleverhans.attacks import CarliniWagnerL2
 from cleverhans.utils_keras import KerasModelWrapper
@@ -18,7 +19,7 @@ keras.backend.set_learning_phase(0)
 sess = keras.backend.get_session()
 
 attack = CarliniWagnerL2(KerasModelWrapper(model), sess=sess)
-x_adv = attack.generate_np(x_val, max_iterations=100,
+x_adv = attack.generate_np(x_val, _labels, max_iterations=100,
                                     binary_search_steps=3,
                                     initial_const=1,
                                     clip_min=0, clip_max=1,
