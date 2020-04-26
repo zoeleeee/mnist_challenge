@@ -6,7 +6,7 @@ import sys
 
 conf = sys.argv[-1]
 target = int(sys.argv[-2])
-x_val = np.load('data/mnist_data.npy')[60000:60400].transpose((0,2,3,1)).astype(np.float32)
+x_val = np.load('data/mnist_data.npy')[60000:60400].transpose((0,2,3,1)).astype(np.float32) / 255.
 labels = (np.load('data/mnist_labels.npy')[60000:60400]+target)%10
 
 # num_iter = int(sys.argv[-2])
@@ -34,11 +34,11 @@ else:
             config = json.load(config_file)
         
         idxs = np.arange(len(labels))
-        while np.sum(labels[idxs] == labels) != 0:
-            if np.min(labels[labels[idxs]==labels]) == np.max(labels[labels[idxs]==labels]):
-                idxs = np.random.permutation(np.arange(len(labels)))
-            idxs[labels[idxs]==labels] = np.random.permutation(idxs[labels[idxs]==labels])
-        image_target = x_val[idxs]
+        # while np.sum(labels[idxs] == labels) != 0:
+        #     if np.min(labels[labels[idxs]==labels]) == np.max(labels[labels[idxs]==labels]):
+        #         idxs = np.random.permutation(np.arange(len(labels)))
+        #     idxs[labels[idxs]==labels] = np.random.permutation(idxs[labels[idxs]==labels])
+        # image_target = x_val[idxs]
         def custom_loss():
             def loss(y_true, y_pred):
                 if config['loss_func'] == 'bce':
