@@ -60,16 +60,16 @@ else:
     labels = np.array([label_rep[i] for i in labels])
     bapp_params = {
         'y_target':labels, 
-        'max_iterations':1000,
+        'max_iterations':100,
         'abort_early':True,
-        'learning_rate':1e-2,
+        'learning_rate':1e-3,
         'binary_search_steps':9,
         'initial_const':1e-3,
         'clip_min':0, 
         'clip_max':1,
         'batch_size':10,
         'rnd': orders,
-        'targeted':True,
+#        'targeted':True,
     }
 
 from cleverhans.utils_keras import KerasModelWrapper

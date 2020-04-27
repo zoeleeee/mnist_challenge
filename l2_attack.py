@@ -380,7 +380,7 @@ class CWL2(object):
       self.sess.run([self.setter_z])
       prev = 1e6
       st = time.time()
-      for iteration in range(1):#self.MAX_ITERATIONS):
+      for iteration in range(self.MAX_ITERATIONS):
         print(time.time()-st)
         st = time.time()
         # perform the attack
