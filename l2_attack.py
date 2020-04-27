@@ -384,7 +384,7 @@ class CWL2(object):
         print(time.time()-st)
         st = time.time()
         # perform the attack
-        for i in range(100):
+        for i in range(1):
             self.sess.run([self.train])
         self.sess.run([self.reset_newimg])
         self.sess.run([self.setter_z])
