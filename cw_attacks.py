@@ -23,7 +23,7 @@ if conf.endswith('.py'):
         'abort_early':True,
         'learning_rate':1e-2,
         'binary_search_steps':9,
-        'initial_const':1e-3,
+        'initial_const':1,
         'clip_min':0, 
         'clip_max':1,
         'batch_size':10,
