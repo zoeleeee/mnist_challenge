@@ -380,16 +380,19 @@ class CWL2(object):
       self.sess.run([self.setter_z])
       prev = 1e6
       st = time.time()
-      for iteration in range(self.MAX_ITERATIONS):
+      for iteration in range(self.MAX_ITERATIONS/10):
         print(time.time()-st)
         st = time.time()
         # perform the attack
-        _, l, l2s, scores, nimg = self.sess.run([
-            self.train, self.loss, self.l2dist, self.output,
-            self.newimg
-        ])
+        for i in range(10):
+            self.sess.run([self.train])
         self.sess.run([self.reset_newimg])
         self.sess.run([self.setter_z])
+        l, l2s, scores, nimg = self.sess.run([
+            self.loss, self.l2dist, self.output,
+            self.newimg
+        ])
+        
         if iteration % ((self.MAX_ITERATIONS // 10) or 1) == 0:
           _logger.debug(("    Iteration {} of {}: loss={:.3g} " +
                          "l2={:.3g} f={:.3g}").format(
