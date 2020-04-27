@@ -6,8 +6,8 @@ import sys
 
 conf = sys.argv[-1]
 target = int(sys.argv[-2])
-x_val = np.load('data/mnist_data.npy')[60000:60400].transpose((0,2,3,1)).astype(np.float32) / 255.
-labels = (np.load('data/mnist_labels.npy')[60000:60400]+target)%10
+x_val = np.load('data/mnist_data.npy')[60000:60010].transpose((0,2,3,1)).astype(np.float32) / 255.
+labels = (np.load('data/mnist_labels.npy')[60000:60010]+target)%10
 if conf.endswith('.py'):
     from cleverhans.attacks import CarliniWagnerL2
     with open('models/mnist.json') as file:
