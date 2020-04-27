@@ -258,7 +258,7 @@ class CWL2(object):
     # self.other = (tf.tanh(self.timg) + 1) / \
     #     2 * (clip_max - clip_min) + clip_min
     self.l2dist = reduce_sum(
-        tf.square(self.newimg - self.timg), list(range(1, len(shape))))
+        tf.square(self.newimg - self.timg), list(shape[1:]))
 
     # compute the probability of the label class versus the maximum other
     # real = reduce_sum((self.tlab) * self.output, 1)
@@ -277,9 +277,9 @@ class CWL2(object):
       # loss1 = tf.maximum(ZERO(), real - other + self.CONFIDENCE)
 
     # sum up the losses
-    self.loss2 = reduce_sum(self.l2dist)
+    # self.loss2 = reduce_sum(self.l2dist)
     self.loss1 = reduce_sum(self.const * loss1)
-    self.loss = self.loss1 + self.loss2
+    self.loss = self.loss1# + self.loss2
 
     # Setup the adam optimizer and keep track of variables we're creating
     start_vars = set(x.name for x in tf.global_variables())
@@ -386,8 +386,7 @@ class CWL2(object):
         print(time.time()-st)
         st = time.time()
         # perform the attack
-        for i in range(1):
-            self.sess.run([self.train])
+        self.sess.run([self.train])
         self.sess.run([self.reset_newimg])
         self.sess.run([self.setter_z])
         l, l2s, scores, nimg = self.sess.run([
