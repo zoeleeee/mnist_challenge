@@ -413,28 +413,25 @@ class CWL2(object):
           lab = batchlab[e]#np.argmax(batchlab[e])
           if l2 < bestl2[e] and compare(sc, lab):
             bestl2[e] = l2
-            bestscore[e] = np.argmax(sc)
+            # bestscore[e] = np.argmax(sc)
           if l2 < o_bestl2[e] and compare(sc, lab):
             o_bestl2[e] = l2
-            o_bestscore[e] = np.argmax(sc)
+            # o_bestscore[e] = np.argmax(sc)
             o_bestattack[e] = ii
 
       # adjust the constant as needed
       for e in range(batch_size):
-        if compare(bestscore[e], batchlab[e]) and \
-           bestscore[e] != -1:
-          # success, divide const by two
-          upper_bound[e] = min(upper_bound[e], CONST[e])
-          if upper_bound[e] < 1e9:
-            CONST[e] = (lower_bound[e] + upper_bound[e]) / 2
-        else:
-          # failure, either multiply by 10 if no solution found yet
-          #          or do binary search with the known upper bound
+        if bestl2[e] == 1e10:
           lower_bound[e] = max(lower_bound[e], CONST[e])
           if upper_bound[e] < 1e9:
             CONST[e] = (lower_bound[e] + upper_bound[e]) / 2
           else:
             CONST[e] *= 10
+        else:
+          upper_bound[e] = min(upper_bound[e], CONST[e])
+          if upper_bound[e] < 1e9:
+            CONST[e] = (lower_bound[e] + upper_bound[e]) / 2
+
       _logger.debug("  Successfully generated adversarial examples " +
                     "on {} of {} instances.".format(
                         sum(upper_bound < 1e9), batch_size))
