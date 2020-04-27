@@ -267,11 +267,13 @@ class CWL2(object):
 
     if self.TARGETED:
       # if targeted, optimize for making the other class most likely
-      loss1 = tf.reduce_mean(tf.reduce_sum(tf.nn.sigmoid_cross_entropy_with_logits(logits=self.output, labels=self.tlab), axis=-1))
+      loss1 = tf.reduce_sum(tf.abs(tf.keras.backend.binary_crossentropy(tf.nn.sigmoid(self.output), self.tlab)))
+      # loss1 = tf.reduce_mean(tf.reduce_sum(tf.nn.sigmoid_cross_entropy_with_logits(logits=self.output, labels=self.tlab), axis=-1))
       # loss1 = tf.maximum(ZERO(), other - real + self.CONFIDENCE)
     else:
+      loss1 =tf.multiply( tf.reduce_sum(tf.abs(tf.keras.backend.binary_crossentropy(tf.nn.sigmoid(self.output), self.tlab))), tf.cast(-1, tf_dtype))
       # if untargeted, optimize for making this class least likely.
-      loss1 = tf.multiply(tf.reduce_mean(tf.reduce_sum(tf.nn.sigmoid_cross_entropy_with_logits(self.output, self.tlab), axis=-1)), tf.cast(-1, tf_dtype))
+      # loss1 = tf.multiply(tf.reduce_mean(tf.reduce_sum(tf.nn.sigmoid_cross_entropy_with_logits(self.output, self.tlab), axis=-1)), tf.cast(-1, tf_dtype))
       # loss1 = tf.maximum(ZERO(), real - other + self.CONFIDENCE)
 
     # sum up the losses
