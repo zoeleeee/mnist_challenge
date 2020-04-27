@@ -69,6 +69,7 @@ else:
         'clip_max':1,
         'batch_size':10,
         'rnd': orders,
+        'targeted':True,
     }
 
 from cleverhans.utils_keras import KerasModelWrapper
