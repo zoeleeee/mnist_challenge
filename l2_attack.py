@@ -257,8 +257,8 @@ class CWL2(object):
     # distance to the input data
     # self.other = (tf.tanh(self.timg) + 1) / \
     #     2 * (clip_max - clip_min) + clip_min
-    self.l2dist = reduce_sum(
-        tf.square(self.newimg - self.timg), list(shape[1:]))
+    self.l2dist = tf.reduce_sum(
+        tf.square(self.newimg - self.timg), axis=list(range(1,len(shape))))
 
     # compute the probability of the label class versus the maximum other
     # real = reduce_sum((self.tlab) * self.output, 1)
@@ -267,19 +267,19 @@ class CWL2(object):
 
     if self.TARGETED:
       # if targeted, optimize for making the other class most likely
-      loss1 = tf.reduce_sum(tf.abs(tf.keras.backend.binary_crossentropy(tf.nn.sigmoid(self.output), self.tlab)))
+      loss1 = tf.reduce_sum(tf.abs(tf.keras.backend.binary_crossentropy(self.tlab, tf.nn.sigmoid(self.output))))
       # loss1 = tf.reduce_mean(tf.reduce_sum(tf.nn.sigmoid_cross_entropy_with_logits(logits=self.output, labels=self.tlab), axis=-1))
       # loss1 = tf.maximum(ZERO(), other - real + self.CONFIDENCE)
     else:
-      loss1 =tf.multiply( tf.reduce_sum(tf.abs(tf.keras.backend.binary_crossentropy(tf.nn.sigmoid(self.output), self.tlab))), tf.cast(-1, tf_dtype))
+      loss1 =tf.multiply( tf.reduce_sum(tf.abs(tf.keras.backend.binary_crossentropy(self.tlab, tf.nn.sigmoid(self.output)))), tf.cast(-1, tf_dtype))
       # if untargeted, optimize for making this class least likely.
       # loss1 = tf.multiply(tf.reduce_mean(tf.reduce_sum(tf.nn.sigmoid_cross_entropy_with_logits(self.output, self.tlab), axis=-1)), tf.cast(-1, tf_dtype))
       # loss1 = tf.maximum(ZERO(), real - other + self.CONFIDENCE)
 
     # sum up the losses
-    # self.loss2 = reduce_sum(self.l2dist)
+    self.loss2 = reduce_sum(self.l2dist)
     self.loss1 = reduce_sum(self.const * loss1)
-    self.loss = self.loss1# + self.loss2
+    self.loss = self.loss1 + self.loss2
 
     # Setup the adam optimizer and keep track of variables we're creating
     start_vars = set(x.name for x in tf.global_variables())
