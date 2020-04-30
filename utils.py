@@ -49,4 +49,14 @@ def extend_data(path, imgs):
 	imgs = imgs.astype(np.int)
 	samples = np.array([[[order[d[0]] for d in c] for c in b] for b in imgs]).astype(np.float32) / (int(path.split('_')[1].split('.')[0])-1)
 	return samples
+
+def show_image(img):
+    """
+    Show MNSIT digits in the console.
+    """
+    remap = "  .*#"+"#"*100
+    img = (img.flatten()+.5)*3
+    if len(img) != 784: return
+    for i in range(28):
+        print("".join([remap[int(round(x))] for x in img[i*28:i*28+28]]))
 	
