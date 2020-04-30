@@ -1,9 +1,23 @@
-from tensorflow import keras
+from tensorflow import keras as k
 import sys
 import numpy as np
 config = sys.argv[-1]
-model = keras.models.load_model(config)
+model = k.models.load_model(config)
 weights = model.get_weights()
+
+import keras
+
+model = keras.Sequential([keras.layers.Conv2D(32, kernel_size=(5,5), activation='relu', input_shape=(28,28,input_shape[-1])),
+    keras.layers.MaxPooling2D(pool_size=(2,2)),
+    keras.layers.Conv2D(64, kernel_size=(5,5), activation='relu'),
+    keras.layers.MaxPooling2D(pool_size=(2,2)),
+    keras.layers.Flatten(),
+    keras.layers.Dense(1024, activation='relu'),
+    keras.layers.Dense(nb_labels)
+    ])
+
+model.set_weights(weights)
+
 
 import torch
 import torch.nn as nn
@@ -53,3 +67,6 @@ imgs = torch.clamp(torch.tensor(imgs), 0, 1)
 net.eval()
 preds = net(imgs)
 np.save('preds/pytorch_test.npy', preds.detach().numpy())
+
+preds = model.predict(imgs.transpose(0,2,3,1))
+np.save('preds/keras_test.npy', preds)
