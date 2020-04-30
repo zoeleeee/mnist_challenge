@@ -2,7 +2,12 @@ import time
 import random 
 import numpy as np
 from tensorflow import keras
+<<<<<<< HEAD
 from utils import extend_data
+=======
+import sys
+import json
+>>>>>>> e71451646986f0f5b7d1f895948c13c271d92ba8
 
 rep_labels = np.load('2_label_permutation.npy')
 conf = sys.argv[-1]
@@ -14,6 +19,7 @@ def predict(models, img, t=0):
     img = extend_data(config['permutation'], [img])
     scores = np.hstack([m.predict(img) for m in models])
     print(scores.shape)
+
     nat_labels = np.zeros(scores.shape).astype(np.float32)
     nat_labels[scores>=0.5] = 1.
     rep = rep_labels[:len(scores)].T
@@ -125,7 +131,7 @@ def attack_targeted(model, train_dataset, x0, y0, target, alpha = 0.1, beta = 0.
     print("\nAdversarial Example Found Successfully: distortion %.4f target %d queries %d \nTime: %.4f seconds" % (g_theta, target, query_count + opt_count, timeend-timestart))
     return x0 + g_theta*best_theta
 
- def fine_grained_binary_search_local_targeted(model, x0, y0, t, theta, initial_lbd = 1.0, tol=1e-5):
+def fine_grained_binary_search_local_targeted(model, x0, y0, t, theta, initial_lbd = 1.0, tol=1e-5):
     nquery = 0
     lbd = initial_lbd
    
@@ -210,7 +216,7 @@ def attack_mnist(model, alpha=0.2, beta=0.001, isTarget= False, num_attacks= 10)
         print("Original label: ", label)
         lab = predict(model, image)
         print("Predicted label: ", lab)
-        if lab != label
+        if lab != label:
             print('CHANGE IMAGES#{}: prediction of original image is not the same with true label'.format(i))
             continue
         #target = None if not isTarget else random.choice(list(range(label)) + list(range(label+1, 10)))
@@ -244,6 +250,6 @@ if __name__ == '__main__':
     model = keras.models.load_model(config['model_dir']+'.h5', custom_objects={ 'custom_loss': custom_loss(), 'loss':custom_loss() }, compile=False)
 
 
-    attack_mnist(model, alpha=2, beta=.005, isTarget=True)
+    attack_mnist([model], alpha=2, beta=.005, isTarget=True)
     timeend = time.time()
     print("\n\nTotal running time: %.4f seconds\n" % (timeend - timestart))
