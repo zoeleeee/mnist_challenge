@@ -6,34 +6,34 @@ from tensorflow import keras
 rep_labels = np.load('2_label_permutation.npy')
 
 def predict(models, img, t=0):
-	scores = np.hstack([m.predict(img) for m in models])
-	nat_labels = np.zeros(scores.shape).astype(np.float32)
-	nat_labels[scores>=0.5] = 1.
-	rep = rep_labels[:len(scores)].T
-	tmp = np.repeat([nat_labels], rep.shape[0], axis=0)
-	dists = np.sum(np.absolute(tmp-rep), axis=-1)
-	min_dist = np.min(dists)
-	pred_labels = np.arange(len(dists))[dists==min_dist]
-	pred_scores = [np.sum([scores[i][k] if rep[j][k]==1 else 1-scores[i][k] for k in np.arange(len(scores[i]))]) for j in pred_labels]
-	pred_label = pred_labels[np.argmax(pred_scores)]
-	if min_dist <= 0:
-		return pred_label
-	else:
-		return -1
+    scores = np.hstack([m.predict(img) for m in models])
+    nat_labels = np.zeros(scores.shape).astype(np.float32)
+    nat_labels[scores>=0.5] = 1.
+    rep = rep_labels[:len(scores)].T
+    tmp = np.repeat([nat_labels], rep.shape[0], axis=0)
+    dists = np.sum(np.absolute(tmp-rep), axis=-1)
+    min_dist = np.min(dists)
+    pred_labels = np.arange(len(dists))[dists==min_dist]
+    pred_scores = [np.sum([scores[i][k] if rep[j][k]==1 else 1-scores[i][k] for k in np.arange(len(scores[i]))]) for j in pred_labels]
+    pred_label = pred_labels[np.argmax(pred_scores)]
+    if min_dist <= 0:
+        return pred_label
+    else:
+        return -1
 
 def attack_targeted(model, train_dataset, x0, y0, target, alpha = 0.1, beta = 0.001, iterations = 1000):
-	# STEP I: find initial direction (theta, g_theta)
-	num_samples = 100
+    # STEP I: find initial direction (theta, g_theta)
+    num_samples = 100
     best_theta, g_theta = None, float('inf')
     query_count = 0
     print("Searching for the initial direction on %d samples: " % (num_samples))
     timestart = time.time()
     samples = np.random.permutation(train_dataset)[:num_samples]
     for i in samples:
-    	xi = train_dataset[i]
-    	if predict(model, xi) == target:
-    		theta = xi - x0
-    		initial_lbd = np.linalg.norm(theta)
+        xi = train_dataset[i]
+        if predict(model, xi) == target:
+            theta = xi - x0
+            initial_lbd = np.linalg.norm(theta)
             theta = theta/np.linalg.norm(theta)
             lbd, count = fine_grained_binary_search_targeted(model, x0, y0, target, theta, initial_lbd)
             query_count += count
@@ -183,16 +183,16 @@ def fine_grained_binary_search_targeted(model, x0, y0, t, theta, initial_lbd = 1
     return lbd_hi, nquery
 
 def attack_mnist(model, alpha=0.2, beta=0.001, isTarget= False, num_attacks= 10):
-	imgs = np.load('data/mnist_data.npy')[60000:]/255.
-	labs = np.load('data/mnist_labels.npy')[60000:]
-	nb_labs = np.max(labs)
+    imgs = np.load('data/mnist_data.npy')[60000:]/255.
+    labs = np.load('data/mnist_labels.npy')[60000:]
+    nb_labs = np.max(labs)
     
     print("\n\n Running {} attack on {} random  MNIST test images for alpha= {} beta= {}\n\n".format("targetted" if isTarget else "untargetted", num_attacks, alpha, beta))
     
     total_distortion = []
     samples = []
     for i in range(nb_labs+1):
-    	samples.append(np.random.permutation(np.arange(len(labs))[labs==i])[0])
+        samples.append(np.random.permutation(np.arange(len(labs))[labs==i])[0])
     
     # samples = [6312, 6891, 4243, 8377, 7962, 6635, 4970, 7809, 5867, 9559, 3579, 8269, 2282, 4618, 2290, 1554, 4105, 9862, 2408, 5082, 1619, 1209, 5410, 7736, 9172, 1650, 5181, 3351, 9053, 7816, 7254, 8542, 4268, 1021, 8990, 231, 1529, 6535, 19, 8087, 5459, 3997, 5329, 1032, 3131, 9299, 3910, 2335, 8897, 7340, 1495, 5244,8323, 8017, 1787, 4939, 9032, 4770, 2045, 8970, 5452, 8853, 3330, 9883, 8966, 9628, 4713, 7291, 9770, 6307, 5195, 9432, 3967, 4757, 3013, 3103, 3060, 541, 4261, 7808, 1132, 1472, 2134, 634, 1315, 8858, 6411, 8595, 4516, 8550, 3859, 3526]
     #true_labels = [3, 1, 6, 6, 9, 2, 7, 5, 5, 3, 3, 4, 5, 6, 7, 9, 1, 6, 3, 4, 0, 6, 5, 9, 7, 0, 3, 1, 6, 6, 9, 6, 4, 7, 6, 3, 4, 3, 4, 3, 0, 7, 3, 5, 3, 9, 3, 1, 9, 1, 3, 0, 2, 9, 9, 2, 2, 3, 3, 3, 0, 5, 2, 5, 2, 7, 2, 2, 5, 7, 4, 9, 9, 0, 0, 7, 9, 4, 5, 5, 2, 3, 5, 9, 3, 0, 9, 0, 1, 2, 9, 9]
@@ -204,17 +204,17 @@ def attack_mnist(model, alpha=0.2, beta=0.001, isTarget= False, num_attacks= 10)
         lab = predict(model, image)
         print("Predicted label: ", lab)
         if lab != label
-        	print('CHANGE IMAGES#{}: prediction of original image is not the same with true label'.format(i))
-        	continue
+            print('CHANGE IMAGES#{}: prediction of original image is not the same with true label'.format(i))
+            continue
         #target = None if not isTarget else random.choice(list(range(label)) + list(range(label+1, 10)))
         advs = [image]
         for i in range(nb_labs):
-        	target = (label + i) % (nb_labs+1)
-        	adv = attack_targeted(model, imgs[labs==target], image, label, target, alpha = alpha, beta = beta, iterations = 1000)
-        	print(i, "Predicted label for adversarial example: ", predict(model, adversarial))
-        	advs.append(adv)
-        	total_distortion.append(np.linalg.norm(adv.reshape(-1) - image.reshape(-1)))
-    	np.save('advs/opt_attacks_{}_show.npy'.format(idx), advs)
+            target = (label + i) % (nb_labs+1)
+            adv = attack_targeted(model, imgs[labs==target], image, label, target, alpha = alpha, beta = beta, iterations = 1000)
+            print(i, "Predicted label for adversarial example: ", predict(model, adversarial))
+            advs.append(adv)
+            total_distortion.append(np.linalg.norm(adv.reshape(-1) - image.reshape(-1)))
+        np.save('advs/opt_attacks_{}_show.npy'.format(idx), advs)
 
     print("Average distortion on random {} images is {}".format(len(total_distortion), np.mean(total_distortion)))
 
@@ -222,13 +222,13 @@ def attack_mnist(model, alpha=0.2, beta=0.001, isTarget= False, num_attacks= 10)
 
 
 if __name__ == '__main__':
-	timestart = time.time()
-	random.seed(0)
-	conf = sys.argv[-1]
-	with open(conf) as config_file:
+    timestart = time.time()
+    random.seed(0)
+    conf = sys.argv[-1]
+    with open(conf) as config_file:
         config = json.load(config_file)
         
-	def custom_loss():
+    def custom_loss():
         def loss(y_true, y_pred):
             if config['loss_func'] == 'bce':
                 _loss = keras.losses.BinaryCrossentropy()
@@ -240,6 +240,6 @@ if __name__ == '__main__':
     model = keras.models.load_model(config['model_dir']+'.h5', custom_objects={ 'custom_loss': custom_loss(), 'loss':custom_loss() }, compile=False)
 
 
-	attack_mnist(model, alpha=2, beta=.005, isTarget=True)
-	timeend = time.time()
-	print("\n\nTotal running time: %.4f seconds\n" % (timeend - timestart))
+    attack_mnist(model, alpha=2, beta=.005, isTarget=True)
+    timeend = time.time()
+    print("\n\nTotal running time: %.4f seconds\n" % (timeend - timestart))
