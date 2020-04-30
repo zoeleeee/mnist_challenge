@@ -17,7 +17,7 @@ model = keras.Sequential([keras.layers.Conv2D(32, kernel_size=(5,5), activation=
     ])
 
 model.set_weights(weights)
-model.save('re256.16_mnist_20_0.h5')
+model.save(config)
 
 import torch
 import torch.nn as nn
@@ -58,7 +58,7 @@ net.fc1.bias.data=torch.from_numpy(weights[5])
 net.fc2.weight.data=torch.from_numpy(np.transpose(weights[6]))
 net.fc2.bias.data=torch.from_numpy(weights[7])
 
-torch.save(net.state_dict(), config[:-2]+'pt')
+#torch.save(net.state_dict(), config[:-2]+'pt')
 
 from utils import load_data
 imgs, labs, _ = load_data('permutation/256_256.16_permutation.npy', 10)

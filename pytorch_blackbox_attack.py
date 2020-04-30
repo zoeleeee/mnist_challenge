@@ -23,7 +23,7 @@ def predict(models, img, t=0):
   #  print(scores)
  #   print(scores.size())
     nat_labels = torch.zeros(scores.shape).type(torch.FloatTensor)
-    nat_labels[scores>=0.5] = 1.
+    nat_labels[scores>=0.9] = 1.
 #    print(nat_labels)
     rep = torch.tensor(rep_labels[:scores.size()[1]].T)
     tmp = nat_labels.repeat(rep.size()[0], 1)
@@ -447,7 +447,7 @@ def attack_mnist(nets, alpha=0.2, beta=0.001, isTarget= False, num_attacks= 100)
         for i in range(1,nb_labs+1):
             target = (label + i) % (nb_labs+1)
             adv = attack_targeted(model, imgs[labs==target], image, label, target, alpha = alpha, beta = beta, iterations = 1)
-            print(i, "Predicted label for adversarial example: ", predict(model, adv), torch.norm(adv-image))
+            print(i, "Predicted label for adversarial example: ", predict(model, adv), np.linalg.norm(adv.numpy()-image.numpy()))
             advs.append(torch.clamp(adv, 0, 1).numpy())
             total_distortion.append(torch.norm(adv - image))
         np.save('advs/opt_attacks_{}_show.npy'.format(idx), advs)
@@ -540,7 +540,7 @@ if __name__ == '__main__':
         with open(conf) as config_file:
             config = json.load(config_file)
         
-        idxs = np.arange(len(labels))
+        #idxs = np.arange(len(labels))
         net = torch.load(config['model_dir']+'.pt')
         conf = conf[:conf.find(conf.split('_')[-1])]+str(config['num_labels']*(i+1))+'.json'
         nets.append(net)
