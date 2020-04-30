@@ -16,7 +16,6 @@ def predict(models, img, t=0):
     img = np.clip(img, 0, 1)*255
     img = extend_data(config['permutation'], np.array([img]))
     scores = np.hstack([m.predict(img) for m in models])[0]
-    #print(scores.shape)
 
     nat_labels = np.zeros(scores.shape).astype(np.float32)
     nat_labels[scores>=0.5] = 1.
