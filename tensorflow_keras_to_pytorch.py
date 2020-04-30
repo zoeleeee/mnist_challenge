@@ -7,7 +7,7 @@ weights = model.get_weights()
 
 import keras
 
-model = keras.Sequential([keras.layers.Conv2D(32, kernel_size=(5,5), activation='relu', input_shape=(28,28,input_shape[-1])),
+model = keras.Sequential([keras.layers.Conv2D(32, kernel_size=(5,5), activation='relu', input_shape=(28,28,16)),
     keras.layers.MaxPooling2D(pool_size=(2,2)),
     keras.layers.Conv2D(64, kernel_size=(5,5), activation='relu'),
     keras.layers.MaxPooling2D(pool_size=(2,2)),
