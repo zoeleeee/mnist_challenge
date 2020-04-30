@@ -431,7 +431,7 @@ def attack_mnist(nets, alpha=0.2, beta=0.001, isTarget= False, num_attacks= 100)
     #true_labels = [3, 1, 6, 6, 9, 2, 7, 5, 5, 3, 3, 4, 5, 6, 7, 9, 1, 6, 3, 4, 0, 6, 5, 9, 7, 0, 3, 1, 6, 6, 9, 6, 4, 7, 6, 3, 4, 3, 4, 3, 0, 7, 3, 5, 3, 9, 3, 1, 9, 1, 3, 0, 2, 9, 9, 2, 2, 3, 3, 3, 0, 5, 2, 5, 2, 7, 2, 2, 5, 7, 4, 9, 9, 0, 0, 7, 9, 4, 5, 5, 2, 3, 5, 9, 3, 0, 9, 0, 1, 2, 9, 9]
     for idx in samples:
         #idx = random.randint(100, len(test_dataset)-1)
-        image, label = imgs[idx], labs[idx]
+        image, label = torch.tensor(imgs[idx]), labs[idx]
         print("\n\n\n\n======== Image %d =========" % idx)
         print("Original label: ", label)
         ab = predict(model, image)
