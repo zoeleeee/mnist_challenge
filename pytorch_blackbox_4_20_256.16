@@ -1,0 +1,712 @@
+
+
+ Running untargetted attack on 100 random  MNIST test images for alpha= 2 beta= 0.005
+
+
+
+
+
+
+======== Image 525 =========
+Original label:  tensor(0, dtype=torch.uint8)
+Predicted label:  tensor(0)
+Searching for the initial direction on 100 samples: 
+--------> Found distortion 10.8015
+--------> Found distortion 10.3607
+--------> Found distortion 10.2879
+--------> Found distortion 10.2527
+--------> Found distortion 10.2056
+--------> Found distortion 10.1717
+--------> Found distortion 10.1714
+--------> Found distortion 9.9934
+--------> Found distortion 9.8912
+==========> Found best distortion 9.8912 in 54.4399 seconds using 11966 queries
+1 Predicted label for adversarial example:  tensor(1) tensor(9.8912)
+Searching for the initial direction on 100 samples: 
+--------> Found distortion 10.2619
+--------> Found distortion 9.9585
+--------> Found distortion 7.6185
+--------> Found distortion 4.0423
+--------> Found distortion 1.8485
+--------> Found distortion 1.7838
+--------> Found distortion 0.3441
+--------> Found distortion 0.2724
+==========> Found best distortion 0.2724 in 31.2312 seconds using 8828 queries
+2 Predicted label for adversarial example:  tensor(2) tensor(0.2724)
+Searching for the initial direction on 100 samples: 
+--------> Found distortion 1.8629
+--------> Found distortion 0.2826
+==========> Found best distortion 0.2826 in 21.6318 seconds using 6393 queries
+3 Predicted label for adversarial example:  tensor(3) tensor(0.2826)
+Searching for the initial direction on 100 samples: 
+--------> Found distortion 10.3266
+--------> Found distortion 9.6139
+--------> Found distortion 8.0228
+==========> Found best distortion 8.0228 in 35.0406 seconds using 11106 queries
+4 Predicted label for adversarial example:  tensor(4) tensor(8.0228)
+Searching for the initial direction on 100 samples: 
+--------> Found distortion 4.6846
+--------> Found distortion 1.7933
+--------> Found distortion 1.6410
+--------> Found distortion 1.5832
+--------> Found distortion 0.2919
+--------> Found distortion 0.2812
+==========> Found best distortion 0.2812 in 25.5462 seconds using 7733 queries
+5 Predicted label for adversarial example:  tensor(5) tensor(0.2812)
+Searching for the initial direction on 100 samples: 
+--------> Found distortion 9.3915
+--------> Found distortion 0.3032
+--------> Found distortion 0.2978
+--------> Found distortion 0.2934
+==========> Found best distortion 0.2934 in 31.1884 seconds using 9047 queries
+6 Predicted label for adversarial example:  tensor(6) tensor(0.2934)
+Searching for the initial direction on 100 samples: 
+--------> Found distortion 5.1691
+--------> Found distortion 1.9804
+--------> Found distortion 1.9414
+--------> Found distortion 1.9076
+==========> Found best distortion 1.9076 in 40.9538 seconds using 10373 queries
+7 Predicted label for adversarial example:  tensor(7) tensor(1.9076)
+Searching for the initial direction on 100 samples: 
+--------> Found distortion 8.1155
+--------> Found distortion 2.8404
+--------> Found distortion 0.2770
+--------> Found distortion 0.1723
+==========> Found best distortion 0.1723 in 17.8106 seconds using 5141 queries
+8 Predicted label for adversarial example:  tensor(8) tensor(0.1723)
+Searching for the initial direction on 100 samples: 
+--------> Found distortion 10.3095
+--------> Found distortion 1.9795
+==========> Found best distortion 1.9795 in 33.0431 seconds using 10280 queries
+9 Predicted label for adversarial example:  tensor(9) tensor(1.9795)
+
+
+
+
+======== Image 6729 =========
+Original label:  tensor(1, dtype=torch.uint8)
+Predicted label:  tensor(1)
+Searching for the initial direction on 100 samples: 
+--------> Found distortion 0.1598
+--------> Found distortion 0.1055
+--------> Found distortion 0.1021
+--------> Found distortion 0.0911
+--------> Found distortion 0.0829
+--------> Found distortion 0.0803
+==========> Found best distortion 0.0803 in 8.6901 seconds using 2041 queries
+1 Predicted label for adversarial example:  tensor(2) tensor(0.0803)
+Searching for the initial direction on 100 samples: 
+--------> Found distortion 0.2887
+--------> Found distortion 0.1812
+--------> Found distortion 0.1458
+--------> Found distortion 0.1444
+==========> Found best distortion 0.1444 in 10.6731 seconds using 2713 queries
+2 Predicted label for adversarial example:  tensor(3) tensor(0.1444)
+Searching for the initial direction on 100 samples: 
+--------> Found distortion 0.1503
+--------> Found distortion 0.1475
+--------> Found distortion 0.1019
+--------> Found distortion 0.1001
+--------> Found distortion 0.0994
+--------> Found distortion 0.0916
+==========> Found best distortion 0.0916 in 14.8710 seconds using 4448 queries
+3 Predicted label for adversarial example:  tensor(4) tensor(0.0916)
+Searching for the initial direction on 100 samples: 
+--------> Found distortion 9.2649
+--------> Found distortion 1.7916
+--------> Found distortion 0.2341
+--------> Found distortion 0.1940
+--------> Found distortion 0.1768
+--------> Found distortion 0.1545
+--------> Found distortion 0.1511
+--------> Found distortion 0.0919
+==========> Found best distortion 0.0919 in 20.7271 seconds using 5825 queries
+4 Predicted label for adversarial example:  tensor(5) tensor(0.0919)
+Searching for the initial direction on 100 samples: 
+--------> Found distortion 3.3155
+--------> Found distortion 2.7201
+--------> Found distortion 0.1911
+--------> Found distortion 0.1817
+--------> Found distortion 0.1760
+--------> Found distortion 0.1712
+--------> Found distortion 0.1691
+--------> Found distortion 0.1505
+==========> Found best distortion 0.1505 in 14.9799 seconds using 4333 queries
+5 Predicted label for adversarial example:  tensor(6) tensor(0.1505)
+Searching for the initial direction on 100 samples: 
+--------> Found distortion 8.9611
+--------> Found distortion 3.4271
+--------> Found distortion 1.4718
+--------> Found distortion 0.2729
+--------> Found distortion 0.2022
+--------> Found distortion 0.1855
+--------> Found distortion 0.1783
+--------> Found distortion 0.1643
+==========> Found best distortion 0.1643 in 19.1050 seconds using 6199 queries
+6 Predicted label for adversarial example:  tensor(7) tensor(0.1643)
+Searching for the initial direction on 100 samples: 
+--------> Found distortion 0.0998
+--------> Found distortion 0.0973
+--------> Found distortion 0.0926
+--------> Found distortion 0.0916
+--------> Found distortion 0.0866
+--------> Found distortion 0.0847
+==========> Found best distortion 0.0847 in 6.5395 seconds using 1514 queries
+7 Predicted label for adversarial example:  tensor(8) tensor(0.0847)
+Searching for the initial direction on 100 samples: 
+--------> Found distortion 9.1880
+--------> Found distortion 1.4003
+--------> Found distortion 0.2687
+--------> Found distortion 0.1831
+==========> Found best distortion 0.1831 in 18.6937 seconds using 5793 queries
+8 Predicted label for adversarial example:  tensor(9) tensor(0.1831)
+Searching for the initial direction on 100 samples: 
+--------> Found distortion 0.1773
+--------> Found distortion 0.1736
+--------> Found distortion 0.1732
+--------> Found distortion 0.1693
+--------> Found distortion 0.1669
+--------> Found distortion 0.1666
+--------> Found distortion 0.1656
+==========> Found best distortion 0.1656 in 11.0860 seconds using 2756 queries
+9 Predicted label for adversarial example:  tensor(0) tensor(0.1656)
+
+
+
+
+======== Image 1658 =========
+Original label:  tensor(2, dtype=torch.uint8)
+Predicted label:  tensor(2)
+Searching for the initial direction on 100 samples: 
+--------> Found distortion 0.2809
+--------> Found distortion 0.1448
+--------> Found distortion 0.1290
+==========> Found best distortion 0.1290 in 11.8280 seconds using 2961 queries
+1 Predicted label for adversarial example:  tensor(3) tensor(0.1290)
+Searching for the initial direction on 100 samples: 
+--------> Found distortion 9.6898
+--------> Found distortion 9.2576
+--------> Found distortion 8.5447
+--------> Found distortion 1.8389
+--------> Found distortion 1.6996
+--------> Found distortion 0.3587
+--------> Found distortion 0.3429
+--------> Found distortion 0.2966
+--------> Found distortion 0.2767
+--------> Found distortion 0.2639
+--------> Found distortion 0.2588
+==========> Found best distortion 0.2588 in 23.9866 seconds using 7592 queries
+2 Predicted label for adversarial example:  tensor(4) tensor(0.2588)
+Searching for the initial direction on 100 samples: 
+--------> Found distortion 2.8738
+--------> Found distortion 1.1633
+--------> Found distortion 1.1142
+--------> Found distortion 0.2629
+--------> Found distortion 0.1742
+--------> Found distortion 0.1730
+==========> Found best distortion 0.1730 in 15.7920 seconds using 4902 queries
+3 Predicted label for adversarial example:  tensor(5) tensor(0.1730)
+Searching for the initial direction on 100 samples: 
+--------> Found distortion 7.0427
+--------> Found distortion 1.6884
+--------> Found distortion 1.5861
+--------> Found distortion 1.3908
+--------> Found distortion 1.3743
+--------> Found distortion 1.1184
+--------> Found distortion 0.3111
+==========> Found best distortion 0.3111 in 24.3827 seconds using 7466 queries
+4 Predicted label for adversarial example:  tensor(6) tensor(0.3111)
+Searching for the initial direction on 100 samples: 
+--------> Found distortion 8.2785
+--------> Found distortion 8.1055
+--------> Found distortion 8.0403
+--------> Found distortion 6.8055
+--------> Found distortion 2.9913
+--------> Found distortion 1.7966
+--------> Found distortion 0.2383
+==========> Found best distortion 0.2383 in 39.5532 seconds using 10310 queries
+5 Predicted label for adversarial example:  tensor(7) tensor(0.2383)
+Searching for the initial direction on 100 samples: 
+--------> Found distortion 0.1619
+--------> Found distortion 0.1504
+==========> Found best distortion 0.1504 in 17.1630 seconds using 4432 queries
+6 Predicted label for adversarial example:  tensor(8) tensor(0.1504)
+Searching for the initial direction on 100 samples: 
+--------> Found distortion 0.3015
+--------> Found distortion 0.2927
+==========> Found best distortion 0.2927 in 28.8634 seconds using 9095 queries
+7 Predicted label for adversarial example:  tensor(9) tensor(0.2927)
+Searching for the initial direction on 100 samples: 
+--------> Found distortion 1.8370
+--------> Found distortion 0.1882
+--------> Found distortion 0.1845
+--------> Found distortion 0.1679
+--------> Found distortion 0.1602
+--------> Found distortion 0.1534
+==========> Found best distortion 0.1534 in 19.2195 seconds using 5021 queries
+8 Predicted label for adversarial example:  tensor(0) tensor(0.1534)
+Searching for the initial direction on 100 samples: 
+--------> Found distortion 6.2824
+--------> Found distortion 6.2573
+==========> Found best distortion 6.2573 in 53.6493 seconds using 11513 queries
+9 Predicted label for adversarial example:  tensor(1) tensor(6.2573)
+
+
+
+
+======== Image 1730 =========
+Original label:  tensor(3, dtype=torch.uint8)
+Predicted label:  tensor(3)
+Searching for the initial direction on 100 samples: 
+--------> Found distortion 10.6263
+--------> Found distortion 10.2575
+--------> Found distortion 9.2055
+--------> Found distortion 8.4743
+--------> Found distortion 4.4859
+--------> Found distortion 4.4482
+--------> Found distortion 4.1715
+--------> Found distortion 1.9230
+--------> Found distortion 0.3627
+--------> Found distortion 0.3376
+==========> Found best distortion 0.3376 in 28.9584 seconds using 9470 queries
+1 Predicted label for adversarial example:  tensor(4) tensor(0.3376)
+Searching for the initial direction on 100 samples: 
+--------> Found distortion 0.1689
+--------> Found distortion 0.1488
+--------> Found distortion 0.1344
+--------> Found distortion 0.1298
+==========> Found best distortion 0.1298 in 15.8039 seconds using 4642 queries
+2 Predicted label for adversarial example:  tensor(5) tensor(0.1298)
+Searching for the initial direction on 100 samples: 
+--------> Found distortion 0.3012
+--------> Found distortion 0.2698
+==========> Found best distortion 0.2698 in 26.7482 seconds using 8944 queries
+3 Predicted label for adversarial example:  tensor(6) tensor(0.2698)
+Searching for the initial direction on 100 samples: 
+--------> Found distortion 9.5291
+--------> Found distortion 2.8082
+--------> Found distortion 1.7855
+--------> Found distortion 1.7058
+==========> Found best distortion 1.7058 in 30.5104 seconds using 10269 queries
+4 Predicted label for adversarial example:  tensor(7) tensor(1.7058)
+Searching for the initial direction on 100 samples: 
+--------> Found distortion 0.1245
+--------> Found distortion 0.1235
+--------> Found distortion 0.0960
+==========> Found best distortion 0.0960 in 10.1643 seconds using 2619 queries
+5 Predicted label for adversarial example:  tensor(8) tensor(0.0960)
+Searching for the initial direction on 100 samples: 
+--------> Found distortion 1.5971
+--------> Found distortion 0.2810
+--------> Found distortion 0.2746
+--------> Found distortion 0.2646
+==========> Found best distortion 0.2646 in 29.2727 seconds using 9810 queries
+6 Predicted label for adversarial example:  tensor(9) tensor(0.2646)
+Searching for the initial direction on 100 samples: 
+--------> Found distortion 0.3274
+--------> Found distortion 0.3110
+--------> Found distortion 0.2944
+--------> Found distortion 0.1779
+==========> Found best distortion 0.1779 in 15.9528 seconds using 4655 queries
+7 Predicted label for adversarial example:  tensor(0) tensor(0.1779)
+Searching for the initial direction on 100 samples: 
+--------> Found distortion 8.7033
+--------> Found distortion 8.4039
+--------> Found distortion 8.1401
+--------> Found distortion 8.1305
+--------> Found distortion 8.0829
+==========> Found best distortion 8.0829 in 35.9212 seconds using 11771 queries
+8 Predicted label for adversarial example:  tensor(1) tensor(8.0829)
+Searching for the initial direction on 100 samples: 
+--------> Found distortion 9.1407
+--------> Found distortion 4.5038
+--------> Found distortion 1.4485
+--------> Found distortion 0.3378
+--------> Found distortion 0.3106
+--------> Found distortion 0.3042
+==========> Found best distortion 0.3042 in 23.2488 seconds using 7376 queries
+9 Predicted label for adversarial example:  tensor(2) tensor(0.3042)
+
+
+
+
+======== Image 5664 =========
+Original label:  tensor(4, dtype=torch.uint8)
+Predicted label:  tensor(4)
+Searching for the initial direction on 100 samples: 
+--------> Found distortion 9.9489
+--------> Found distortion 0.1667
+--------> Found distortion 0.1553
+--------> Found distortion 0.1496
+--------> Found distortion 0.1429
+==========> Found best distortion 0.1429 in 18.0167 seconds using 5505 queries
+1 Predicted label for adversarial example:  tensor(5) tensor(0.1429)
+Searching for the initial direction on 100 samples: 
+--------> Found distortion 1.9561
+--------> Found distortion 0.1509
+--------> Found distortion 0.1438
+--------> Found distortion 0.1380
+--------> Found distortion 0.1367
+==========> Found best distortion 0.1367 in 10.3191 seconds using 2520 queries
+2 Predicted label for adversarial example:  tensor(6) tensor(0.1367)
+Searching for the initial direction on 100 samples: 
+--------> Found distortion 1.5962
+--------> Found distortion 0.2890
+--------> Found distortion 0.2236
+--------> Found distortion 0.1777
+--------> Found distortion 0.1728
+--------> Found distortion 0.1500
+==========> Found best distortion 0.1500 in 22.5176 seconds using 6625 queries
+3 Predicted label for adversarial example:  tensor(7) tensor(0.1500)
+Searching for the initial direction on 100 samples: 
+--------> Found distortion 0.1734
+--------> Found distortion 0.1587
+--------> Found distortion 0.1560
+--------> Found distortion 0.1543
+--------> Found distortion 0.1174
+==========> Found best distortion 0.1174 in 12.5928 seconds using 3562 queries
+4 Predicted label for adversarial example:  tensor(8) tensor(0.1174)
+Searching for the initial direction on 100 samples: 
+--------> Found distortion 0.2031
+--------> Found distortion 0.1838
+==========> Found best distortion 0.1838 in 21.7526 seconds using 5768 queries
+5 Predicted label for adversarial example:  tensor(9) tensor(0.1838)
+Searching for the initial direction on 100 samples: 
+--------> Found distortion 3.4902
+--------> Found distortion 1.5517
+--------> Found distortion 0.6923
+--------> Found distortion 0.2465
+--------> Found distortion 0.2370
+--------> Found distortion 0.2355
+--------> Found distortion 0.2329
+--------> Found distortion 0.1998
+--------> Found distortion 0.1978
+==========> Found best distortion 0.1978 in 13.3391 seconds using 3850 queries
+6 Predicted label for adversarial example:  tensor(0) tensor(0.1978)
+Searching for the initial direction on 100 samples: 
+--------> Found distortion 7.0247
+--------> Found distortion 6.1784
+--------> Found distortion 6.0127
+--------> Found distortion 2.6740
+==========> Found best distortion 2.6740 in 45.2364 seconds using 11382 queries
+7 Predicted label for adversarial example:  tensor(1) tensor(2.6740)
+Searching for the initial direction on 100 samples: 
+--------> Found distortion 3.1637
+--------> Found distortion 1.6898
+--------> Found distortion 0.1674
+--------> Found distortion 0.1528
+==========> Found best distortion 0.1528 in 17.5058 seconds using 5339 queries
+8 Predicted label for adversarial example:  tensor(2) tensor(0.1528)
+Searching for the initial direction on 100 samples: 
+--------> Found distortion 1.7364
+--------> Found distortion 1.2909
+--------> Found distortion 0.1652
+--------> Found distortion 0.1617
+--------> Found distortion 0.1426
+==========> Found best distortion 0.1426 in 14.3989 seconds using 4162 queries
+9 Predicted label for adversarial example:  tensor(3) tensor(0.1426)
+
+
+
+
+======== Image 1467 =========
+Original label:  tensor(5, dtype=torch.uint8)
+Predicted label:  -1
+CHANGE IMAGES#9: prediction of original image is not the same with true label
+
+
+
+
+======== Image 4395 =========
+Original label:  tensor(6, dtype=torch.uint8)
+Predicted label:  tensor(6)
+Searching for the initial direction on 100 samples: 
+--------> Found distortion 3.9759
+--------> Found distortion 1.9569
+--------> Found distortion 1.9059
+--------> Found distortion 0.3147
+--------> Found distortion 0.3053
+==========> Found best distortion 0.3053 in 22.5687 seconds using 7414 queries
+1 Predicted label for adversarial example:  tensor(7) tensor(0.3053)
+Searching for the initial direction on 100 samples: 
+--------> Found distortion 2.0689
+--------> Found distortion 1.9118
+--------> Found distortion 0.3267
+==========> Found best distortion 0.3267 in 24.6137 seconds using 8210 queries
+2 Predicted label for adversarial example:  tensor(8) tensor(0.3267)
+Searching for the initial direction on 100 samples: 
+--------> Found distortion 11.1476
+--------> Found distortion 10.8795
+--------> Found distortion 10.3005
+--------> Found distortion 8.1234
+--------> Found distortion 1.9060
+==========> Found best distortion 1.9060 in 30.9488 seconds using 10615 queries
+3 Predicted label for adversarial example:  tensor(9) tensor(1.9060)
+Searching for the initial direction on 100 samples: 
+--------> Found distortion 0.1771
+--------> Found distortion 0.1561
+==========> Found best distortion 0.1561 in 19.0801 seconds using 5664 queries
+4 Predicted label for adversarial example:  tensor(0) tensor(0.1561)
+Searching for the initial direction on 100 samples: 
+--------> Found distortion 10.9503
+--------> Found distortion 10.7177
+--------> Found distortion 8.6958
+--------> Found distortion 8.5291
+==========> Found best distortion 8.5291 in 47.5688 seconds using 11422 queries
+5 Predicted label for adversarial example:  tensor(1) tensor(8.5291)
+Searching for the initial direction on 100 samples: 
+--------> Found distortion 1.8237
+--------> Found distortion 1.8041
+--------> Found distortion 0.3334
+==========> Found best distortion 0.3334 in 28.9527 seconds using 8413 queries
+6 Predicted label for adversarial example:  tensor(2) tensor(0.3334)
+Searching for the initial direction on 100 samples: 
+--------> Found distortion 9.3428
+--------> Found distortion 4.8461
+--------> Found distortion 4.7397
+--------> Found distortion 2.2226
+==========> Found best distortion 2.2226 in 32.7553 seconds using 10008 queries
+7 Predicted label for adversarial example:  tensor(3) tensor(2.2226)
+Searching for the initial direction on 100 samples: 
+--------> Found distortion 10.5188
+--------> Found distortion 7.3240
+--------> Found distortion 1.8768
+--------> Found distortion 1.7707
+--------> Found distortion 1.6562
+--------> Found distortion 0.3188
+==========> Found best distortion 0.3188 in 29.2844 seconds using 8249 queries
+8 Predicted label for adversarial example:  tensor(4) tensor(0.3188)
+Searching for the initial direction on 100 samples: 
+--------> Found distortion 12.6883
+--------> Found distortion 9.3599
+--------> Found distortion 9.0076
+--------> Found distortion 8.3524
+==========> Found best distortion 8.3524 in 34.0095 seconds using 10931 queries
+9 Predicted label for adversarial example:  tensor(5) tensor(8.3524)
+
+
+
+
+======== Image 5560 =========
+Original label:  tensor(7, dtype=torch.uint8)
+Predicted label:  tensor(7)
+Searching for the initial direction on 100 samples: 
+--------> Found distortion 0.2934
+--------> Found distortion 0.1827
+--------> Found distortion 0.1589
+--------> Found distortion 0.1534
+--------> Found distortion 0.1483
+==========> Found best distortion 0.1483 in 12.0553 seconds using 3373 queries
+1 Predicted label for adversarial example:  tensor(8) tensor(0.1483)
+Searching for the initial direction on 100 samples: 
+--------> Found distortion 6.3842
+--------> Found distortion 0.1183
+--------> Found distortion 0.0748
+--------> Found distortion 0.0731
+--------> Found distortion 0.0730
+--------> Found distortion 0.0617
+==========> Found best distortion 0.0617 in 8.6047 seconds using 2054 queries
+2 Predicted label for adversarial example:  tensor(9) tensor(0.0617)
+Searching for the initial direction on 100 samples: 
+--------> Found distortion 0.3007
+--------> Found distortion 0.2288
+--------> Found distortion 0.1681
+--------> Found distortion 0.1368
+==========> Found best distortion 0.1368 in 11.7980 seconds using 2918 queries
+3 Predicted label for adversarial example:  tensor(0) tensor(0.1368)
+Searching for the initial direction on 100 samples: 
+--------> Found distortion 10.6418
+--------> Found distortion 9.9103
+--------> Found distortion 9.2282
+--------> Found distortion 9.1910
+==========> Found best distortion 9.1910 in 33.7581 seconds using 11691 queries
+4 Predicted label for adversarial example:  tensor(1) tensor(9.1910)
+Searching for the initial direction on 100 samples: 
+--------> Found distortion 10.6705
+--------> Found distortion 0.3027
+--------> Found distortion 0.1875
+--------> Found distortion 0.1590
+==========> Found best distortion 0.1590 in 25.6379 seconds using 6880 queries
+5 Predicted label for adversarial example:  tensor(2) tensor(0.1590)
+Searching for the initial direction on 100 samples: 
+--------> Found distortion 1.6419
+--------> Found distortion 0.1962
+--------> Found distortion 0.1786
+--------> Found distortion 0.1580
+==========> Found best distortion 0.1580 in 20.2157 seconds using 5039 queries
+6 Predicted label for adversarial example:  tensor(3) tensor(0.1580)
+Searching for the initial direction on 100 samples: 
+--------> Found distortion 7.7059
+--------> Found distortion 0.3600
+--------> Found distortion 0.2170
+==========> Found best distortion 0.2170 in 23.4105 seconds using 5855 queries
+7 Predicted label for adversarial example:  tensor(4) tensor(0.2170)
+Searching for the initial direction on 100 samples: 
+--------> Found distortion 2.6136
+--------> Found distortion 2.3576
+--------> Found distortion 1.5260
+--------> Found distortion 0.2755
+--------> Found distortion 0.1499
+--------> Found distortion 0.1493
+--------> Found distortion 0.1420
+--------> Found distortion 0.1418
+==========> Found best distortion 0.1418 in 25.7357 seconds using 7110 queries
+8 Predicted label for adversarial example:  tensor(5) tensor(0.1418)
+Searching for the initial direction on 100 samples: 
+--------> Found distortion 8.9828
+--------> Found distortion 7.7933
+--------> Found distortion 2.0980
+--------> Found distortion 1.9986
+--------> Found distortion 1.8097
+--------> Found distortion 1.7791
+--------> Found distortion 0.3512
+--------> Found distortion 0.3394
+--------> Found distortion 0.3216
+==========> Found best distortion 0.3216 in 31.9071 seconds using 8957 queries
+9 Predicted label for adversarial example:  tensor(6) tensor(0.3216)
+
+
+
+
+======== Image 6189 =========
+Original label:  tensor(8, dtype=torch.uint8)
+Predicted label:  tensor(8)
+Searching for the initial direction on 100 samples: 
+--------> Found distortion 1.8491
+--------> Found distortion 1.7009
+--------> Found distortion 0.3901
+--------> Found distortion 0.2605
+==========> Found best distortion 0.2605 in 38.2065 seconds using 7757 queries
+1 Predicted label for adversarial example:  tensor(9) tensor(0.2605)
+Searching for the initial direction on 100 samples: 
+--------> Found distortion 0.2618
+--------> Found distortion 0.2464
+--------> Found distortion 0.2418
+--------> Found distortion 0.2376
+--------> Found distortion 0.2362
+==========> Found best distortion 0.2362 in 15.7475 seconds using 2896 queries
+2 Predicted label for adversarial example:  tensor(0) tensor(0.2362)
+Searching for the initial direction on 100 samples: 
+--------> Found distortion 9.8239
+--------> Found distortion 8.5543
+--------> Found distortion 2.9687
+--------> Found distortion 1.7086
+--------> Found distortion 1.6923
+==========> Found best distortion 1.6923 in 67.4065 seconds using 10641 queries
+3 Predicted label for adversarial example:  tensor(1) tensor(1.6923)
+Searching for the initial direction on 100 samples: 
+--------> Found distortion 0.2448
+--------> Found distortion 0.2358
+--------> Found distortion 0.2206
+--------> Found distortion 0.1770
+==========> Found best distortion 0.1770 in 20.5719 seconds using 3983 queries
+4 Predicted label for adversarial example:  tensor(2) tensor(0.1770)
+Searching for the initial direction on 100 samples: 
+--------> Found distortion 0.2448
+--------> Found distortion 0.2010
+--------> Found distortion 0.1791
+--------> Found distortion 0.1715
+--------> Found distortion 0.1670
+==========> Found best distortion 0.1670 in 18.0076 seconds using 3211 queries
+5 Predicted label for adversarial example:  tensor(3) tensor(0.1670)
+Searching for the initial direction on 100 samples: 
+--------> Found distortion 2.0396
+--------> Found distortion 0.3707
+--------> Found distortion 0.2253
+--------> Found distortion 0.2196
+==========> Found best distortion 0.2196 in 31.9871 seconds using 6440 queries
+6 Predicted label for adversarial example:  tensor(4) tensor(0.2196)
+Searching for the initial direction on 100 samples: 
+--------> Found distortion 1.8108
+--------> Found distortion 0.6759
+--------> Found distortion 0.2426
+--------> Found distortion 0.2304
+--------> Found distortion 0.1979
+==========> Found best distortion 0.1979 in 24.1536 seconds using 4469 queries
+7 Predicted label for adversarial example:  tensor(5) tensor(0.1979)
+Searching for the initial direction on 100 samples: 
+--------> Found distortion 0.2485
+--------> Found distortion 0.2345
+--------> Found distortion 0.2340
+--------> Found distortion 0.2230
+--------> Found distortion 0.2188
+==========> Found best distortion 0.2188 in 21.8077 seconds using 4268 queries
+8 Predicted label for adversarial example:  tensor(6) tensor(0.2188)
+Searching for the initial direction on 100 samples: 
+--------> Found distortion 1.7523
+--------> Found distortion 0.2931
+--------> Found distortion 0.2614
+==========> Found best distortion 0.2614 in 33.8609 seconds using 6796 queries
+9 Predicted label for adversarial example:  tensor(7) tensor(0.2614)
+
+
+
+
+======== Image 5447 =========
+Original label:  tensor(9, dtype=torch.uint8)
+Predicted label:  tensor(9)
+Searching for the initial direction on 100 samples: 
+--------> Found distortion 0.1852
+--------> Found distortion 0.1763
+--------> Found distortion 0.1698
+--------> Found distortion 0.1650
+==========> Found best distortion 0.1650 in 18.1996 seconds using 4325 queries
+1 Predicted label for adversarial example:  tensor(0) tensor(0.1650)
+Searching for the initial direction on 100 samples: 
+--------> Found distortion 8.5205
+--------> Found distortion 8.5085
+--------> Found distortion 8.4268
+--------> Found distortion 8.0938
+==========> Found best distortion 8.0938 in 47.7382 seconds using 11757 queries
+2 Predicted label for adversarial example:  tensor(1) tensor(8.0938)
+Searching for the initial direction on 100 samples: 
+--------> Found distortion 9.3027
+--------> Found distortion 2.7235
+--------> Found distortion 1.7434
+--------> Found distortion 0.2298
+==========> Found best distortion 0.2298 in 26.7430 seconds using 7325 queries
+3 Predicted label for adversarial example:  tensor(2) tensor(0.2298)
+Searching for the initial direction on 100 samples: 
+--------> Found distortion 1.2645
+--------> Found distortion 0.2736
+--------> Found distortion 0.1760
+--------> Found distortion 0.1711
+--------> Found distortion 0.1685
+--------> Found distortion 0.1593
+==========> Found best distortion 0.1593 in 17.7240 seconds using 4292 queries
+4 Predicted label for adversarial example:  tensor(3) tensor(0.1593)
+Searching for the initial direction on 100 samples: 
+--------> Found distortion 0.1409
+--------> Found distortion 0.1382
+--------> Found distortion 0.1275
+==========> Found best distortion 0.1275 in 24.5759 seconds using 5797 queries
+5 Predicted label for adversarial example:  tensor(4) tensor(0.1275)
+Searching for the initial direction on 100 samples: 
+--------> Found distortion 0.1565
+--------> Found distortion 0.1340
+--------> Found distortion 0.1254
+==========> Found best distortion 0.1254 in 25.1188 seconds using 6452 queries
+6 Predicted label for adversarial example:  tensor(5) tensor(0.1254)
+Searching for the initial direction on 100 samples: 
+--------> Found distortion 10.4855
+--------> Found distortion 2.1507
+--------> Found distortion 1.8907
+--------> Found distortion 1.7926
+--------> Found distortion 1.3608
+==========> Found best distortion 1.3608 in 25.9789 seconds using 7025 queries
+7 Predicted label for adversarial example:  tensor(6) tensor(1.3608)
+Searching for the initial direction on 100 samples: 
+--------> Found distortion 0.6369
+--------> Found distortion 0.2061
+==========> Found best distortion 0.2061 in 35.7316 seconds using 7779 queries
+8 Predicted label for adversarial example:  tensor(7) tensor(0.2061)
+Searching for the initial direction on 100 samples: 
+--------> Found distortion 0.1397
+--------> Found distortion 0.1387
+==========> Found best distortion 0.1387 in 14.9933 seconds using 3315 queries
+9 Predicted label for adversarial example:  tensor(8) tensor(0.1387)
+Average distortion on random 81 images is 1.1668246984481812
+
+
+Total running time: 2018.2883 seconds
+
