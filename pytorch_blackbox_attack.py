@@ -75,7 +75,7 @@ def attack_targeted(model, train_dataset, x0, y0, target, alpha = 0.1, beta = 0.
 
     timeend = time.time()
     print("==========> Found best distortion %.4f in %.4f seconds using %d queries" % (g_theta, timeend-timestart, query_count))
-
+    return x0+g_theta*best_theta
 
     # STEP II: seach for optimal
     timestart = time.time()
@@ -444,13 +444,13 @@ def attack_mnist(nets, alpha=0.2, beta=0.001, isTarget= False, num_attacks= 100)
             print('CHANGE IMAGES#{}: prediction of original image is not the same with true label'.format(i))
             continue
         advs = [image.numpy()]
-        for i in range(nb_labs):
+        for i in range(1,nb_labs+1):
             target = (label + i) % (nb_labs+1)
             adv = attack_targeted(model, imgs[labs==target], image, label, target, alpha = alpha, beta = beta, iterations = 1)
-            print(i, "Predicted label for adversarial example: ", predict(model, adv))
+            print(i, "Predicted label for adversarial example: ", predict(model, adv), torch.norm(adv-image))
             advs.append(torch.clamp(adv, 0, 1).numpy())
             total_distortion.append(torch.norm(adv - image))
-        np.save('advs/opt_attacks_{}_show.npy'.format(idx), torch.mean(advs))
+        np.save('advs/opt_attacks_{}_show.npy'.format(idx), advs)
 
     print("Average distortion on random {} images is {}".format(len(total_distortion), np.mean(total_distortion)))
 
