@@ -1,13 +1,13 @@
 import time
 import random 
-#import minpy.numpy as np
+import minpy.numpy as np
 from tensorflow import keras
 from utils import extend_data
 import sys
 import json
-import numpy as np
+import numpy as nnp
 
-rep_labels = np.load('2_label_permutation.npy')
+rep_labels = np.array(nnp.load('2_label_permutation.npy'))
 conf = sys.argv[-1]
 with open(conf) as config_file:
     config = json.load(config_file)
@@ -16,6 +16,7 @@ def predict(models, img, t=0):
     img = np.clip(img, 0, 1)*255
     img = extend_data(config['permutation'], np.array([img]))
     scores = np.hstack([m.predict(img) for m in models])[0]
+    #print(scores.shape)
 
     nat_labels = np.zeros(scores.shape).astype(np.float32)
     nat_labels[scores>=0.5] = 1.
@@ -38,7 +39,7 @@ def attack_targeted(model, train_dataset, x0, y0, target, alpha = 0.1, beta = 0.
     query_count = 0
     print("Searching for the initial direction on %d samples: " % (num_samples))
     timestart = time.time()
-    samples = np.random.permutation(train_dataset)[:num_samples]
+    samples = nnp.random.permutation(train_dataset)[:num_samples]
     for xi in samples:
         if predict(model, xi) == target:
             theta = xi - x0
@@ -192,9 +193,9 @@ def fine_grained_binary_search_targeted(model, x0, y0, t, theta, initial_lbd = 1
     return lbd_hi, nquery
 
 def attack_mnist(model, alpha=0.2, beta=0.001, isTarget= False, num_attacks= 10):
-    imgs = np.load('data/mnist_data.npy')[60000:].transpose((0,2,3,1)).astype(np.float32)/255.
-    labs = np.load('data/mnist_labels.npy')[60000:]
-    nb_labs = np.max(labs)
+    imgs = np.array(nnp.load('data/mnist_data.npy')[60000:].transpose((0,2,3,1)).astype(np.float32)/255.)
+    labs = nnp.load('data/mnist_labels.npy')[60000:]
+    nb_labs = nnp.max(labs)
     
     print("\n\n Running {} attack on {} random  MNIST test images for alpha= {} beta= {}\n\n".format("targetted" if isTarget else "untargetted", num_attacks, alpha, beta))
     
