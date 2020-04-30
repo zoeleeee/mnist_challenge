@@ -7,29 +7,33 @@ import torchvision.datasets as dsets
 import torchvision.transforms as transforms
 from torch.autograd import Variable
 import torch.nn.functional as F
-from models import IMAGENET, MNIST, CIFAR10, load_imagenet_data, load_mnist_data, load_cifar10_data, load_model, show_image
+#from models import IMAGENET, MNIST, CIFAR10, load_imagenet_data, load_mnist_data, load_cifar10_data, load_model, show_image
 import sys
-
+import json
+from utils import extend_data
 rep_labels = np.load('2_label_permutation.npy')
 conf = sys.argv[-1]
 with open(conf) as config_file:
     config = json.load(config_file)
 
-def predict(model, img, t=0):
+def predict(models, img, t=0):
     img = torch.clamp(img, 0, 1)*255
-    img = extend_data(config['permutation'], np.array([img.numpy()]))
-    scores = torch.cat(torch.tensor([(img) for m in models]), dim=1)
-    print(scores.size())
+    img = torch.tensor(extend_data(config['permutation'], np.array([img.numpy()])).transpose((0,3,1,2))).cuda()
+    scores = torch.cat(tuple([torch.sigmoid(model(img)) for model in models]), dim=1)
+  #  print(scores)
+ #   print(scores.size())
     nat_labels = torch.zeros(scores.shape).type(torch.FloatTensor)
     nat_labels[scores>=0.5] = 1.
-    rep = torch.tensor(rep_labels[:len(scores)].T)
-    tmp = nat_labels.repeat(rep.size()[0], -1)
+#    print(nat_labels)
+    rep = torch.tensor(rep_labels[:scores.size()[1]].T)
+    tmp = nat_labels.repeat(rep.size()[0], 1)
     dists = (tmp-rep).abs().sum(dim=-1)
+   # print(dists)
     min_dist = dists.min()
     if min_dist > t:
         return -1
     pred_labels = torch.arange(len(dists))[dists==min_dist]
-    pred_scores = torch.tensor([torch.sum(torch.tensor([scores[k] if rep[j][k]==1 else 1-scores[k] for k in np.arange(len(scores))])) for j in pred_labels])
+    pred_scores = torch.tensor([torch.sum(torch.tensor([scores[0][k] if rep[j][k]==1 else 1-scores[0][k] for k in np.arange(scores.size()[1])])) for j in pred_labels])
     pred_label = pred_labels[torch.argmax(pred_scores)]
     
     return pred_label
@@ -55,7 +59,7 @@ def attack_targeted(model, train_dataset, x0, y0, target, alpha = 0.1, beta = 0.
     print("Searching for the initial direction on %d samples: " % (num_samples))
     timestart = time.time()
     samples = set(random.sample(range(len(train_dataset)), num_samples))
-    for i, (xi, yi) in enumerate(train_dataset):
+    for i, xi in enumerate(train_dataset):
         if i not in samples:
             continue
         query_count += 1
@@ -408,21 +412,21 @@ def attack_mnist(nets, alpha=0.2, beta=0.001, isTarget= False, num_attacks= 100)
     nb_labs = np.max(labs)
     imgs = torch.tensor(imgs)
 
-    models = []
+    model = []
     for net in nets:
         if torch.cuda.is_available():
             net.cuda()
             net = torch.nn.DataParallel(net, device_ids=[0])
         net.eval()
         if torch.cuda.is_available():
-            models.append(net.module)
+            model.append(net.module)
         else:
-            models.append(net)
+            model.append(net)
     #load_model(net, 'models/mnist_cpu.pt')
     
 
     print("\n\n Running {} attack on {} random  MNIST test images for alpha= {} beta= {}\n\n".format("targetted" if isTarget else "untargetted", num_attacks, alpha, beta))
-    total_distortion = 0.0
+    total_distortion = []
     samples = []
     for i in range(nb_labs+1):
         samples.append(np.random.permutation(np.arange(len(labs))[labs==i])[0])
@@ -434,7 +438,7 @@ def attack_mnist(nets, alpha=0.2, beta=0.001, isTarget= False, num_attacks= 100)
         image, label = torch.tensor(imgs[idx]), labs[idx]
         print("\n\n\n\n======== Image %d =========" % idx)
         print("Original label: ", label)
-        ab = predict(model, image)
+        lab = predict(model, image)
         print("Predicted label: ", lab)
         if lab != label:
             print('CHANGE IMAGES#{}: prediction of original image is not the same with true label'.format(i))

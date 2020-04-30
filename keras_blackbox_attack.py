@@ -60,6 +60,7 @@ def attack_targeted(model, train_dataset, x0, y0, target, alpha = 0.1, beta = 0.
     opt_count = 0
 
     for i in range(iterations):
+        print(i)
         gradient = np.zeros(theta.shape)
         q = 10
         min_g1 = float('inf')
