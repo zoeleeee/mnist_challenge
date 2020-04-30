@@ -2,15 +2,22 @@ import time
 import random 
 import numpy as np
 from tensorflow import keras
+from utils import extend_data
 
 rep_labels = np.load('2_label_permutation.npy')
+conf = sys.argv[-1]
+with open(conf) as config_file:
+    config = json.load(config_file)
 
 def predict(models, img, t=0):
+    img = np.clip(img, 0, 1)*255
+    img = extend_data(config['permutation'], [img])
     scores = np.hstack([m.predict(img) for m in models])
+    print(scores.shape)
     nat_labels = np.zeros(scores.shape).astype(np.float32)
     nat_labels[scores>=0.5] = 1.
     rep = rep_labels[:len(scores)].T
-    tmp = np.repeat([nat_labels], rep.shape[0], axis=0)
+    tmp = np.repeat([nat_labels[0]], rep.shape[0], axis=0)
     dists = np.sum(np.absolute(tmp-rep), axis=-1)
     min_dist = np.min(dists)
     pred_labels = np.arange(len(dists))[dists==min_dist]
@@ -183,7 +190,7 @@ def fine_grained_binary_search_targeted(model, x0, y0, t, theta, initial_lbd = 1
     return lbd_hi, nquery
 
 def attack_mnist(model, alpha=0.2, beta=0.001, isTarget= False, num_attacks= 10):
-    imgs = np.load('data/mnist_data.npy')[60000:]/255.
+    imgs = np.load('data/mnist_data.npy')[60000:].transpose((0,2,3,1)),astype(np.float32)/255.
     labs = np.load('data/mnist_labels.npy')[60000:]
     nb_labs = np.max(labs)
     
@@ -212,7 +219,7 @@ def attack_mnist(model, alpha=0.2, beta=0.001, isTarget= False, num_attacks= 10)
             target = (label + i) % (nb_labs+1)
             adv = attack_targeted(model, imgs[labs==target], image, label, target, alpha = alpha, beta = beta, iterations = 1000)
             print(i, "Predicted label for adversarial example: ", predict(model, adversarial))
-            advs.append(adv)
+            advs.append(np.clip(adv, 0, 1))
             total_distortion.append(np.linalg.norm(adv.reshape(-1) - image.reshape(-1)))
         np.save('advs/opt_attacks_{}_show.npy'.format(idx), advs)
 
@@ -224,9 +231,6 @@ def attack_mnist(model, alpha=0.2, beta=0.001, isTarget= False, num_attacks= 10)
 if __name__ == '__main__':
     timestart = time.time()
     random.seed(0)
-    conf = sys.argv[-1]
-    with open(conf) as config_file:
-        config = json.load(config_file)
         
     def custom_loss():
         def loss(y_true, y_pred):
