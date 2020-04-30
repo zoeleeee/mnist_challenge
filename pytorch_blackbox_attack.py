@@ -531,12 +531,24 @@ def attack_imagenet(arch='resnet50', alpha=0.2, beta= 0.001, isTarget=False, num
 if __name__ == '__main__':
     timestart = time.time()
     random.seed(0)
-    
+
+    nb_models = int(sys.argv[-2])
+    nets = []
     import imp
     MainModel = imp.load_source('MainModel', 'models/256.py')
-    net = torch.load(config['model_dir']+'.pt')
+    for i in range(nb_models):
+        with open(conf) as config_file:
+            config = json.load(config_file)
+        
+        idxs = np.arange(len(labels))
+        net = torch.load(config['model_dir']+'.pt')
+        conf = conf[:conf.find(conf.split('_')[-1])]+str(config['num_labels']*(i+1))+'.json'
+        nets.append(net)
+    
+    
+    
 
-    attack_mnist([net], alpha=2, beta=0.005, isTarget= False)
+    attack_mnist(nets, alpha=2, beta=0.005, isTarget= False)
     # attack_cifar10(alpha=5, beta=0.001, isTarget= False)
     #attack_imagenet(arch='resnet50', alpha=10, beta=0.005, isTarget= False)
     #attack_imagenet(arch='vgg19', alpha=0.05, beta=0.001, isTarget= False, num_attacks= 10)
