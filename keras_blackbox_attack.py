@@ -221,7 +221,7 @@ def attack_mnist(model, alpha=0.2, beta=0.001, isTarget= False, num_attacks= 10)
         for i in range(nb_labs):
             target = (label + i) % (nb_labs+1)
             adv = attack_targeted(model, imgs[labs==target], image, label, target, alpha = alpha, beta = beta, iterations = 1000)
-            print(i, "Predicted label for adversarial example: ", predict(model, adversarial))
+            print(i, "Predicted label for adversarial example: ", predict(model, adv))
             advs.append(np.clip(adv, 0, 1))
             total_distortion.append(np.linalg.norm(adv.reshape(-1) - image.reshape(-1)))
         np.save('advs/opt_attacks_{}_show.npy'.format(idx), advs)
