@@ -43,6 +43,8 @@ def load_data(path, nb_labels=-1, one_hot=False):
 	return imgs, labels, input_shape
 
 def extend_data(path, imgs):
+	if np.max(imgs) <= 1:
+		imgs *= 255
 	order = np.load(path)
 	imgs = imgs.astype(np.int)
 	samples = np.array([[[order[d[0]] for d in c] for c in b] for b in imgs]).astype(np.float32) / (int(path.split('_')[1].split('.')[0])-1)
