@@ -10,7 +10,7 @@ import torch.nn.functional as F
 #from models import IMAGENET, MNIST, CIFAR10, load_imagenet_data, load_mnist_data, load_cifar10_data, load_model, show_image
 import sys
 import json
-from utils import extend_data
+from utils import extend_data, show_image
 rep_labels = np.load('2_label_permutation.npy')
 conf = sys.argv[-1]
 with open(conf) as config_file:
@@ -437,6 +437,7 @@ def attack_mnist(nets, alpha=0.2, beta=0.001, isTarget= False, num_attacks= 100)
         #idx = random.randint(100, len(test_dataset)-1)
         image, label = torch.tensor(imgs[idx]), labs[idx]
         print("\n\n\n\n======== Image %d =========" % idx)
+        show_image(image.numpy())
         print("Original label: ", label)
         lab = predict(model, image)
         print("Predicted label: ", lab)
@@ -447,7 +448,9 @@ def attack_mnist(nets, alpha=0.2, beta=0.001, isTarget= False, num_attacks= 100)
         for i in range(1,nb_labs+1):
             target = (label + i) % (nb_labs+1)
             adv = attack_targeted(model, imgs[labs==target], image, label, target, alpha = alpha, beta = beta, iterations = 1)
-            print(i, "Predicted label for adversarial example: ", predict(model, adv), np.linalg.norm(adv.numpy()-image.numpy()))
+            tmp = (adv.numpy()*255.).astype(np.int).astype(np.float32)/255.
+            show_image((adv.numpy()*255.).astype(np.int).astype(np.float32)/255.)
+            print(i, "Predicted label for adversarial example: ", predict(model, adv), torch.norm(tmp-image), np.linalg.norm(adv.numpy()-image.numpy()))
             advs.append(torch.clamp(adv, 0, 1).numpy())
             total_distortion.append(torch.norm(adv - image))
         np.save('advs/opt_attacks_{}_show.npy'.format(idx), advs)
