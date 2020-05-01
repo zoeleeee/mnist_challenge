@@ -12,7 +12,7 @@ def custom_loss():
       _loss = keras.losses.SparseCategoricalCrossentropy()
       return _loss(y_true, tf.nn.softmax(y_pred))
   return loss
-model = k.models.load_model(model_dir+'.h5', custom_objects={ 'custom_loss': custom_loss(), 'loss':custom_loss() }, compile=False)
+model = k.models.load_model(config, custom_objects={ 'custom_loss': custom_loss(), 'loss':custom_loss() }, compile=False)
 weights = model.get_weights()
 
 import keras
