@@ -2,7 +2,17 @@ from tensorflow import keras as k
 import sys
 import numpy as np
 config = sys.argv[-1]
-model = k.models.load_model(config)
+loss_func = 'bce'
+def custom_loss():
+  def loss(y_true, y_pred):
+    if loss_func == 'bce':
+      _loss = keras.losses.BinaryCrossentropy()
+      return _loss(y_true, tf.nn.sigmoid(y_pred))
+    elif loss_func == 'xent':
+      _loss = keras.losses.SparseCategoricalCrossentropy()
+      return _loss(y_true, tf.nn.softmax(y_pred))
+  return loss
+model = k.models.load_model(model_dir+'.h5', custom_objects={ 'custom_loss': custom_loss(), 'loss':custom_loss() }, compile=False)
 weights = model.get_weights()
 
 import keras
