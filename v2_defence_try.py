@@ -30,8 +30,10 @@ for i in range(101):
 	preds.append(pred)
 
 np.save('tmp/est_pred.npy', preds)
+
 score = np.argmax(preds, axis=-1)
 lab = [np.argmax(np.bincount(score[:,i]))  for i in range(score.shape[-1])]
-
 print(np.mean(np.array(lab)==label))
 
+lab = np.argmax(np.sum(preds, axis=0), axis=-1)
+print(np.mean(lab==label))
