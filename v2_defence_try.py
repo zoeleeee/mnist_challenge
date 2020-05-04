@@ -25,8 +25,8 @@ res = np.zeros(label.shape)
 preds = []
 for i in range(101):
 	order = np.random.permutation(np.arange(256))
-	data =  extend_data(order.reshape(-1, 1), data)
-	pred = model.predict(data)
+	_data =  extend_data(order.reshape(-1, 1), data)
+	pred = model.predict(_data)
 	preds.append(pred)
 
 score = np.argmax(preds, axis=-1)
