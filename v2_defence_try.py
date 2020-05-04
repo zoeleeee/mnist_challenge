@@ -25,7 +25,7 @@ res = np.zeros(label.shape)
 preds = []
 for i in range(101):
 	order = np.random.permutation(np.arange(256))
-	data =  extend_data(order, data)
+	data =  extend_data(order.reshape(-1, 1), data)
 	pred = model.predict(data)
 	preds.append(pred)
 
