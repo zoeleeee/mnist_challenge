@@ -29,8 +29,9 @@ for i in range(101):
 	pred = model.predict(_data)
 	preds.append(pred)
 
+np.save('tmp/est_pred.npy')
 score = np.argmax(preds, axis=-1)
 lab = [np.argmax(np.bincount(score[:,i]))  for i in range(score.shape[-1])]
 
-print(np.mean(np.array(lab)-label))
+print(np.mean(np.array(lab)==label))
 
