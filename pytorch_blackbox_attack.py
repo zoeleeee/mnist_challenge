@@ -456,7 +456,7 @@ def attack_mnist(nets, alpha=0.2, beta=0.001, isTarget= False, num_attacks= 100)
         np.save('advs/opt_attacks_{}_show.npy'.format(idx), advs)
 
     print("Average distortion on random {} images is {}".format(len(total_distortion), np.mean(total_distortion)))
-
+    print('image distortion beyond 1.0 number:', np.sum(np.array(total_distortion) > 1.))
 
 def attack_cifar10(alpha= 0.2, beta= 0.001, isTarget= False, num_attacks= 100):
     train_loader, test_loader, train_dataset, test_dataset = load_cifar10_data()
