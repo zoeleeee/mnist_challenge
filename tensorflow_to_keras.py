@@ -1,9 +1,11 @@
 import tensorflow as tf
 import keras
 import sys
+from model import Model
 
 model_dir = sys.argv[-1]
 checkpoint = tf.train.latest_checkpoint(model_dir)
+model = Model()
 saver = tf.train.Saver()
 
 with tf.Session() as sess:
