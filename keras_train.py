@@ -36,9 +36,9 @@ imgs, labels, input_shape = load_data(path, nb_labels)
 if config['loss_func'] == 'bce':
   labels = np.array([lab_perm[i] for i in labels]).astype(np.float32)
 
-model = keras.Sequential([keras.layers.Conv2D(32, kernel_size=(5,5), activation='relu', input_shape=(28,28,input_shape[-1])),
+model = keras.Sequential([keras.layers.Conv2D(32, kernel_size=(5,5), padding='same', activation='relu', input_shape=(28,28,input_shape[-1])),
 	keras.layers.MaxPooling2D(pool_size=(2,2)),
-	keras.layers.Conv2D(64, kernel_size=(5,5), activation='relu'),
+	keras.layers.Conv2D(64, kernel_size=(5,5), activation='relu', padding='same'),
 	keras.layers.MaxPooling2D(pool_size=(2,2)),
 	keras.layers.Flatten(),
 	keras.layers.Dense(1024, activation='relu'),
