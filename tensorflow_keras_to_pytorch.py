@@ -17,7 +17,7 @@ weights = model.get_weights()
 
 import keras
 
-model = keras.Sequential([keras.layers.Conv2D(32, kernel_size=(5,5), activation='relu', input_shape=(28,28,16)),
+model = keras.Sequential([keras.layers.Conv2D(32, kernel_size=(5,5), activation='relu', input_shape=(28,28,32)),
     keras.layers.MaxPooling2D(pool_size=(2,2)),
     keras.layers.Conv2D(64, kernel_size=(5,5), activation='relu'),
     keras.layers.MaxPooling2D(pool_size=(2,2)),
@@ -37,7 +37,7 @@ import torch.nn.functional as F
 class Net(nn.Module):
     def __init__(self):
         super(Net, self).__init__()
-        self.conv1 = nn.Conv2d(16, 32, 5)
+        self.conv1 = nn.Conv2d(32, 32, 5)
         self.pool = nn.MaxPool2d(2, 2)
         self.conv2 = nn.Conv2d(32, 64, 5)
         self.fc1 = nn.Linear(1024, 1024)
@@ -71,7 +71,7 @@ net.fc2.bias.data=torch.from_numpy(weights[7])
 #torch.save(net.state_dict(), config[:-2]+'pt')
 
 from utils import load_data
-imgs, labs, _ = load_data('permutation/256_256.16_permutation.npy', 10)
+imgs, labs, _ = load_data('permutation/256_256.32_permutation.npy', 10)
 imgs = imgs.transpose((0,3,1,2))[60000:60100]
 imgs = torch.clamp(torch.tensor(imgs), 0, 1)
 net.eval()

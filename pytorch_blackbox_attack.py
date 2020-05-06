@@ -450,13 +450,13 @@ def attack_mnist(nets, alpha=0.2, beta=0.001, isTarget= False, num_attacks= 100)
             adv = attack_targeted(model, imgs[labs==target], image, label, target, alpha = alpha, beta = beta, iterations = 1)
             tmp = (adv.numpy()*255.).astype(np.int).astype(np.float32)/255.
             show_image((adv.numpy()*255.).astype(np.int).astype(np.float32)/255.)
-            print(i, "Predicted label for adversarial example: ", predict(model, adv), torch.norm(tmp-image), np.linalg.norm(adv.numpy()-image.numpy()))
+            print(i, "Predicted label for adversarial example: ", predict(model, adv), np.linalg.norm(tmp-image.numpy()), np.linalg.norm(tmp.reshape(-1)-image.numpy().reshape(-1), axis=-1, ord=np.inf), np.sum(tmp!=image.numpy()))
             advs.append(torch.clamp(adv, 0, 1).numpy())
             total_distortion.append(torch.norm(adv - image))
         np.save('advs/opt_attacks_{}_show.npy'.format(idx), advs)
 
     print("Average distortion on random {} images is {}".format(len(total_distortion), np.mean(total_distortion)))
-
+    print('image distortion beyond 1.0 number:', np.sum(np.array(total_distortion) > 1.))
 
 def attack_cifar10(alpha= 0.2, beta= 0.001, isTarget= False, num_attacks= 100):
     train_loader, test_loader, train_dataset, test_dataset = load_cifar10_data()
