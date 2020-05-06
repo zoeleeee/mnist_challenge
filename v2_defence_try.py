@@ -23,9 +23,10 @@ label = np.load('data/mnist_labels.npy')[60000:]
 
 res = np.zeros(label.shape)
 preds = []
-for i in range(101):
-	order = np.random.permutation(np.arange(256))
-	_data =  extend_data(order.reshape(-1, 1), data)
+for i in range(255):
+	_data = (data+1+i)%255 / 255.
+	# order = np.random.permutation(np.arange(256))
+	# _data =  extend_data(order.reshape(-1, 1), data)
 	pred = model.predict(_data)
 	preds.append(pred)
 
