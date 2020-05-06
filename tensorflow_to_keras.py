@@ -4,6 +4,8 @@ import sys
 
 model_dir = sys.argv[-1]
 checkpoint = tf.train.latest_checkpoint(model_dir)
+saver = tf.train.Saver()
+
 with tf.Session() as sess:
     # load weights for graph
     saver.restore(sess, checkpoint)
