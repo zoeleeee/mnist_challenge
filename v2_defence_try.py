@@ -11,12 +11,12 @@ def extend_data(order, imgs):
 	return samples
 
 
-with open('models/mnist.json') as file:
-	json_mnist = file.read()
+#with open('models/mnist.json') as file:
+#	json_mnist = file.read()
 
-model = keras.models.model_from_json(json_mnist)
-model.load_weights('models/mnist.h5')
-
+#model = keras.models.model_from_json(json_mnist)
+#model.load_weights('models/mnist.h5')
+model = keras.models.load_model('models/adv_trained.h5')
 data = np.load('data/mnist_data.npy').transpose((0,2,3,1))[60000:]
 label = np.load('data/mnist_labels.npy')[60000:]
 

@@ -1,4 +1,4 @@
-import numpy as numpy
+import numpy as np
 from utils import order_extend_data
 import sys
 import matplotlib.pyplot as plt
@@ -16,11 +16,11 @@ def plot(x, lab, name):
 nb_channel = int(sys.argv[-1])
 data = np.load('data/mnist_data.npy').transpose((0,2,3,1))[60000:]
 label = np.load('data/mnist_labels.npy')[60000:]
-X_embedded = TSNE(n_components=2).fit_transform(data)
+X_embedded = TSNE(n_components=2).fit_transform(data.reshape(-1, 784))
 plot(X_embedded, label, 'mnist_pics/origin.png')
 for i in range(0,100,20):
 	np.random.seed(i)
 	perm = np.array([np.random.permutation(np.arange(256)) for j in range(nb_channel)]).transpose((1,0))
 	imgs = order_extend_data(perm, data)
-	X_embedded = TSNE(n_components=2).fit_transform(imgs)
+	X_embedded = TSNE(n_components=2).fit_transform(imgs.reshape((-1,784*nb_channel)))
 	plot(X_embedded, label, 'mnist_pics/{}_perm.png'.format(i))
