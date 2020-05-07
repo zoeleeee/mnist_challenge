@@ -3,6 +3,7 @@ import sys
 import numpy as np
 config = sys.argv[-1]
 loss_func = 'bce'
+nb_channel = int(sys.argv[-2])
 def custom_loss():
   def loss(y_true, y_pred):
     if loss_func == 'bce':
@@ -17,9 +18,9 @@ weights = model.get_weights()
 
 import keras
 
-model = keras.Sequential([keras.layers.Conv2D(32, kernel_size=(5,5), activation='relu', input_shape=(28,28,32)),
+model = keras.Sequential([keras.layers.Conv2D(32, kernel_size=(5,5), activation='relu', input_shape=(28,28,nb_channel), padding='same'),
     keras.layers.MaxPooling2D(pool_size=(2,2)),
-    keras.layers.Conv2D(64, kernel_size=(5,5), activation='relu'),
+    keras.layers.Conv2D(64, kernel_size=(5,5), activation='relu', padding='same'),
     keras.layers.MaxPooling2D(pool_size=(2,2)),
     keras.layers.Flatten(),
     keras.layers.Dense(1024, activation='relu'),
@@ -40,7 +41,7 @@ class Net(nn.Module):
         self.conv1 = nn.Conv2d(32, 32, 5)
         self.pool = nn.MaxPool2d(2, 2)
         self.conv2 = nn.Conv2d(32, 64, 5)
-        self.fc1 = nn.Linear(1024, 1024)
+        self.fc1 = nn.Linear(3136, 1024)
         self.fc2 = nn.Linear(1024, 20)
         # self.fc3 = nn.Linear(84, 10)
 
