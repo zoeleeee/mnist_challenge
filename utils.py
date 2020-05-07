@@ -50,6 +50,13 @@ def extend_data(path, imgs):
 	samples = np.array([[[order[d[0]] for d in c] for c in b] for b in imgs]).astype(np.float32) / (int(path.split('_')[1].split('.')[0])-1)
 	return samples
 
+def order_extend_data(order, imgs, basis=255):
+	if np.max(imgs) <= 1:
+		imgs *= 255
+	imgs = imgs.astype(np.int)
+	samples = np.array([[[order[d[0]] for d in c] for c in b] for b in imgs]).astype(np.float32) / basis
+	return samples
+
 def show_image(img):
     """
     Show MNSIT digits in the console.

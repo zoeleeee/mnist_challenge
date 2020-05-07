@@ -9,7 +9,7 @@ from keras import backend as K
 import sys
 import os
 import json
-from utils import load_data
+from utils import load_data, order_extend_data
 import numpy as np
 
 conf = sys.argv[-1]
@@ -24,15 +24,24 @@ lab_perm = np.load('2_label_permutation.npy')[st_lab:st_lab+nb_labels].T
 
 # Setting up training parameters
 tf.set_random_seed(config['random_seed'])
-
 max_num_training_steps = config['max_num_training_steps']
 num_output_steps = config['num_output_steps']
 num_summary_steps = config['num_summary_steps']
 num_checkpoint_steps = config['num_checkpoint_steps']
 
 batch_size = config['training_batch_size']
+nb_channal = int(path.split('_')[1].split('.')[1])
 
-imgs, labels, input_shape = load_data(path, nb_labels)
+np.random.seed(st_lab)
+perm = []
+for i in range(nb_channal):
+	perm.append(np.random.permutation(np.arange(256)))
+perm = np.array(perm).transpose((1,0))
+imgs = np.load('data/mnist_data.npy').transpose((0,2,3,1))
+imgs = order_extend_data(perm, imgs)
+labels = np.load('data/mnist_labels.npy')
+input_shape = imgs.shape[1:]
+# imgs, labels, input_shape = load_data(path, nb_labels)
 if config['loss_func'] == 'bce':
   labels = np.array([lab_perm[i] for i in labels]).astype(np.float32)
 
