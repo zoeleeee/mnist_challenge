@@ -10,16 +10,22 @@ import torch.nn.functional as F
 #from models import IMAGENET, MNIST, CIFAR10, load_imagenet_data, load_mnist_data, load_cifar10_data, load_model, show_image
 import sys
 import json
-from utils import extend_data, show_image
+from utils import extend_data, show_image, order_extend_data
 rep_labels = np.load('2_label_permutation.npy')
 conf = sys.argv[-1]
 with open(conf) as config_file:
     config = json.load(config_file)
 
 def predict(models, img, t=0):
+    nb_channel = int(config['permutation'].split('_')[1].split('.')[1])
     img = torch.clamp(img, 0, 1)*255
-    img = torch.tensor(extend_data(config['permutation'], np.array([img.numpy()])).transpose((0,3,1,2))).cuda()
-    scores = torch.cat(tuple([torch.sigmoid(model(img)) for model in models]), dim=1)
+    imgs = []
+    for i in range(len(models)):
+        np.random.seed(i*20)
+        perm = np.array([np.random.permutation(np.arange(256)) for j in range(nb_channel)]).transpose((1,0))
+        imgs.append(torch.tensor(order_extend_data(perm, np.array([img.numpy()])).transpose((0,3,1,2))).cuda())
+    # img = torch.tensor(extend_data(config['permutation'], np.array([img.numpy()])).transpose((0,3,1,2))).cuda()
+    scores = torch.cat(tuple([torch.sigmoid(model(imgs[i])) for i,model in enumerate(models)]), dim=1)
   #  print(scores)
  #   print(scores.size())
     nat_labels = torch.zeros(scores.shape).type(torch.FloatTensor)
