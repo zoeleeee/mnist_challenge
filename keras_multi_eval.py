@@ -27,9 +27,19 @@ nb_labels = config['num_labels']
 model_dir = config['model_dir']
 st_lab = config['start_label']
 rep = np.load('2_label_permutation.npy')[st_lab:st_lab+nb_labels].T
+nb_channal = int(config['permutation'].split('_')[1].split('.')[1])
 
 #if dataset == 'origin.npy':
-imgs, labels, input_shape = load_data(config['permutation'], config['num_labels'])
+np.random.seed(st_lab)
+perm = []
+for i in range(nb_channal):
+  perm.append(np.random.permutation(np.arange(256)))
+perm = np.array(perm).transpose((1,0))
+imgs = np.load('data/mnist_data.npy').transpose((0,2,3,1))
+imgs = order_extend_data(perm, imgs)
+labels = np.load('data/mnist_labels.npy')
+input_shape = imgs.shape[1:]
+# imgs, labels, input_shape = load_data(config['permutation'], config['num_labels'])
 labels = np.array([rep[i] for i in labels]).astype(np.float32)
 x_train, y_train = imgs[:60000], labels[:60000]
 x_test, y_test = imgs[60000:], labels[60000:]
