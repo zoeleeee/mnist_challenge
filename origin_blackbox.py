@@ -8,6 +8,7 @@ import torchvision.transforms as transforms
 from torch.autograd import Variable
 import torch.nn.functional as F
 import sys
+from utils import show_image
 
 def predict(model, x):
     return torch.argmax(model(x))
