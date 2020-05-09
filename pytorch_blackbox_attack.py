@@ -17,6 +17,7 @@ nb_models = int(sys.argv[-2])
 with open(conf) as config_file:
     config = json.load(config_file)
 perms= []
+nb_channel = int(config['permutation'].split('_')[1].split('.')[1])
 for i in range(nb_models):
     np.random.seed(i*20)
     perms.append(np.array([np.random.permutation(np.arange(256)) for j in range(nb_channel)]).transpose((1,0)))
