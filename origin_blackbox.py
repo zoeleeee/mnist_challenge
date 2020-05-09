@@ -386,8 +386,8 @@ def attack_mnist(net_path, alpha=0.2, beta=0.001, isTarget= False, num_attacks= 
     # nb_labs = np.max(labs)
     imgs = torch.tensor(imgs)
     # train_loader, test_loader, train_dataset, test_dataset = load_mnist_data()
-    dataset = torch.utils.data.TensorDataset(imgs[:60000], labs[:60000])
-    test_dataset = torch.utils.data.TensorDataset(imgs[60000:], labs[60000:])
+    dataset = torch.utils.data.TensorDataset(torch.tensor(imgs[:60000]), torch.tensor(labs[:60000]))
+    test_dataset = torch.utils.data.TensorDataset(torch.tensor(imgs[60000:]), torch.tensor(labs[60000:]))
     print("Length of test_set: ", len(test_dataset))
     
     import imp
