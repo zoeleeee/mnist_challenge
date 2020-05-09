@@ -16,6 +16,7 @@ for line in cnt:
 	elif line.startswith('1 Predicted label'):
 		calibration.append(eval(line.split(' ')[-3]))
 		linf.append(eval(line.split(' ')[-2]))
+print('len:', len(count))
 print('count:', np.mean(count), np.median(count), np.min(count), np.max(count))
 print('distortion:', np.mean(distortion), np.median(distortion), np.min(distortion), np.max(distortion))
 print('calibration:', np.mean(calibration), np.median(calibration), np.min(calibration), np.max(calibration))
