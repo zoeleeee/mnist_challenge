@@ -7,11 +7,6 @@ import torchvision.datasets as dsets
 import torchvision.transforms as transforms
 from torch.autograd import Variable
 import torch.nn.functional as F
-#<<<<<<< HEAD
-#from models import IMAGENET, MNIST, CIFAR10, load_imagenet_data, load_mnist_data, load_cifar10_data, load_model, show_image
-#=======
-# from models import IMAGENET, MNIST, CIFAR10, load_imagenet_data, load_mnist_data, load_cifar10_data, load_model, show_image
-#>>>>>>> refs/remotes/origin/master
 import sys
 
 def predict(model, x):
