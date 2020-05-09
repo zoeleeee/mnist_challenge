@@ -382,7 +382,7 @@ def fine_grained_binary_search(model, x0, y0, theta, initial_lbd, current_best):
     return lbd_hi, nquery
 
 def attack_mnist(net_path, alpha=0.2, beta=0.001, isTarget= False, num_attacks= 100):
-    imgs = np.load('data/mnist_data.npy').transpose((0,2,3,1)).astype(np.float32)/255.
+    imgs = np.load('data/mnist_data.npy').astype(np.float32)/255.
     labs = np.load('data/mnist_labels.npy')
     # nb_labs = np.max(labs)
     imgs = torch.tensor(imgs)
