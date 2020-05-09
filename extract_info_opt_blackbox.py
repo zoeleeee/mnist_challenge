@@ -11,11 +11,11 @@ calibration = []
 linf = []
 for line in cnt:
 	if line.startswith('Adversarial Example Found Successfully:'):
-		count.append(int(line.split(' ')[-1]))
-		distortion.append(eval(line.split(' ')[-5]))
+		count.append(int(line.split(' ')[-2]))
+		distortion.append(eval(line.split(' ')[-6]))
 	elif line.startswith('1 Predicted label'):
-		calibration.append(eval(line.split(' ')[-3]))
-		linf.append(eval(line.split(' ')[-2]))
+		calibration.append(eval(line.split(' ')[-4]))
+		linf.append(eval(line.split(' ')[-3]))
 print('len:', len(count))
 print('count:', np.mean(count), np.median(count), np.min(count), np.max(count))
 print('distortion:', np.mean(distortion), np.median(distortion), np.min(distortion), np.max(distortion))
