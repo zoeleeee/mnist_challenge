@@ -16,11 +16,12 @@ conf = sys.argv[-1]
 with open(conf) as config_file:
     config = json.load(config_file)
 
-model_dir = config['model_dir']
+model_dir = config['model_dir']+'_lab'
 nb_labels = config['num_labels']
 path = config['permutation']
 st_lab = config['start_label']
-lab_perm = np.load('2_label_permutation.npy')[st_lab:st_lab+nb_labels].T
+np.random.seed(st_lab)
+lab_perm = np.random.permutation(np.load('2_label_permutation.npy')[st_lab:st_lab+nb_labels].T)
 
 # Setting up training parameters
 tf.set_random_seed(config['random_seed'])
