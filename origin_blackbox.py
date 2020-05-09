@@ -11,7 +11,7 @@ import sys
 from utils import show_image
 
 def predict(model, x):
-    return torch.argmax(model(x.unsqueeze(0)))
+    return torch.argmax(model(x.unsqueeze(0).cuda()))
     
 def attack_targeted(model, train_dataset, x0, y0, target, alpha = 0.1, beta = 0.001, iterations = 1000):
     """ Attack the original image and return adversarial example of target t
@@ -385,7 +385,7 @@ def attack_mnist(net_path, alpha=0.2, beta=0.001, isTarget= False, num_attacks= 
     imgs = np.load('data/mnist_data.npy').astype(np.float32)/255.
     labs = np.load('data/mnist_labels.npy')
     # nb_labs = np.max(labs)
-    imgs = torch.tensor(imgs)
+    # imgs = torch.tensor(imgs)
     # train_loader, test_loader, train_dataset, test_dataset = load_mnist_data()
     dataset = torch.utils.data.TensorDataset(torch.tensor(imgs[:60000]), torch.tensor(labs[:60000]))
     test_dataset = torch.utils.data.TensorDataset(torch.tensor(imgs[60000:]), torch.tensor(labs[60000:]))
