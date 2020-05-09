@@ -7,9 +7,16 @@ import torchvision.datasets as dsets
 import torchvision.transforms as transforms
 from torch.autograd import Variable
 import torch.nn.functional as F
+#<<<<<<< HEAD
 #from models import IMAGENET, MNIST, CIFAR10, load_imagenet_data, load_mnist_data, load_cifar10_data, load_model, show_image
+#=======
+# from models import IMAGENET, MNIST, CIFAR10, load_imagenet_data, load_mnist_data, load_cifar10_data, load_model, show_image
+#>>>>>>> refs/remotes/origin/master
 import sys
 
+def predict(model, x):
+    return torch.argmax(model(x))
+    
 def attack_targeted(model, train_dataset, x0, y0, target, alpha = 0.1, beta = 0.001, iterations = 1000):
     """ Attack the original image and return adversarial example of target t
         model: (pytorch model)
@@ -18,7 +25,7 @@ def attack_targeted(model, train_dataset, x0, y0, target, alpha = 0.1, beta = 0.
         t: target
     """
 
-    if (model.predict(x0) != y0):
+    if (predict(model,x0) != y0):
         print("Fail to classify the image. No need to attack.")
         return x0
 
@@ -35,7 +42,7 @@ def attack_targeted(model, train_dataset, x0, y0, target, alpha = 0.1, beta = 0.
         if i not in samples:
             continue
         query_count += 1
-        if model.predict(xi) == target:
+        if predict(model,xi) == target:
             theta = xi - x0
             initial_lbd = torch.norm(theta)
             theta = theta/torch.norm(theta)
@@ -119,7 +126,7 @@ def attack_targeted(model, train_dataset, x0, y0, target, alpha = 0.1, beta = 0.
             if (beta < 0.0005):
                 break
 
-    target = model.predict(x0 + g_theta*best_theta)
+    target = predict(model,x0 + g_theta*best_theta)
     timeend = time.time()
     print("\nAdversarial Example Found Successfully: distortion %.4f target %d queries %d \nTime: %.4f seconds" % (g_theta, target, query_count + opt_count, timeend-timestart))
     return x0 + g_theta*best_theta
@@ -128,11 +135,11 @@ def fine_grained_binary_search_local_targeted(model, x0, y0, t, theta, initial_l
     nquery = 0
     lbd = initial_lbd
    
-    if model.predict(x0+lbd*theta) != t:
+    if predict(model,x0+lbd*theta) != t:
         lbd_lo = lbd
         lbd_hi = lbd*1.01
         nquery += 1
-        while model.predict(x0+lbd_hi*theta) != t:
+        while predict(model,x0+lbd_hi*theta) != t:
             lbd_hi = lbd_hi*1.01
             nquery += 1
             if lbd_hi > 100: 
@@ -141,14 +148,14 @@ def fine_grained_binary_search_local_targeted(model, x0, y0, t, theta, initial_l
         lbd_hi = lbd
         lbd_lo = lbd*0.99
         nquery += 1
-        while model.predict(x0+lbd_lo*theta) == t:
+        while predict(model,x0+lbd_lo*theta) == t:
             lbd_lo = lbd_lo*0.99
             nquery += 1
 
     while (lbd_hi - lbd_lo) > tol:
         lbd_mid = (lbd_lo + lbd_hi)/2.0
         nquery += 1
-        if model.predict(x0 + lbd_mid*theta) == t:
+        if predict(model,x0 + lbd_mid*theta) == t:
             lbd_hi = lbd_mid
         else:
             lbd_lo = lbd_mid
@@ -158,7 +165,7 @@ def fine_grained_binary_search_targeted(model, x0, y0, t, theta, initial_lbd = 1
     nquery = 0
     lbd = initial_lbd
 
-    while model.predict(x0 + lbd*theta) != t:
+    while predict(model,x0 + lbd*theta) != t:
         lbd *= 1.05
         nquery += 1
         if lbd > 100: 
@@ -171,7 +178,7 @@ def fine_grained_binary_search_targeted(model, x0, y0, t, theta, initial_lbd = 1
     lbd_hi_index = 0
     for i, lbd in enumerate(lambdas):
         nquery += 1
-        if model.predict(x0 + lbd*theta) == t:
+        if predict(model,x0 + lbd*theta) == t:
             lbd_hi = lbd
             lbd_hi_index = i
             break
@@ -181,7 +188,7 @@ def fine_grained_binary_search_targeted(model, x0, y0, t, theta, initial_lbd = 1
     while (lbd_hi - lbd_lo) > 1e-7:
         lbd_mid = (lbd_lo + lbd_hi)/2.0
         nquery += 1
-        if model.predict(x0 + lbd_mid*theta) == t:
+        if predict(model,x0 + lbd_mid*theta) == t:
             lbd_hi = lbd_mid
         else:
             lbd_lo = lbd_mid
@@ -197,7 +204,7 @@ def attack_untargeted(model, train_dataset, x0, y0, alpha = 0.2, beta = 0.001, i
         (x0, y0): original image
     """
 
-    if (model.predict(x0) != y0):
+    if (predict(model,x0) != y0):
         print("Fail to classify the image. No need to attack.")
         return x0
 
@@ -212,7 +219,7 @@ def attack_untargeted(model, train_dataset, x0, y0, alpha = 0.2, beta = 0.001, i
         if i not in samples:
             continue
         query_count += 1
-        if model.predict(xi) != y0:
+        if predict(model,xi) != y0:
             theta = xi - x0
             initial_lbd = torch.norm(theta)
             theta = theta/torch.norm(theta)
@@ -300,7 +307,7 @@ def attack_untargeted(model, train_dataset, x0, y0, alpha = 0.2, beta = 0.001, i
             if (beta < 0.0005):
                 break
 
-    target = model.predict(x0 + g_theta*best_theta)
+    target = predict(model,x0 + g_theta*best_theta)
     timeend = time.time()
     print("\nAdversarial Example Found Successfully: distortion %.4f target %d queries %d \nTime: %.4f seconds" % (g_theta, target, query_count + opt_count, timeend-timestart))
     return x0 + g_theta*best_theta
@@ -309,11 +316,11 @@ def fine_grained_binary_search_local(model, x0, y0, theta, initial_lbd = 1.0, to
     nquery = 0
     lbd = initial_lbd
      
-    if model.predict(x0+lbd*theta) == y0:
+    if predict(model,x0+lbd*theta) == y0:
         lbd_lo = lbd
         lbd_hi = lbd*1.01
         nquery += 1
-        while model.predict(x0+lbd_hi*theta) == y0:
+        while predict(model,x0+lbd_hi*theta) == y0:
             lbd_hi = lbd_hi*1.01
             nquery += 1
             if lbd_hi > 20:
@@ -322,14 +329,14 @@ def fine_grained_binary_search_local(model, x0, y0, theta, initial_lbd = 1.0, to
         lbd_hi = lbd
         lbd_lo = lbd*0.99
         nquery += 1
-        while model.predict(x0+lbd_lo*theta) != y0 :
+        while predict(model,x0+lbd_lo*theta) != y0 :
             lbd_lo = lbd_lo*0.99
             nquery += 1
 
     while (lbd_hi - lbd_lo) > tol:
         lbd_mid = (lbd_lo + lbd_hi)/2.0
         nquery += 1
-        if model.predict(x0 + lbd_mid*theta) != y0:
+        if predict(model,x0 + lbd_mid*theta) != y0:
             lbd_hi = lbd_mid
         else:
             lbd_lo = lbd_mid
@@ -338,7 +345,7 @@ def fine_grained_binary_search_local(model, x0, y0, theta, initial_lbd = 1.0, to
 def fine_grained_binary_search(model, x0, y0, theta, initial_lbd, current_best):
     nquery = 0
     if initial_lbd > current_best: 
-        if model.predict(x0+current_best*theta) == y0:
+        if predict(model,x0+current_best*theta) == y0:
             nquery += 1
             return float('inf'), nquery
         lbd = current_best
@@ -347,7 +354,7 @@ def fine_grained_binary_search(model, x0, y0, theta, initial_lbd, current_best):
     
     ## original version
     #lbd = initial_lbd
-    #while model.predict(x0 + lbd*theta) == y0:
+    #while predict(model,x0 + lbd*theta) == y0:
     #    lbd *= 2
     #    nquery += 1
     #    if lbd > 100:
@@ -360,7 +367,7 @@ def fine_grained_binary_search(model, x0, y0, theta, initial_lbd, current_best):
     # lbd_hi_index = 0
     # for i, lbd in enumerate(lambdas):
     #     nquery += 1
-    #     if model.predict(x0 + lbd*theta) != y0:
+    #     if predict(model,x0 + lbd*theta) != y0:
     #         lbd_hi = lbd
     #         lbd_hi_index = i
     #         break
@@ -372,16 +379,21 @@ def fine_grained_binary_search(model, x0, y0, theta, initial_lbd, current_best):
     while (lbd_hi - lbd_lo) > 1e-5:
         lbd_mid = (lbd_lo + lbd_hi)/2.0
         nquery += 1
-        if model.predict(x0 + lbd_mid*theta) != y0:
+        if predict(model,x0 + lbd_mid*theta) != y0:
             lbd_hi = lbd_mid
         else:
             lbd_lo = lbd_mid
     return lbd_hi, nquery
 
 def attack_mnist(net_path, alpha=0.2, beta=0.001, isTarget= False, num_attacks= 100):
-    train_loader, test_loader, train_dataset, test_dataset = load_mnist_data()
+    imgs = np.load('data/mnist_data.npy').transpose((0,2,3,1)).astype(np.float32)/255.
+    labs = np.load('data/mnist_labels.npy')
+    # nb_labs = np.max(labs)
+    imgs = torch.tensor(imgs)
+    # train_loader, test_loader, train_dataset, test_dataset = load_mnist_data()
     print("Length of test_set: ", len(test_dataset))
-    dataset = train_dataset
+    dataset = torch.utils.data.TensorDataset(imgs[:60000], labs[:60000])
+    test_dataset = torch.utils.data.TensorDataset(imgs[60000:], labs[60000:])
     
     import imp
     MainModel = imp.load_source('MainModel', 'models/256.py')
@@ -398,14 +410,14 @@ def attack_mnist(net_path, alpha=0.2, beta=0.001, isTarget= False, num_attacks= 
     def single_attack(image, label, target = None):
         show_image(image.numpy())
         print("Original label: ", label)
-        print("Predicted label: ", model.predict(image))
+        print("Predicted label: ", predict(model,image))
         if target == None:
             adversarial = attack_untargeted(model, dataset, image, label, alpha = alpha, beta = beta, iterations = 1000)
         else:
             print("Targeted attack: %d" % target)
             adversarial = attack_targeted(model, dataset, image, label, target, alpha = alpha, beta = beta, iterations = 1000)
         show_image(adversarial.numpy())
-        print("Predicted label for adversarial example: ", model.predict(adversarial))
+        print("Predicted label for adversarial example: ", predict(model,adversarial))
         return torch.norm(adversarial - image)
 
     print("\n\n Running {} attack on {} random  MNIST test images for alpha= {} beta= {}\n\n".format("targetted" if isTarget else "untargetted", num_attacks, alpha, beta))
@@ -441,13 +453,13 @@ def attack_cifar10(alpha= 0.2, beta= 0.001, isTarget= False, num_attacks= 100):
 
     def single_attack(image, label, target = None):
         print("Original label: ", label)
-        print("Predicted label: ", model.predict(image))
+        print("Predicted label: ", predict(model,image))
         if target == None:
             adversarial = attack_untargeted(model, dataset, image, label, alpha = alpha, beta = beta, iterations = 1000)
         else:
             print("Targeted attack: %d" % target)
             adversarial = attack_targeted(model, dataset, image, label, target, alpha = alpha, beta = beta, iterations = 1000)
-        print("Predicted label for adversarial example: ", model.predict(adversarial))
+        print("Predicted label for adversarial example: ", predict(model,adversarial))
         return torch.norm(adversarial - image)
 
     print("\n\nRunning {} attack on {} random CIFAR10 test images for alpha= {} beta= {}\n\n".format("targetted" if isTarget else "untargetted", num_attacks, alpha, beta))
@@ -475,13 +487,13 @@ def attack_imagenet(arch='resnet50', alpha=0.2, beta= 0.001, isTarget=False, num
 
     def attack_single(image, label, target = None):
         print("Original label: ", label)
-        print("Predicted label: ", model.predict(image))
+        print("Predicted label: ", predict(model,image))
         if target == None:
             adversarial = attack_untargeted(model, dataset, image, label, alpha = alpha, beta = beta, iterations = 1500)
         else:
             print("Targeted attack: %d" % target)
             adversarial = attack_targeted(model, dataset, image, label, target, alpha = alpha, beta = beta, iterations = 1500)
-        print("Predicted label for adversarial example: ", model.predict(adversarial))
+        print("Predicted label for adversarial example: ", predict(model,adversarial))
         return torch.norm(adversarial - image)
 
     print("\nRunning {} attack on {} random IMAGENET test images for alpha= {} beta= {} using {}\n".format("targetted" if isTarget else "untargetted", num_attacks, alpha, beta, arch))
