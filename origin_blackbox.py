@@ -11,7 +11,7 @@ import sys
 from utils import show_image
 
 def predict(model, x):
-    return torch.argmax(model(x))
+    return torch.argmax(model(x.unsqueeze(0)))
     
 def attack_targeted(model, train_dataset, x0, y0, target, alpha = 0.1, beta = 0.001, iterations = 1000):
     """ Attack the original image and return adversarial example of target t
