@@ -13,17 +13,22 @@ import json
 from utils import extend_data, show_image, order_extend_data
 rep_labels = np.load('2_label_permutation.npy')
 conf = sys.argv[-1]
+nb_models = int(sys.argv[-2])
 with open(conf) as config_file:
     config = json.load(config_file)
+perms= []
+for i in range(len(models)):
+    np.random.seed(i*20)
+    perms.append(np.array([np.random.permutation(np.arange(256)) for j in range(nb_channel)]).transpose((1,0)))
 
 def predict(models, img, t=0):
     nb_channel = int(config['permutation'].split('_')[1].split('.')[1])
     img = torch.clamp(img, 0, 1)*255
     imgs = []
     for i in range(len(models)):
-        np.random.seed(i*20)
-        perm = np.array([np.random.permutation(np.arange(256)) for j in range(nb_channel)]).transpose((1,0))
-        imgs.append(torch.tensor(order_extend_data(perm, np.array([img.numpy()])).transpose((0,3,1,2))).cuda())
+        # np.random.seed(i*20)
+        # perm = np.array([np.random.permutation(np.arange(256)) for j in range(nb_channel)]).transpose((1,0))
+        imgs.append(torch.tensor(order_extend_data(perms[i], np.array([img.numpy()])).transpose((0,3,1,2))).cuda())
     # img = torch.tensor(extend_data(config['permutation'], np.array([img.numpy()])).transpose((0,3,1,2))).cuda()
     scores = torch.cat(tuple([torch.sigmoid(model(imgs[i])) for i,model in enumerate(models)]), dim=1)
   #  print(scores)
@@ -81,7 +86,7 @@ def attack_targeted(model, train_dataset, x0, y0, target, alpha = 0.1, beta = 0.
 
     timeend = time.time()
     print("==========> Found best distortion %.4f in %.4f seconds using %d queries" % (g_theta, timeend-timestart, query_count))
-    return x0+g_theta*best_theta
+    # return x0+g_theta*best_theta
 
     # STEP II: seach for optimal
     timestart = time.time()
@@ -542,7 +547,7 @@ if __name__ == '__main__':
     timestart = time.time()
     random.seed(0)
 
-    nb_models = int(sys.argv[-2])
+    
     nets = []
     import imp
     MainModel = imp.load_source('MainModel', 'models/256.py')
