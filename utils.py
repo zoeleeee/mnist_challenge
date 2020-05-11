@@ -70,7 +70,8 @@ def two_pixel_perm_img(nb_channal, imgs):
 	if np.max(imgs) <= 1:
 		imgs *= 255
 	imgs = imgs.reshape(-1, 784)
-	imgs = np.array([[perms[a[i]][a[i+1]] for i in range(0, len(a), 2)] for a in imgs]).reshape(-1, 14, 14, nb_channal)
+	print(imgs.shape)
+	imgs = np.array([[perms[a[i]][a[i+1]] for i in range(0, len(a), 2)] for a in imgs]).reshape(-1, 28, 14, nb_channal)
 	return imgs
 
 def two_pixel_perm(nb_channal, model_dir):
