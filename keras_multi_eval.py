@@ -24,7 +24,7 @@ num_eval_examples = config['num_eval_examples']
 eval_batch_size = config['eval_batch_size']
 eval_on_cpu = config['eval_on_cpu']
 nb_labels = config['num_labels']
-model_dir = config['model_dir']+'_lab'
+model_dir = config['model_dir']
 st_lab = config['start_label']
 rep = np.load('2_label_permutation.npy')[st_lab:st_lab+nb_labels].T
 nb_channal = int(config['permutation'].split('_')[1].split('.')[1])
@@ -48,7 +48,7 @@ if dataset != 'origin.npy':
   x_test = np.load(dataset)
   if dataset.endswith('show.npy'):
     # x_test = extend_data(config['permutation'], x_test)
-    two_pixel_perm_img = extend_data(nb_channal, x_test)
+    two_pixel_perm_img = two_pixel_perm_img(nb_channal, x_test)
     # x_test = order_extend_data(perm, x_test)
 
 if len(x_test.shape) == 3:
