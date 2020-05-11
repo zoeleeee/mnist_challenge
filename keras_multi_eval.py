@@ -48,7 +48,7 @@ if dataset != 'origin.npy':
   x_test = np.load(dataset)
   if dataset.endswith('show.npy'):
     # x_test = extend_data(config['permutation'], x_test)
-    two_pixel_perm_img = two_pixel_perm_img(nb_channal, x_test)
+    x_test = two_pixel_perm_img(nb_channal, x_test)
     # x_test = order_extend_data(perm, x_test)
 
 if len(x_test.shape) == 3:
