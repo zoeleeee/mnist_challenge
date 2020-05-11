@@ -65,6 +65,7 @@ def custom_loss():
       return _loss(y_true, tf.nn.softmax(y_pred))
   return loss
 
+print(model_dir)
 model = keras.models.load_model(model_dir+'.h5', custom_objects={ 'custom_loss': custom_loss(), 'loss':custom_loss() }, compile=False)
 
 output = model.predict(x_test, batch_size=eval_batch_size)
