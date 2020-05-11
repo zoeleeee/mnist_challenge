@@ -33,8 +33,8 @@ num_checkpoint_steps = config['num_checkpoint_steps']
 batch_size = config['training_batch_size']
 nb_channal = int(path.split('_')[1].split('.')[1])
 
-imgs, labels, input_shape = two_pixel_perm(nb_channal)
-# imgs, labels, input_shape = diff_perm_per_classifier(st_lab, nb_channal)
+imgs, labels, input_shape, model_dir = two_pixel_perm(nb_channal, model_dir)
+# imgs, labels, input_shape, model_dir = diff_perm_per_classifier(st_lab, nb_channal, model_dir)
 # imgs, labels, input_shape = load_data(path, nb_labels)
 
 if config['loss_func'] == 'bce':

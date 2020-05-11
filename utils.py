@@ -57,7 +57,7 @@ def order_extend_data(order, imgs, basis=255):
 	samples = np.array([[[order[d[0]] for d in c] for c in b] for b in imgs]).astype(np.float32) / basis
 	return samples
 
-def two_pixel_perm(nb_channal):
+def two_pixel_perm(nb_channal, model_dir):
 	np.random.seed(0)
 	perms = []
 	for j in range(256):
@@ -71,10 +71,10 @@ def two_pixel_perm(nb_channal):
 	imgs = np.array([[perms[a[i]][a[i+1]] for i in range(0, len(a), 2)] for a in imgs]).reshape(-1, 14, 14, nb_channal)
 	labels = np.load('data/mnist_labels.npy')
 	input_shape = imgs.shape[1:]
-	return imgs, labels, input_shape
+	return imgs, labels, input_shape, model_dir+'_two'
 
 
-def diff_perm_per_classifier(st_lab, nb_channal):
+def diff_perm_per_classifier(st_lab, nb_channal, model_dir):
 	np.random.seed(st_lab)
 	perm = []
 	for i in range(nb_channal):
@@ -84,7 +84,7 @@ def diff_perm_per_classifier(st_lab, nb_channal):
 	imgs = order_extend_data(perm, imgs)
 	labels = np.load('data/mnist_labels.npy')
 	input_shape = imgs.shape[1:]
-	return imgs, labels, input_shape
+	return imgs, labels, input_shape, model_dir+'_lab'
 
 def show_image(img):
     """
