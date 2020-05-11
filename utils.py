@@ -57,6 +57,22 @@ def order_extend_data(order, imgs, basis=255):
 	samples = np.array([[[order[d[0]] for d in c] for c in b] for b in imgs]).astype(np.float32) / basis
 	return samples
 
+def two_pixel_perm_img(nb_channal, imgs):
+	np.random.seed(0)
+	perms = []
+	for j in range(256):
+		perm = []
+		for i in range(nb_channal):
+			perm.append(np.random.permutation(np.arange(256)))
+		perms.append(perm)
+	perms = np.array(perms).transpose((0,2,1))
+
+	if np.max(imgs) <= 1:
+		imgs *= 255
+	imgs = imgs.reshape(-1, 784)
+	imgs = np.array([[perms[a[i]][a[i+1]] for i in range(0, len(a), 2)] for a in imgs]).reshape(-1, 14, 14, nb_channal)
+	return imgs
+
 def two_pixel_perm(nb_channal, model_dir):
 	np.random.seed(0)
 	perms = []
