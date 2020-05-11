@@ -9,7 +9,7 @@ from keras import backend as K
 import sys
 import os
 import json
-from utils import load_data, order_extend_data, diff_perm_per_classifier, two_pixel_perm
+from utils import load_data, order_extend_data, diff_perm_per_classifier, two_pixel_perm, two_pixel_perm_sliding
 import numpy as np
 
 conf = sys.argv[-1]
@@ -21,7 +21,7 @@ nb_labels = config['num_labels']
 path = config['permutation']
 st_lab = config['start_label']
 #np.random.seed(st_lab)
-lab_perm = np.random.permutation(np.load('2_label_permutation.npy')[:nb_labels].T)#[st_lab:st_lab+nb_labels].T)
+# lab_perm = np.random.permutation(np.load('2_label_permutation.npy')[:nb_labels].T)#[st_lab:st_lab+nb_labels].T)
 lab_perm = np.load('2_label_permutation.npy')[st_lab:st_lab+nb_labels].T
 
 # Setting up training parameters
@@ -34,7 +34,8 @@ num_checkpoint_steps = config['num_checkpoint_steps']
 batch_size = config['training_batch_size']
 nb_channal = int(path.split('_')[1].split('.')[1])
 
-imgs, labels, input_shape, model_dir = two_pixel_perm(nb_channal, model_dir)
+imgs, labels, input_shape, model_dir = two_pixel_perm_sliding(nb_channal, model_dir)
+# imgs, labels, input_shape, model_dir = two_pixel_perm(nb_channal, model_dir)
 # imgs, labels, input_shape, model_dir = diff_perm_per_classifier(st_lab, nb_channal, model_dir)
 # imgs, labels, input_shape = load_data(path, nb_labels)
 print(input_shape)
