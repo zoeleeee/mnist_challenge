@@ -9,7 +9,7 @@ from keras import backend as K
 import sys
 import os
 import json
-from utils import load_data, order_extend_data
+from utils import load_data, order_extend_data, diff_perm_per_classifier, two_pixel_perm
 import numpy as np
 
 conf = sys.argv[-1]
@@ -33,20 +33,14 @@ num_checkpoint_steps = config['num_checkpoint_steps']
 batch_size = config['training_batch_size']
 nb_channal = int(path.split('_')[1].split('.')[1])
 
-# np.random.seed(st_lab)
-# perm = []
-# for i in range(nb_channal):
-# 	perm.append(np.random.permutation(np.arange(256)))
-# perm = np.array(perm).transpose((1,0))
-# imgs = np.load('data/mnist_data.npy').transpose((0,2,3,1))
-# imgs = order_extend_data(perm, imgs)
-# labels = np.load('data/mnist_labels.npy')
-# input_shape = imgs.shape[1:]
-imgs, labels, input_shape = load_data(path, nb_labels)
+imgs, labels, input_shape = two_pixel_perm(nb_channal)
+# imgs, labels, input_shape = diff_perm_per_classifier(st_lab, nb_channal)
+# imgs, labels, input_shape = load_data(path, nb_labels)
+
 if config['loss_func'] == 'bce':
   labels = np.array([lab_perm[i] for i in labels]).astype(np.float32)
 
-model = keras.Sequential([keras.layers.Conv2D(32, kernel_size=(5,5), padding='same', activation='relu', input_shape=(28,28,input_shape[-1])),
+model = keras.Sequential([keras.layers.Conv2D(32, kernel_size=(5,5), padding='same', activation='relu', input_shape=input_shape[1:]),
 	keras.layers.MaxPooling2D(pool_size=(2,2)),
 	keras.layers.Conv2D(64, kernel_size=(5,5), activation='relu', padding='same'),
 	keras.layers.MaxPooling2D(pool_size=(2,2)),

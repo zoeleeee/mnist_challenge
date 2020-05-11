@@ -57,6 +57,35 @@ def order_extend_data(order, imgs, basis=255):
 	samples = np.array([[[order[d[0]] for d in c] for c in b] for b in imgs]).astype(np.float32) / basis
 	return samples
 
+def two_pixel_perm(nb_channal):
+	np.random.seed(0)
+	perms = []
+	for j in range(256):
+		perm = []
+		for i in range(nb_channal):
+			perm.append(np.random.permutation(np.arange(256)))
+		perms.append(perm)
+	perms = np.array(perms).transpose((0,2,1))
+	print(perms.shape)
+	imgs = np.load('data/mnist_data.npy').transpose((0,2,3,1)).reshape(-1, 784)
+	imgs = np.array([[perms[a[i]][a[i+1]] for i in range(0, len(a), 2)] for a in imgs]).reshape(-1, 14, 14, nb_channal)
+	labels = np.load('data/mnist_labels.npy')
+	input_shape = imgs.shape[1:]
+	return imgs, labels, input_shape
+
+
+def diff_perm_per_classifier(st_lab, nb_channal):
+	np.random.seed(st_lab)
+	perm = []
+	for i in range(nb_channal):
+		perm.append(np.random.permutation(np.arange(256)))
+	perm = np.array(perm).transpose((1,0))
+	imgs = np.load('data/mnist_data.npy').transpose((0,2,3,1))
+	imgs = order_extend_data(perm, imgs)
+	labels = np.load('data/mnist_labels.npy')
+	input_shape = imgs.shape[1:]
+	return imgs, labels, input_shape
+
 def show_image(img):
     """
     Show MNSIT digits in the console.
