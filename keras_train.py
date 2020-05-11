@@ -16,7 +16,7 @@ conf = sys.argv[-1]
 with open(conf) as config_file:
     config = json.load(config_file)
 
-model_dir = config['model_dir']+'_lab'
+model_dir = config['model_dir']
 nb_labels = config['num_labels']
 path = config['permutation']
 st_lab = config['start_label']
