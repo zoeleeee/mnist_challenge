@@ -20,8 +20,9 @@ model_dir = config['model_dir']
 nb_labels = config['num_labels']
 path = config['permutation']
 st_lab = config['start_label']
-np.random.seed(st_lab)
+#np.random.seed(st_lab)
 lab_perm = np.random.permutation(np.load('2_label_permutation.npy')[:nb_labels].T)#[st_lab:st_lab+nb_labels].T)
+lab_perm = np.load('2_label_permutation.npy')[st_lab:st_lab+nb_labels].T
 
 # Setting up training parameters
 tf.set_random_seed(config['random_seed'])
