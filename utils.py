@@ -68,7 +68,7 @@ def two_pixel_perm(nb_channal, model_dir):
 	perms = np.array(perms).transpose((0,2,1))
 	print(perms.shape)
 	imgs = np.load('data/mnist_data.npy').transpose((0,2,3,1)).reshape(-1, 784)
-	imgs = np.array([[perms[a[i]][a[i+1]] for i in range(0, len(a), 2)] for a in imgs]).reshape(-1, 14, 14, nb_channal)
+	imgs = np.array([[perms[a[i]][a[i+1]] for i in range(0, len(a), 2)] for a in imgs]).reshape(-1, 28, 14, nb_channal)
 	labels = np.load('data/mnist_labels.npy')
 	input_shape = imgs.shape
 	return imgs, labels, input_shape, model_dir+'_two'
