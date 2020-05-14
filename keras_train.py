@@ -39,9 +39,10 @@ nb_channal = int(path.split('_')[1].split('.')[1])
 imgs, labels, input_shape, model_dir = diff_perm_per_classifier(st_lab, nb_channal, model_dir)
 # imgs, labels, input_shape = load_data(path, nb_labels)
 print(input_shape)
-if loss_func == 'bce':
+if loss_func != 'xent':
   labels = np.array([lab_perm[i] for i in labels]).astype(np.float32)
-
+  if loss_func == 'balance':
+      labels[labels==0]=-1
 model = keras.Sequential([keras.layers.Conv2D(32, kernel_size=(5,5), padding='same', activation='relu', input_shape=input_shape[1:]),
 	keras.layers.MaxPooling2D(pool_size=(2,2)),
 	keras.layers.Conv2D(64, kernel_size=(5,5), activation='relu', padding='same'),
@@ -59,8 +60,8 @@ def custom_loss(y_true, y_pred):
 		loss = keras.losses.SparseCategoricalCrossentropy()
 		return loss(y_true, keras.activations.softmax(y_pred))
 	elif loss_func == 'balance':
-		y_true[y_true==0]=-1
-		return -1*np.sum(y_true*(y_pred-.5))
+#		y_true[y_true==0]=-1
+		return -1*np.sum(np.absolute(y_true*(y_pred-.5)))
 model.compile(loss=custom_loss, optimizer=keras.optimizers.Adam(1e-3))
 
 x_train, y_train = imgs[:60000], labels[:60000]
