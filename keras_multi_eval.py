@@ -12,7 +12,7 @@ import tensorflow as tf
 from tensorflow import keras
 from tensorflow.examples.tutorials.mnist import input_data
 
-from utils import load_data, extend_data, order_extend_data
+from utils import load_data, extend_data, order_extend_data, two_pixel_perm_img, two_pixel_perm, two_pixel_perm_sliding_img,two_pixel_perm_sliding
 import numpy as np
 
 conf = sys.argv[-1]
@@ -39,14 +39,18 @@ nb_channal = int(config['permutation'].split('_')[1].split('.')[1])
 # imgs = order_extend_data(perm, imgs)
 # labels = np.load('data/mnist_labels.npy')
 # input_shape = imgs.shape[1:]
-imgs, labels, input_shape = load_data(config['permutation'], config['num_labels'])
+imgs, labels, input_shape, model_dir = two_pixel_perm_img(nb_channal, model_dir)
+# imgs, labels, input_shape, model_dir = two_pixel_perm_sliding(nb_channal, model_dir)
+# imgs, labels, input_shape = load_data(config['permutation'], config['num_labels'])
 labels = np.array([rep[i] for i in labels]).astype(np.float32)
 #x_train, y_train = imgs[:60000], labels[:60000]
 x_test, y_test = imgs[60000:], labels[60000:]
 if dataset != 'origin.npy':
   x_test = np.load(dataset)
   if dataset.endswith('show.npy'):
-    x_test = extend_data(config['permutation'], x_test)
+    # x_test = extend_data(config['permutation'], x_test)
+    x_test = two_pixel_perm(nb_channal, x_test)
+    # x_test = two_pixel_perm_sliding_img(nb_channal, x_test)
     # x_test = order_extend_data(perm, x_test)
 
 if len(x_test.shape) == 3:
@@ -63,6 +67,7 @@ def custom_loss():
       return _loss(y_true, tf.nn.softmax(y_pred))
   return loss
 
+print(model_dir)
 model = keras.models.load_model(model_dir+'.h5', custom_objects={ 'custom_loss': custom_loss(), 'loss':custom_loss() }, compile=False)
 
 output = model.predict(x_test, batch_size=eval_batch_size)

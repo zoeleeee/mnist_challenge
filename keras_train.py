@@ -9,19 +9,20 @@ from keras import backend as K
 import sys
 import os
 import json
-from utils import load_data, order_extend_data
+from utils import load_data, order_extend_data, diff_perm_per_classifier, two_pixel_perm, two_pixel_perm_sliding
 import numpy as np
 
 conf = sys.argv[-1]
 with open(conf) as config_file:
     config = json.load(config_file)
 
-model_dir = config['model_dir']+'_lab'
+model_dir = config['model_dir']
 nb_labels = config['num_labels']
 path = config['permutation']
 st_lab = config['start_label']
-np.random.seed(st_lab)
-lab_perm = np.random.permutation(np.load('2_label_permutation.npy')[:nb_labels].T)#[st_lab:st_lab+nb_labels].T)
+#np.random.seed(st_lab)
+# lab_perm = np.random.permutation(np.load('2_label_permutation.npy')[:nb_labels].T)#[st_lab:st_lab+nb_labels].T)
+lab_perm = np.load('2_label_permutation.npy')[st_lab:st_lab+nb_labels].T
 
 # Setting up training parameters
 tf.set_random_seed(config['random_seed'])
@@ -29,24 +30,19 @@ max_num_training_steps = config['max_num_training_steps']
 num_output_steps = config['num_output_steps']
 num_summary_steps = config['num_summary_steps']
 num_checkpoint_steps = config['num_checkpoint_steps']
-
+loss_func = config['loss_func']
 batch_size = config['training_batch_size']
 nb_channal = int(path.split('_')[1].split('.')[1])
 
-# np.random.seed(st_lab)
-# perm = []
-# for i in range(nb_channal):
-# 	perm.append(np.random.permutation(np.arange(256)))
-# perm = np.array(perm).transpose((1,0))
-# imgs = np.load('data/mnist_data.npy').transpose((0,2,3,1))
-# imgs = order_extend_data(perm, imgs)
-# labels = np.load('data/mnist_labels.npy')
-# input_shape = imgs.shape[1:]
-imgs, labels, input_shape = load_data(path, nb_labels)
-if config['loss_func'] == 'bce':
+# imgs, labels, input_shape, model_dir = two_pixel_perm_sliding(nb_channal, model_dir)
+# imgs, labels, input_shape, model_dir = two_pixel_perm(nb_channal, model_dir)
+imgs, labels, input_shape, model_dir = diff_perm_per_classifier(st_lab, nb_channal, model_dir)
+# imgs, labels, input_shape = load_data(path, nb_labels)
+print(input_shape)
+if loss_func == 'bce':
   labels = np.array([lab_perm[i] for i in labels]).astype(np.float32)
 
-model = keras.Sequential([keras.layers.Conv2D(32, kernel_size=(5,5), padding='same', activation='relu', input_shape=(28,28,input_shape[-1])),
+model = keras.Sequential([keras.layers.Conv2D(32, kernel_size=(5,5), padding='same', activation='relu', input_shape=input_shape[1:]),
 	keras.layers.MaxPooling2D(pool_size=(2,2)),
 	keras.layers.Conv2D(64, kernel_size=(5,5), activation='relu', padding='same'),
 	keras.layers.MaxPooling2D(pool_size=(2,2)),
@@ -56,12 +52,15 @@ model = keras.Sequential([keras.layers.Conv2D(32, kernel_size=(5,5), padding='sa
 	])
 
 def custom_loss(y_true, y_pred):
-	if config['loss_func'] == 'bce':
+	if loss_func == 'bce':
 		loss = keras.losses.BinaryCrossentropy()
 		return loss(y_true, tf.nn.sigmoid(y_pred))
-	elif config['loss_func'] == 'xent':
+	elif loss_func == 'xent':
 		loss = keras.losses.SparseCategoricalCrossentropy()
 		return loss(y_true, keras.activations.softmax(y_pred))
+	elif loss_func == 'balance':
+		y_true[y_true==0]=-1
+		return -1*np.sum(y_true*(y_pred-.5))
 model.compile(loss=custom_loss, optimizer=keras.optimizers.Adam(1e-3))
 
 x_train, y_train = imgs[:60000], labels[:60000]

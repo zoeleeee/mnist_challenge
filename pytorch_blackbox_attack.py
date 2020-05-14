@@ -419,6 +419,7 @@ def fine_grained_binary_search(model, x0, y0, theta, initial_lbd, current_best):
     return lbd_hi, nquery
 
 def attack_mnist(nets, alpha=0.2, beta=0.001, isTarget= False, num_attacks= 100):
+    aux_imgs = np.load('data/mnist_data.npy')[:60000].transpose((0,2,3,1)).astype(np.float32)/255.
     imgs = np.load('data/mnist_data.npy')[60000:].transpose((0,2,3,1)).astype(np.float32)/255.
     labs = np.load('data/mnist_labels.npy')[60000:]
     nb_labs = np.max(labs)
@@ -460,7 +461,7 @@ def attack_mnist(nets, alpha=0.2, beta=0.001, isTarget= False, num_attacks= 100)
         advs = [image.numpy()]
         for i in range(1,2):#nb_labs+1):
             target = (label + i) % (nb_labs+1)
-            adv = attack_targeted(model, imgs[labs==target], image, label, target, alpha = alpha, beta = beta, iterations = 1)
+            adv = attack_targeted(model, aux_imgs, image, label, target, alpha = alpha, beta = beta, iterations = 1)
             tmp = (adv.numpy()*255.).astype(np.int).astype(np.float32)/255.
             show_image((adv.numpy()*255.).astype(np.int).astype(np.float32)/255.)
             print(i, "Predicted label for adversarial example: ", predict(model, adv), np.linalg.norm(tmp-image.numpy()), np.linalg.norm(tmp.reshape(-1)-image.numpy().reshape(-1), axis=-1, ord=np.inf), np.sum(tmp!=image.numpy()))
