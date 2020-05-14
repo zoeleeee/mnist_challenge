@@ -10,13 +10,17 @@ import torch.nn.functional as F
 #from models import IMAGENET, MNIST, CIFAR10, load_imagenet_data, load_mnist_data, load_cifar10_data, load_model, show_image
 import sys
 import json
-from utils import extend_data, show_image, order_extend_data
+from utils import *
 rep_labels = np.load('2_label_permutation.npy')
 conf = sys.argv[-1]
 nb_models = int(sys.argv[-2])
 with open(conf) as config_file:
     config = json.load(config_file)
+st_lab = config['start_label']
+nb_channal = int(config['permutation'].split('_')[1].split('.')[1])
+
 perms= []
+nb_channel = int(config['permutation'].split('_')[1].split('.')[1])
 for i in range(nb_models):
     np.random.seed(i*20)
     perms.append(np.array([np.random.permutation(np.arange(256)) for j in range(nb_channel)]).transpose((1,0)))
@@ -26,9 +30,9 @@ def predict(models, img, t=0):
     img = torch.clamp(img, 0, 1)*255
     imgs = []
     for i in range(len(models)):
-        # np.random.seed(i*20)
-        # perm = np.array([np.random.permutation(np.arange(256)) for j in range(nb_channel)]).transpose((1,0))
-        imgs.append(torch.tensor(order_extend_data(perms[i], np.array([img.numpy()])).transpose((0,3,1,2))).cuda())
+        imgs = two_pixel_perm_sliding_img(nb_channel, np.array([img.numpy()])).transpose((0,3,1,2))
+        # imgs = diff_perm_per_classifier_img(st_lab, nb_channel, np.array([img.numpy()])).transpose((0,3,1,2))
+        imgs.append(torch.tensor(imgs).cuda())
     # img = torch.tensor(extend_data(config['permutation'], np.array([img.numpy()])).transpose((0,3,1,2))).cuda()
     scores = torch.cat(tuple([torch.sigmoid(model(imgs[i])) for i,model in enumerate(models)]), dim=1)
   #  print(scores)
@@ -418,6 +422,7 @@ def fine_grained_binary_search(model, x0, y0, theta, initial_lbd, current_best):
     return lbd_hi, nquery
 
 def attack_mnist(nets, alpha=0.2, beta=0.001, isTarget= False, num_attacks= 100):
+    aux_imgs = np.load('data/mnist_data.npy')[:60000].transpose((0,2,3,1)).astype(np.float32)/255.
     imgs = np.load('data/mnist_data.npy')[60000:].transpose((0,2,3,1)).astype(np.float32)/255.
     labs = np.load('data/mnist_labels.npy')[60000:]
     nb_labs = np.max(labs)
@@ -459,7 +464,7 @@ def attack_mnist(nets, alpha=0.2, beta=0.001, isTarget= False, num_attacks= 100)
         advs = [image.numpy()]
         for i in range(1,2):#nb_labs+1):
             target = (label + i) % (nb_labs+1)
-            adv = attack_targeted(model, imgs[labs==target], image, label, target, alpha = alpha, beta = beta, iterations = 1)
+            adv = attack_targeted(model, aux_imgs, image, label, target, alpha = alpha, beta = beta, iterations = 1)
             tmp = (adv.numpy()*255.).astype(np.int).astype(np.float32)/255.
             show_image((adv.numpy()*255.).astype(np.int).astype(np.float32)/255.)
             print(i, "Predicted label for adversarial example: ", predict(model, adv), np.linalg.norm(tmp-image.numpy()), np.linalg.norm(tmp.reshape(-1)-image.numpy().reshape(-1), axis=-1, ord=np.inf), np.sum(tmp!=image.numpy()))

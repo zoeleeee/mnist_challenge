@@ -3,12 +3,12 @@ import tensorflow as tf
 from tensorflow import keras
 import numpy as np
 
-with open('models/mnist.json') as file:
-    json_model = file.read()
+#with open('models/mnist.json') as file:
+#    json_model = file.read()
 
-model = keras.models.model_from_json(json_model)
-model.load_weights('models/mnist.h5')
-
+#model = keras.models.model_from_json(json_model)
+#model.load_weights('models/mnist.h5')
+model = keras.models.load_model('models/natural.h5')
 data = np.load('data/mnist_data.npy')[60000:].transpose((0,2,3,1)).astype(np.float32) / 255.
 labels = np.load('data/mnist_labels.npy')[60000:]
 

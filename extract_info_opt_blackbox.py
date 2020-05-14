@@ -19,5 +19,6 @@ for line in cnt:
 print('len:', len(count))
 print('count:', np.mean(count), np.median(count), np.min(count), np.max(count))
 print('distortion:', np.mean(distortion), np.median(distortion), np.min(distortion), np.max(distortion))
-print('calibration:', np.mean(calibration), np.median(calibration), np.min(calibration), np.max(calibration))
-print('linf:', np.mean(linf), np.median(linf), np.min(linf), np.max(linf))
+if len(linf) != 0:
+    print('calibration:', np.mean(calibration), np.median(calibration), np.min(calibration), np.max(calibration))
+    print('linf:', np.mean(linf), np.median(linf), np.min(linf), np.max(linf))
