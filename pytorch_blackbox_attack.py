@@ -10,12 +10,15 @@ import torch.nn.functional as F
 #from models import IMAGENET, MNIST, CIFAR10, load_imagenet_data, load_mnist_data, load_cifar10_data, load_model, show_image
 import sys
 import json
-from utils import extend_data, show_image, order_extend_data
+from utils import *
 rep_labels = np.load('2_label_permutation.npy')
 conf = sys.argv[-1]
 nb_models = int(sys.argv[-2])
 with open(conf) as config_file:
     config = json.load(config_file)
+st_lab = config['start_label']
+nb_channal = int(config['permutation'].split('_')[1].split('.')[1])
+
 perms= []
 for i in range(nb_models):
     np.random.seed(i*20)
@@ -26,9 +29,9 @@ def predict(models, img, t=0):
     img = torch.clamp(img, 0, 1)*255
     imgs = []
     for i in range(len(models)):
-        # np.random.seed(i*20)
-        # perm = np.array([np.random.permutation(np.arange(256)) for j in range(nb_channel)]).transpose((1,0))
-        imgs.append(torch.tensor(order_extend_data(perms[i], np.array([img.numpy()])).transpose((0,3,1,2))).cuda())
+        imgs = two_pixel_perm_sliding_img(nb_channel, np.array([img.numpy()])).transpose((0,3,1,2))
+        # imgs = diff_perm_per_classifier_img(st_lab, nb_channel, np.array([img.numpy()])).transpose((0,3,1,2))
+        imgs.append(torch.tensor(imgs).cuda())
     # img = torch.tensor(extend_data(config['permutation'], np.array([img.numpy()])).transpose((0,3,1,2))).cuda()
     scores = torch.cat(tuple([torch.sigmoid(model(imgs[i])) for i,model in enumerate(models)]), dim=1)
   #  print(scores)
