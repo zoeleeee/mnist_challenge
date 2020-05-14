@@ -3,6 +3,7 @@ import sys
 import numpy as np
 config = sys.argv[-1]
 loss_func = 'bce'
+input_shape = tuple(sys.argv[-3])
 nb_channel = int(sys.argv[-2])
 def custom_loss():
   def loss(y_true, y_pred):
@@ -12,13 +13,16 @@ def custom_loss():
     elif loss_func == 'xent':
       _loss = keras.losses.SparseCategoricalCrossentropy()
       return _loss(y_true, tf.nn.softmax(y_pred))
+    elif loss_func == 'balance':
+      y_true[y_true==0]=-1
+      return -1*np.sum(y_true*(y_pred-.5))
   return loss
 model = k.models.load_model(config, custom_objects={ 'custom_loss': custom_loss(), 'loss':custom_loss() }, compile=False)
 weights = model.get_weights()
 
 import keras
 
-model = keras.Sequential([keras.layers.Conv2D(32, kernel_size=(5,5), activation='relu', input_shape=(28,28,nb_channel), padding='same'),
+model = keras.Sequential([keras.layers.Conv2D(32, kernel_size=(5,5), activation='relu', input_shape=input_shape, padding='same'),
     keras.layers.MaxPooling2D(pool_size=(2,2)),
     keras.layers.Conv2D(64, kernel_size=(5,5), activation='relu', padding='same'),
     keras.layers.MaxPooling2D(pool_size=(2,2)),
