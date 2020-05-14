@@ -60,7 +60,7 @@ def custom_loss(y_true, y_pred):
 		return loss(y_true, keras.activations.softmax(y_pred))
 	elif loss_func == 'balance':
 		y_true[y_true==0]=-1
-		return np.sum(y_true*(y_pred-.5))
+		return -1*np.sum(y_true*(y_pred-.5))
 model.compile(loss=custom_loss, optimizer=keras.optimizers.Adam(1e-3))
 
 x_train, y_train = imgs[:60000], labels[:60000]
