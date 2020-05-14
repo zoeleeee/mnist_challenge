@@ -90,7 +90,7 @@ def two_pixel_perm(nb_channal, model_dir):
 	input_shape = imgs.shape
 	return imgs, labels, input_shape, model_dir+'_two'
 
-def two_pixel_perm_sliding_img(nb_channal, img):
+def two_pixel_perm_sliding_img(nb_channal, imgs):
 	np.random.seed(0)
 	perms = []
 	for j in range(256):
@@ -104,9 +104,9 @@ def two_pixel_perm_sliding_img(nb_channal, img):
 
 	if np.max(imgs) <= 1:
 		imgs *= 255
-	imgs = imgs.transpose((1,0,2,3))[0].astype(np.int)
+	imgs = imgs.transpose((3,0,1,2))[0].astype(np.int)
 	print(imgs.shape)
-	imgs = np.array([[[perms[b[i-1]][b[i]] for i in range(1, len(b), 1)] for b in a] for a in imgs]).reshape(-1, 28, 14, nb_channal)
+	imgs = np.array([[[perms[b[i-1]][b[i]] for i in range(1, len(b), 1)] for b in a] for a in imgs])
 	return imgs
 
 def two_pixel_perm_sliding(nb_channal, model_dir):
@@ -121,7 +121,7 @@ def two_pixel_perm_sliding(nb_channal, model_dir):
 	perms = np.array(perms).transpose((0,2,1))
 	print(perms.shape)
 	imgs = np.load('data/mnist_data.npy').transpose((1,0,2,3))[0]
-	imgs = np.array([[[perms[b[i-1]][b[i]] for i in range(1, len(b), 1)] for b in a] for a in imgs]).reshape(-1, 28, 14, nb_channal)
+	imgs = np.array([[[perms[b[i-1]][b[i]] for i in range(1, len(b), 1)] for b in a] for a in imgs])
 	labels = np.load('data/mnist_labels.npy')
 	input_shape = imgs.shape
 	return imgs, labels, input_shape, model_dir+'_slide'

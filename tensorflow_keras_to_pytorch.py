@@ -3,7 +3,7 @@ import sys
 import numpy as np
 config = sys.argv[-1]
 loss_func = 'bce'
-input_shape = tuple(sys.argv[-3])
+input_shape = eval(sys.argv[-3])
 nb_channel = int(sys.argv[-2])
 def custom_loss():
   def loss(y_true, y_pred):
