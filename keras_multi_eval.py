@@ -12,7 +12,7 @@ import tensorflow as tf
 from tensorflow import keras
 from tensorflow.examples.tutorials.mnist import input_data
 
-from utils import load_data, extend_data, order_extend_data, two_pixel_perm_img, two_pixel_perm, two_pixel_perm_sliding_img,two_pixel_perm_sliding
+from utils import *
 import numpy as np
 
 conf = sys.argv[-1]
@@ -39,7 +39,13 @@ loss_func = config['loss_func']
 # imgs = order_extend_data(perm, imgs)
 # labels = np.load('data/mnist_labels.npy')
 # input_shape = imgs.shape[1:]
-imgs, labels, input_shape, model_dir = two_pixel_perm(nb_channal, model_dir)
+#<<<<<<< HEAD
+#imgs, labels, input_shape, model_dir = two_pixel_perm(nb_channal, model_dir)
+#=======
+#diff_perm_per_classifier
+imgs, labels, input_shape, model_dir = diff_perm_per_classifier(st_lab, nb_channal, model_dir)
+# imgs, labels, input_shape, model_dir = two_pixel_perm_img(nb_channal, model_dir)
+#>>>>>>> refs/remotes/origin/master
 # imgs, labels, input_shape, model_dir = two_pixel_perm_sliding(nb_channal, model_dir)
 # imgs, labels, input_shape = load_data(config['permutation'], config['num_labels'])
 labels = np.array([rep[i] for i in labels]).astype(np.float32)
@@ -49,9 +55,9 @@ if dataset != 'origin.npy':
   x_test = np.load(dataset)
   if dataset.endswith('show.npy'):
     # x_test = extend_data(config['permutation'], x_test)
-    x_test = two_pixel_perm(nb_channal, x_test)
+    # x_test = two_pixel_perm(nb_channal, x_test)
     # x_test = two_pixel_perm_sliding_img(nb_channal, x_test)
-    # x_test = order_extend_data(perm, x_test)
+    x_test = diff_perm_per_classifier_img(st_lab, nb_channal, x_test)
 
 if len(x_test.shape) == 3:
   x_test = x_test.reshape(x_test.shape[0], x_test.shape[1], x_test.shape[2], 1)
