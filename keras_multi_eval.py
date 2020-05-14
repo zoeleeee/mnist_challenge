@@ -28,7 +28,7 @@ model_dir = config['model_dir']
 st_lab = config['start_label']
 rep = np.load('2_label_permutation.npy')[st_lab:st_lab+nb_labels].T
 nb_channal = int(config['permutation'].split('_')[1].split('.')[1])
-
+loss_func = config['loss_func']
 #if dataset == 'origin.npy':
 # np.random.seed(st_lab)
 # perm = []
@@ -59,12 +59,15 @@ print(x_test.shape, len(x_test))
 y_test = y_test[:len(x_test)]
 def custom_loss():
   def loss(y_true, y_pred):
-    if config['loss_func'] == 'bce':
+    if loss_func == 'bce':
       _loss = keras.losses.BinaryCrossentropy()
       return _loss(y_true, tf.nn.sigmoid(y_pred))
-    elif config['loss_func'] == 'xent':
+    elif loss_func == 'xent':
       _loss = keras.losses.SparseCategoricalCrossentropy()
       return _loss(y_true, tf.nn.softmax(y_pred))
+    elif loss_func == 'balance':
+      y_true[y_true==0]=-1
+      return -1*np.sum(y_true*(y_pred-.5))
   return loss
 
 print(model_dir)
