@@ -8,11 +8,12 @@ import os
 import sys
 import time
 
+from utils import *
 import tensorflow as tf
 from tensorflow import keras
 from tensorflow.examples.tutorials.mnist import input_data
 
-from utils import *
+#from utils import *
 import numpy as np
 
 conf = sys.argv[-1]

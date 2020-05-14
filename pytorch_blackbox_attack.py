@@ -561,7 +561,7 @@ if __name__ == '__main__':
             config = json.load(config_file)
         
         #idxs = np.arange(len(labels))
-        net = torch.load(config['model_dir']+'.pt')
+        net = torch.load(config['model_dir']+'_slide.pt')
         conf = conf[:conf.find(conf.split('_')[-1])]+str(config['num_labels']*(i+1))+'.json'
         nets.append(net)
     
