@@ -20,6 +20,7 @@ st_lab = config['start_label']
 nb_channal = int(config['permutation'].split('_')[1].split('.')[1])
 
 perms= []
+nb_channel = int(config['permutation'].split('_')[1].split('.')[1])
 for i in range(nb_models):
     np.random.seed(i*20)
     perms.append(np.array([np.random.permutation(np.arange(256)) for j in range(nb_channel)]).transpose((1,0)))

@@ -13,6 +13,7 @@ from utils import load_data, order_extend_data, diff_perm_per_classifier, two_pi
 import numpy as np
 
 conf = sys.argv[-1]
+_type = sys.argv[-2]
 with open(conf) as config_file:
     config = json.load(config_file)
 
@@ -34,14 +35,20 @@ loss_func = config['loss_func']
 batch_size = config['training_batch_size']
 nb_channal = int(path.split('_')[1].split('.')[1])
 
-# imgs, labels, input_shape, model_dir = two_pixel_perm_sliding(nb_channal, model_dir)
-# imgs, labels, input_shape, model_dir = two_pixel_perm(nb_channal, model_dir)
-imgs, labels, input_shape, model_dir = diff_perm_per_classifier(st_lab, nb_channal, model_dir)
-# imgs, labels, input_shape = load_data(path, nb_labels)
+if _type == 'diff':
+  imgs, labels, input_shape, model_dir = diff_perm_per_classifier(st_lab, nb_channal, model_dir)
+elif _type == 'two':
+  imgs, labels, input_shape, model_dir = two_pixel_perm_img(nb_channal, model_dir)
+elif _type == 'slide':
+  imgs, labels, input_shape, model_dir = two_pixel_perm_sliding(nb_channal, model_dir)
+elif _type == 'normal':
+  imgs, labels, input_shape = load_data(config['permutation'], config['num_labels'])
+  
 print(input_shape)
-if loss_func == 'bce':
+if loss_func != 'xent':
   labels = np.array([lab_perm[i] for i in labels]).astype(np.float32)
-
+  if loss_func == 'balance':
+      labels[labels==0]=-1
 model = keras.Sequential([keras.layers.Conv2D(32, kernel_size=(5,5), padding='same', activation='relu', input_shape=input_shape[1:]),
 	keras.layers.MaxPooling2D(pool_size=(2,2)),
 	keras.layers.Conv2D(64, kernel_size=(5,5), activation='relu', padding='same'),
@@ -59,8 +66,8 @@ def custom_loss(y_true, y_pred):
 		loss = keras.losses.SparseCategoricalCrossentropy()
 		return loss(y_true, keras.activations.softmax(y_pred))
 	elif loss_func == 'balance':
-		y_true[y_true==0]=-1
-		return -1*np.sum(y_true*(y_pred-.5))
+#		y_true[y_true==0]=-1
+		return -1*np.sum(np.absolute(y_true*(y_pred-.5)))
 model.compile(loss=custom_loss, optimizer=keras.optimizers.Adam(1e-3))
 
 x_train, y_train = imgs[:60000], labels[:60000]
