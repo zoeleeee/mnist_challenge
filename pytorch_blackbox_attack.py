@@ -79,7 +79,7 @@ def attack_targeted(model, train_dataset, x0, y0, target, alpha = 0.1, beta = 0.
             continue
         query_count += 1
         if predict(model,xi) == target:
-            theta = xi - x0
+            theta = torch.tensor(xi) - x0
             initial_lbd = torch.norm(theta)
             theta = theta/torch.norm(theta)
             lbd, count = fine_grained_binary_search_targeted(model, x0, y0, target, theta, initial_lbd)
