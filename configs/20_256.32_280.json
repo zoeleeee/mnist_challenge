@@ -1,0 +1,29 @@
+{
+  "_comment": "===== MODEL CONFIGURATION =====",
+  "model_dir": "models/256.32_mnist_20_280",
+
+  "_comment": "===== TRAINING CONFIGURATION =====",
+  "random_seed": 2395306,
+  "max_num_training_steps": 200000,
+  "num_output_steps": 100,
+  "num_summary_steps": 100,
+  "num_checkpoint_steps": 300,
+  "training_batch_size": 50,
+
+  "_comment": "===== EVAL CONFIGURATION =====",
+  "num_eval_examples": 10000,
+  "eval_batch_size": 50,
+  "eval_on_cpu": false,
+
+  "_comment": "=====ADVERSARIAL EXAMPLES CONFIGURATION=====",
+  "epsilon": 0.3,
+  "k": 40,
+  "a": 0.01,
+  "random_start": true,
+  "loss_func": "bce",
+
+  "store_adv_path": "advs/280_20_256.32_pgd_attack.npy",
+  "permutation": "permutation/256_256.32_permutation.npy",
+  "num_labels": 20,
+  "start_label":280
+}
