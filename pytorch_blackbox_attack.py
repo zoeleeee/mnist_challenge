@@ -25,14 +25,14 @@ def predict(models, img, t=0):
     img = torch.clamp(img, 0, 1)*255
     if _type == 'slide':
         img = torch.tensor(two_pixel_perm_sliding_img(nb_channel, np.array([img.numpy()])).transpose((0,3,1,2))).cuda()
-        scores = torch.cat(tuple([torch.sigmoid(model(imgs)) for i,model in enumerate(models)]), dim=1)
+        scores = torch.cat(tuple([torch.sigmoid(model(img)) for i,model in enumerate(models)]), dim=1)
     elif _type == 'normal':
         img = torch.tensor(extend_data(config['permutation'], np.array([img.numpy()])).transpose((0,3,1,2))).cuda()
-        scores = torch.cat(tuple([torch.sigmoid(model(imgs)) for i,model in enumerate(models)]), dim=1)
+        scores = torch.cat(tuple([torch.sigmoid(model(img)) for i,model in enumerate(models)]), dim=1)
     elif _type == 'diff':
         imgs = []
         for i in range(len(models)):
-            imgs = diff_perm_per_classifier_img(i*st_lab, nb_channel, np.array([img.numpy()])).transpose((0,3,1,2))
+            tmp = diff_perm_per_classifier_img(i*st_lab, nb_channel, np.array([img.numpy()])).transpose((0,3,1,2))
             imgs.append(torch.tensor(tmp).cuda())
         scores = torch.cat(tuple([torch.sigmoid(model(imgs[i])) for i,model in enumerate(models)]), dim=1)
   #  print(scores)
