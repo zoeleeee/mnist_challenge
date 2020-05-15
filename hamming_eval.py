@@ -5,7 +5,7 @@ from scipy.special import expit
 
 from utils import load_data
 
-def hamming_idxs(scores, config):
+def hamming_idxs(scores, config, _type):
 	res = []
 	#nb_labels = config['num_labels']
 	rep = np.load('2_label_permutation.npy')[config['start_label']:config['start_label']+scores.shape[-1]].T
@@ -20,8 +20,10 @@ def hamming_idxs(scores, config):
 	labels = labels[60000:60000+len(scores)]
 
 	nat_labels = np.zeros(scores.shape).astype(np.float32)
-	nat_labels[scores>=0.98] = 1.
-
+	nat_labels[scores>=0.9] = 1.
+	if _type == 'balance':
+		nat_labels[scores <= -0.9] = -1
+		rep[rep==0] == -1
 	preds, preds_dist, preds_score = [], [], []
 
 	for i in range(len(nat_labels)):
@@ -46,13 +48,14 @@ if __name__ == '__main__':
 	with open(sys.argv[-1]) as config_file:
 	  config = json.load(config_file)
 	name = sys.argv[-2].split('/')[-1][5:]
+	_type = sys.argv[-3]
 	#model_dir = config['model_dir']
 	scores = np.load('preds/pred_{}'.format(name))
 	if np.max(scores) > 1:
 		scores = expit(scores)
 	# labels = np.load('preds/labels_{}'.format(name))
 	print(scores.shape)
-	preds_dist, correct_idxs, error_idxs = hamming_idxs(scores, config)
+	preds_dist, correct_idxs, error_idxs = hamming_idxs(scores, config, _type)
 	print(preds_dist.shape)
 	print('avg Hamming distance:{}, max:{}, min:{}, med:{}'.format(np.mean(preds_dist), np.max(preds_dist), np.min(preds_dist), np.median(preds_dist)))
 
