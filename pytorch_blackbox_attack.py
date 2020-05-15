@@ -22,7 +22,7 @@ nb_channal = int(config['permutation'].split('_')[1].split('.')[1])
 
 def predict(models, img, t=0):
     nb_channel = int(config['permutation'].split('_')[1].split('.')[1])
-    img = torch.clamp(img, 0, 1)*255
+    img = torch.clamp(torch.tensor(img), 0, 1)*255
     if _type == 'slide':
         img = torch.tensor(two_pixel_perm_sliding_img(nb_channel, np.array([img.numpy()])).transpose((0,3,1,2))).cuda()
         scores = torch.cat(tuple([torch.sigmoid(model(img)) for i,model in enumerate(models)]), dim=1)
