@@ -30,9 +30,9 @@ def predict(models, img, t=0):
     img = torch.clamp(img, 0, 1)*255
     imgs = []
     for i in range(len(models)):
-        imgs = two_pixel_perm_sliding_img(nb_channel, np.array([img.numpy()])).transpose((0,3,1,2))
+        tmp = two_pixel_perm_sliding_img(nb_channel, np.array([img.numpy()])).transpose((0,3,1,2))
         # imgs = diff_perm_per_classifier_img(st_lab, nb_channel, np.array([img.numpy()])).transpose((0,3,1,2))
-        imgs.append(torch.tensor(imgs).cuda())
+        imgs.append(torch.tensor(tmp).cuda())
     # img = torch.tensor(extend_data(config['permutation'], np.array([img.numpy()])).transpose((0,3,1,2))).cuda()
     scores = torch.cat(tuple([torch.sigmoid(model(imgs[i])) for i,model in enumerate(models)]), dim=1)
   #  print(scores)
