@@ -1,6 +1,7 @@
 import numpy as np
 import sys
 import json
+from scipy.special import expit
 
 from utils import load_data
 
@@ -47,6 +48,8 @@ if __name__ == '__main__':
 	name = sys.argv[-2].split('/')[-1][5:]
 	#model_dir = config['model_dir']
 	scores = np.load('preds/pred_{}'.format(name))
+	if np.max(scores) > 1:
+		scores = expit(scores)
 	# labels = np.load('preds/labels_{}'.format(name))
 	print(scores.shape)
 	preds_dist, correct_idxs, error_idxs = hamming_idxs(scores, config)
