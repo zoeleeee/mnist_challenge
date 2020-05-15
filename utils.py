@@ -65,7 +65,7 @@ def two_pixel_perm_img(nb_channal, imgs):
 		for i in range(nb_channal):
 			perm.append(np.random.permutation(np.arange(256)))
 		perms.append(perm)
-	perms = np.array(perms).transpose((0,2,1))
+	perms = np.array(perms).transpose((0,2,1)).astype(np.float32)/255.
 
 	if np.max(imgs) <= 1:
 		imgs *= 255
@@ -82,8 +82,13 @@ def two_pixel_perm(nb_channal, model_dir):
 		for i in range(nb_channal):
 			perm.append(np.random.permutation(np.arange(256)))
 		perms.append(perm)
+<<<<<<< HEAD
 	perms = np.array(perms).transpose((0,2,1))
 	#print(perms.shape)
+=======
+	perms = np.array(perms).transpose((0,2,1)).astype(np.float32)/255.
+	print(perms.shape)
+>>>>>>> b510dd8edc4b00d654d30020ebfac7f23765a296
 	imgs = np.load('data/mnist_data.npy').transpose((0,2,3,1)).reshape(-1, 784)
 	imgs = np.array([[perms[a[i]][a[i+1]] for i in range(0, len(a), 2)] for a in imgs]).reshape(-1, 28, 14, nb_channal)
 	labels = np.load('data/mnist_labels.npy')
@@ -99,8 +104,13 @@ def two_pixel_perm_sliding_img(nb_channal, imgs):
 			perm.append(np.random.permutation(np.arange(256)))
 		perms.append(perm)
 
+<<<<<<< HEAD
 	perms = np.array(perms).transpose((0,2,1))
 	#print(perms.shape)
+=======
+	perms = np.array(perms).transpose((0,2,1)).astype(np.float32)/255.
+	print(perms.shape)
+>>>>>>> b510dd8edc4b00d654d30020ebfac7f23765a296
 
 	if np.max(imgs) <= 1:
 		imgs *= 255
@@ -118,8 +128,13 @@ def two_pixel_perm_sliding(nb_channal, model_dir):
 			perm.append(np.random.permutation(np.arange(256)))
 		perms.append(perm)
 
+<<<<<<< HEAD
 	perms = np.array(perms).transpose((0,2,1))
 	#print(perms.shape)
+=======
+	perms = np.array(perms).transpose((0,2,1)).astype(np.float32)/255.
+	print(perms.shape)
+>>>>>>> b510dd8edc4b00d654d30020ebfac7f23765a296
 	imgs = np.load('data/mnist_data.npy').transpose((1,0,2,3))[0]
 	imgs = np.array([[[perms[b[i-1]][b[i]] for i in range(1, len(b), 1)] for b in a] for a in imgs])
 	labels = np.load('data/mnist_labels.npy')
@@ -132,7 +147,7 @@ def diff_perm_per_classifier(st_lab, nb_channal, model_dir):
 	perm = []
 	for i in range(nb_channal):
 		perm.append(np.random.permutation(np.arange(256)))
-	perm = np.array(perm).transpose((1,0))
+	perm = np.array(perm).transpose((1,0)).astype(np.float32)/255.
 	imgs = np.load('data/mnist_data.npy').transpose((0,2,3,1))
 	imgs = order_extend_data(perm, imgs)
 	labels = np.load('data/mnist_labels.npy')
@@ -144,7 +159,7 @@ def diff_perm_per_classifier_img(st_lab, nb_channal, imgs):
 	perm = []
 	for i in range(nb_channal):
 		perm.append(np.random.permutation(np.arange(256)))
-	perm = np.array(perm).transpose((1,0))
+	perm = np.array(perm).transpose((1,0)).astype(np.float32)/255.
 	# imgs = np.load('data/mnist_data.npy').transpose((0,2,3,1))
 	imgs = order_extend_data(perm, imgs)
 	return imgs

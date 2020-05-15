@@ -44,6 +44,7 @@ elif _type == 'slide':
 elif _type == 'normal':
   imgs, labels, input_shape = load_data(config['permutation'], config['num_labels'])
   
+
 print(input_shape)
 if loss_func != 'xent':
   labels = np.array([lab_perm[i] for i in labels]).astype(np.float32)
