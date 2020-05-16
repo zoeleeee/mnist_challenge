@@ -141,7 +141,7 @@ def diff_perm_per_classifier(st_lab, nb_channal, model_dir):
 	imgs = order_extend_data(perm, imgs)
 	labels = np.load('data/mnist_labels.npy')
 	input_shape = imgs.shape
-	return imgs, labels, input_shape, model_dir+'_lab'
+	return imgs, labels, input_shape, model_dir
 
 def diff_perm_per_classifier_img(st_lab, nb_channal, imgs):
 	np.random.seed(st_lab)

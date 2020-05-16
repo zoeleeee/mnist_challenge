@@ -12,6 +12,7 @@ import sys
 import json
 from utils import *
 rep_labels = np.load('2_label_permutation.npy')
+rep_labels[rep_labels==0] = -1
 conf = sys.argv[-1]
 nb_models = int(sys.argv[-2])
 _type = sys.argv[-3]
@@ -39,6 +40,7 @@ def predict(models, img, t=0):
  #   print(scores.size())
     nat_labels = torch.zeros(scores.shape).type(torch.FloatTensor)
     nat_labels[scores>=0.9] = 1.
+    nat_labels[scores<=0.1] = -1.
 #    print(nat_labels)
     rep = torch.tensor(rep_labels[:scores.size()[1]].T)
     tmp = nat_labels.repeat(rep.size()[0], 1)
@@ -561,7 +563,7 @@ if __name__ == '__main__':
             config = json.load(config_file)
         
         #idxs = np.arange(len(labels))
-        net = torch.load(config['model_dir']+'_slide.pt')
+        net = torch.load(config['model_dir']+'.pt')
         conf = conf[:conf.find(conf.split('_')[-1])]+str(config['num_labels']*(i+1))+'.json'
         nets.append(net)
     
