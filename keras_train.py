@@ -48,6 +48,7 @@ elif _type == 'normal':
 print(input_shape)
 if loss_func != 'xent':
   labels = np.array([lab_perm[i] for i in labels]).astype(np.float32)
+  labels[labels==0]=-1
   if loss_func == 'balance':
       labels[labels==0]=-1
 model = keras.Sequential([keras.layers.Conv2D(32, kernel_size=(5,5), padding='same', activation='relu', input_shape=input_shape[1:]),
