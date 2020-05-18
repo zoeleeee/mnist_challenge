@@ -1,6 +1,7 @@
 import torch
 import imp
 import sys
+import torch.nn as nn
 
 net_file = sys.argv[-1]
 
