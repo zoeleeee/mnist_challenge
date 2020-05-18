@@ -24,6 +24,7 @@ nb_channal = int(config['permutation'].split('_')[1].split('.')[1])
 def predict(models, img, t=0):
     nb_channel = int(config['permutation'].split('_')[1].split('.')[1])
     img = torch.clamp(torch.tensor(img), 0, 1)*255
+    print(torch.max(img), torch.min(img))
     if _type == 'slide':
         img = torch.tensor(two_pixel_perm_sliding_img(nb_channel, np.array([img.numpy()])).transpose((0,3,1,2))).cuda()
         scores = torch.cat(tuple([torch.sigmoid(model(img)) for i,model in enumerate(models)]), dim=1)
@@ -39,8 +40,12 @@ def predict(models, img, t=0):
   #  print(scores)
  #   print(scores.size())
     nat_labels = torch.zeros(scores.shape).type(torch.FloatTensor)
+#<<<<<<< HEAD
+#    nat_labels[scores>=0.5] = 1.
+#=======
     nat_labels[scores>=0.9] = 1.
     nat_labels[scores<=0.1] = -1.
+#>>>>>>> refs/remotes/origin/master
 #    print(nat_labels)
     rep = torch.tensor(rep_labels[:scores.size()[1]].T)
     tmp = nat_labels.repeat(rep.size()[0], 1)
