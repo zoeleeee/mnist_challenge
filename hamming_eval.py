@@ -21,8 +21,10 @@ def hamming_idxs(scores, config, _type):
 
 	nat_labels = np.zeros(scores.shape).astype(np.float32)
 	nat_labels[scores>=0.9] = 1.
-	nat_labels[scores<=0.1] = -1
-	rep[rep==0] == -1
+	nat_labels[scores<=0.1] = -1.
+	rep[rep==0] = -1
+#        print(nat_labels[0])
+#        print(rep[labels[0]])
 	preds, preds_dist, preds_score = [], [], []
 
 	for i in range(len(nat_labels)):

@@ -136,7 +136,7 @@ def diff_perm_per_classifier(st_lab, nb_channal, model_dir):
 	perm = []
 	for i in range(nb_channal):
 		perm.append(np.random.permutation(np.arange(256)))
-	perm = np.array(perm).transpose((1,0)).astype(np.float32)/255.
+	perm = np.array(perm).transpose((1,0)).astype(np.float32)
 	imgs = np.load('data/mnist_data.npy').transpose((0,2,3,1))
 	imgs = order_extend_data(perm, imgs)
 	labels = np.load('data/mnist_labels.npy')
@@ -148,7 +148,7 @@ def diff_perm_per_classifier_img(st_lab, nb_channal, imgs):
 	perm = []
 	for i in range(nb_channal):
 		perm.append(np.random.permutation(np.arange(256)))
-	perm = np.array(perm).transpose((1,0)).astype(np.float32)/255.
+	perm = np.array(perm).transpose((1,0)).astype(np.float32)
 	# imgs = np.load('data/mnist_data.npy').transpose((0,2,3,1))
 	imgs = order_extend_data(perm, imgs)
 	return imgs

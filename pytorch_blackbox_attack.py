@@ -20,11 +20,11 @@ with open(conf) as config_file:
     config = json.load(config_file)
 st_lab = config['start_label']
 nb_channal = int(config['permutation'].split('_')[1].split('.')[1])
-
+nb_label = config['num_labels']
 def predict(models, img, t=0):
     nb_channel = int(config['permutation'].split('_')[1].split('.')[1])
     img = torch.clamp(torch.tensor(img), 0, 1)*255
-    print(torch.max(img), torch.min(img))
+#    print(torch.max(img), torch.min(img))
     if _type == 'slide':
         img = torch.tensor(two_pixel_perm_sliding_img(nb_channel, np.array([img.numpy()])).transpose((0,3,1,2))).cuda()
         scores = torch.cat(tuple([torch.sigmoid(model(img)) for i,model in enumerate(models)]), dim=1)
@@ -34,7 +34,7 @@ def predict(models, img, t=0):
     elif _type == 'diff':
         imgs = []
         for i in range(len(models)):
-            tmp = diff_perm_per_classifier_img(i*st_lab, nb_channel, np.array([img.numpy()])).transpose((0,3,1,2))
+            tmp = diff_perm_per_classifier_img(i*nb_label, nb_channel, np.array([img.numpy()])).transpose((0,3,1,2))
             imgs.append(torch.tensor(tmp).cuda())
         scores = torch.cat(tuple([torch.sigmoid(model(imgs[i])) for i,model in enumerate(models)]), dim=1)
   #  print(scores)
@@ -46,9 +46,10 @@ def predict(models, img, t=0):
     nat_labels[scores>=0.9] = 1.
     nat_labels[scores<=0.1] = -1.
 #>>>>>>> refs/remotes/origin/master
-#    print(nat_labels)
+    #print(nat_labels, rep[3])
     rep = torch.tensor(rep_labels[:scores.size()[1]].T)
     tmp = nat_labels.repeat(rep.size()[0], 1)
+    print(nat_labels, rep[3])
     dists = (tmp-rep).abs().sum(dim=-1)
    # print(dists)
     min_dist = dists.min()
@@ -568,7 +569,7 @@ if __name__ == '__main__':
             config = json.load(config_file)
         
         #idxs = np.arange(len(labels))
-        net = torch.load(config['model_dir']+'.pt')
+        net = torch.load(config['model_dir']+'_slide.pt')
         conf = conf[:conf.find(conf.split('_')[-1])]+str(config['num_labels']*(i+1))+'.json'
         nets.append(net)
     
