@@ -3,15 +3,6 @@ import imp
 import sys
 import torch.nn as nn
 
-net_file = sys.argv[-1]
-
-imp.load_source('MainModel', 'models/natural.py')
-net = torch.load(net_file)
-weights = []
-for child in net.children():
-	for param in list(child.parameters()):
-		weights.append(param)
-
 class Net(nn.Module):
     def __init__(self):
         super(Net, self).__init__()
@@ -31,14 +22,23 @@ class Net(nn.Module):
         # x = self.fc3(x)
         return x
 
-net = Net()
-net.conv1.weight.data=weights[0]
-net.conv1.bias.data=weights[1]
-net.conv2.weight.data=weights[2]
-net.conv2.bias.data=weights[3]
-net.fc1.weight.data=weights[4]
-net.fc1.bias.data=weights[5]
-net.fc2.weight.data=weights[6]
-net.fc2.bias.data=weights[7]
+if __name__ == '__main__':
+	net_file = sys.argv[-1]
 
-torch.save(net.state_dict(), net_file)
+	imp.load_source('MainModel', 'models/natural.py')
+	net = torch.load(net_file)
+	weights = []
+	for child in net.children():
+		for param in list(child.parameters()):
+			weights.append(param)
+	net = Net()
+	net.conv1.weight.data=weights[0]
+	net.conv1.bias.data=weights[1]
+	net.conv2.weight.data=weights[2]
+	net.conv2.bias.data=weights[3]
+	net.fc1.weight.data=weights[4]
+	net.fc1.bias.data=weights[5]
+	net.fc2.weight.data=weights[6]
+	net.fc2.bias.data=weights[7]
+
+	torch.save(net.state_dict(), net_file)
