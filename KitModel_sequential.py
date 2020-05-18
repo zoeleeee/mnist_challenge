@@ -2,6 +2,7 @@ import torch
 import imp
 import sys
 import torch.nn as nn
+import torch.nn.functional as F
 
 class Net(nn.Module):
     def __init__(self):
