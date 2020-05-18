@@ -41,4 +41,4 @@ net.fc1.bias.data=weights[5]
 net.fc2.weight.data=weights[6]
 net.fc2.bias.data=weights[7]
 
-torch.save(net, net_file)
+torch.save(net.state_dict(), net_file)
