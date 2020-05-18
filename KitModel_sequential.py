@@ -10,7 +10,7 @@ class Net(nn.Module):
         self.pool = nn.MaxPool2d(2, 2)
         self.conv2 = nn.Conv2d(32, 64, 5, padding=2)
         self.fc1 = nn.Linear(3136, 1024)
-        self.fc2 = nn.Linear(1024, 20)
+        self.fc2 = nn.Linear(1024, 10)
         # self.fc3 = nn.Linear(84, 10)
 
     def forward(self, x):
