@@ -47,7 +47,7 @@ if _type == 'diff':
 elif _type == 'two':
   imgs, labels, input_shape, model_dir = two_pixel_perm_img(nb_channal, model_dir)
 elif _type == 'slide':
-  imgs, labels, input_shape, model_dir = two_pixel_perm_sliding(nb_channal, model_dir)
+  imgs, labels, input_shape, model_dir = two_pixel_perm_sliding(nb_channal, model_dir, st_lab)
 elif _type == 'normal':
   imgs, labels, input_shape = load_data(config['permutation'], config['num_labels'])
 

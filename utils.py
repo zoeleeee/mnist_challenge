@@ -92,8 +92,8 @@ def two_pixel_perm(nb_channal, model_dir):
 	input_shape = imgs.shape
 	return imgs, labels, input_shape, model_dir+'_two'
 
-def two_pixel_perm_sliding_img(nb_channal, imgs):
-	np.random.seed(0)
+def two_pixel_perm_sliding_img(nb_channal, imgs, seed):
+	np.random.seed(seed)
 	perms = []
 	for j in range(256):
 		perm = []
@@ -112,8 +112,8 @@ def two_pixel_perm_sliding_img(nb_channal, imgs):
 	imgs = np.array([[[perms[b[i-1]][b[i]] for i in range(1, len(b), 1)] for b in a] for a in imgs])
 	return imgs
 
-def two_pixel_perm_sliding(nb_channal, model_dir):
-	np.random.seed(0)
+def two_pixel_perm_sliding(nb_channal, model_dir, seed):
+	np.random.seed(seed)
 	perms = []
 	for j in range(256):
 		perm = []
