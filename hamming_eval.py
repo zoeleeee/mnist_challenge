@@ -21,8 +21,8 @@ def hamming_idxs(scores, config, _type):
 
 	nat_labels = np.zeros(scores.shape).astype(np.float32)
 	nat_labels[scores>=0.9] = 1.
-	nat_labels[scores<=0.1] = -1.
-	rep[rep==0] = -1
+#	nat_labels[scores<0.5] = -1.
+#	rep[rep==0] = -1
 #        print(nat_labels[0])
 #        print(rep[labels[0]])
 	preds, preds_dist, preds_score = [], [], []
@@ -52,8 +52,8 @@ if __name__ == '__main__':
 	_type = sys.argv[-3]
 	#model_dir = config['model_dir']
 	scores = np.load('preds/pred_{}'.format(name))
-	if np.max(scores) > 1:
-		scores = expit(scores)
+#	if np.max(scores) > 1:
+#		scores = expit(scores)
 	# labels = np.load('preds/labels_{}'.format(name))
 	print(scores.shape)
 	preds_dist, correct_idxs, error_idxs = hamming_idxs(scores, config, _type)
