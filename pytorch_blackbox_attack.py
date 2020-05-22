@@ -28,7 +28,7 @@ def predict(models, img, t=0):
     if _type == 'slide':
         imgs = []
         for i in range(len(models)):
-            tmp = two_pixel_perm_sliding_img(i*st_lab, nb_channel, np.array([img.numpy()])).transpose((0,3,1,2))
+            tmp = two_pixel_perm_sliding_img(nb_channel, np.array([img.numpy()])).transpose((0,3,1,2), i*nb_label)
             imgs.append(torch.tensor(tmp).cuda())
         #img = torch.tensor(two_pixel_perm_sliding_img(nb_channel, np.array([img.numpy()])).transpose((0,3,1,2))).cuda()
         scores = torch.cat(tuple([torch.sigmoid(model(imgs[i])) for i,model in enumerate(models)]), dim=1)
