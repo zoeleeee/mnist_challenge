@@ -20,11 +20,11 @@ with open(conf) as config_file:
     config = json.load(config_file)
 st_lab = config['start_label']
 nb_channal = int(config['permutation'].split('_')[1].split('.')[1])
-
+nb_label = config['num_labels']
 def predict(models, img, t=0):
     nb_channel = int(config['permutation'].split('_')[1].split('.')[1])
     img = torch.clamp(torch.tensor(img), 0, 1)*255
-    print(torch.max(img), torch.min(img))
+#    print(torch.max(img), torch.min(img))
     if _type == 'slide':
         imgs = []
         for i in range(len(models)):
@@ -39,7 +39,7 @@ def predict(models, img, t=0):
     elif _type == 'diff':
         imgs = []
         for i in range(len(models)):
-            tmp = diff_perm_per_classifier_img(i*st_lab, nb_channel, np.array([img.numpy()])).transpose((0,3,1,2))
+            tmp = diff_perm_per_classifier_img(i*nb_label, nb_channel, np.array([img.numpy()])).transpose((0,3,1,2))
             imgs.append(torch.tensor(tmp).cuda())
         scores = torch.cat(tuple([torch.sigmoid(model(imgs[i])) for i,model in enumerate(models)]), dim=1)
   #  print(scores)
@@ -51,9 +51,10 @@ def predict(models, img, t=0):
     nat_labels[scores>=0.9] = 1.
     nat_labels[scores<=0.1] = -1.
 #>>>>>>> refs/remotes/origin/master
-#    print(nat_labels)
+    #print(nat_labels, rep[3])
     rep = torch.tensor(rep_labels[:scores.size()[1]].T)
     tmp = nat_labels.repeat(rep.size()[0], 1)
+    print(nat_labels, rep[3])
     dists = (tmp-rep).abs().sum(dim=-1)
    # print(dists)
     min_dist = dists.min()
