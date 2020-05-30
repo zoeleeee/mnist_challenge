@@ -18,7 +18,7 @@ def hamming_idxs(scores, config, _type, t):
 
 	imgs, labels, input_shape = load_data(config['permutation'], scores.shape[-1])
 	labels = labels[60000:60000+len(scores)]
-
+	print(t)
 	nat_labels = np.zeros(scores.shape).astype(np.float32)
 	nat_labels[scores>=t] = 1.
 	if t == 1-t:
