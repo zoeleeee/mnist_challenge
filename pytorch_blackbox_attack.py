@@ -54,7 +54,7 @@ def predict(models, img, t=0):
     #print(nat_labels, rep[3])
     rep = torch.tensor(rep_labels[:scores.size()[1]].T)
     tmp = nat_labels.repeat(rep.size()[0], 1)
-    print(nat_labels, rep[3])
+    #print(nat_labels, rep[3])
     dists = (tmp-rep).abs().sum(dim=-1)
    # print(dists)
     min_dist = dists.min()
