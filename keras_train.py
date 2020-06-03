@@ -43,7 +43,8 @@ elif _type == 'slide':
   imgs, labels, input_shape, model_dir = two_pixel_perm_sliding(nb_channal, model_dir, st_lab)
 elif _type == 'normal':
   imgs, labels, input_shape = load_data(config['permutation'], config['num_labels'])
-  
+elif _type == 'slide4':
+  imgs, labels, input_shape, model_dir = four_pixel_perm_sliding(nb_channal, model_dir, st_lab)
 
 print(input_shape)
 if loss_func != 'xent':
