@@ -50,6 +50,10 @@ elif _type == 'slide':
   imgs, labels, input_shape, model_dir = two_pixel_perm_sliding(nb_channal, model_dir, st_lab)
 elif _type == 'normal':
   imgs, labels, input_shape = load_data(config['permutation'], config['num_labels'])
+elif _type == 'slide4':
+  imgs, labels, input_shape, model_dir = four_pixel_perm_sliding(nb_channal, model_dir, st_lab)
+elif _type == 'window':
+  imgs, labels, input_shape, model_dir = window_perm_sliding(nb_channal, model_dir, st_lab)
 
 labels = np.array([rep[i] for i in labels]).astype(np.float32)
 #x_train, y_train = imgs[:60000], labels[:60000]
@@ -66,6 +70,8 @@ if dataset != 'origin.npy':
       x_test = two_pixel_perm_sliding_img(nb_channal, x_test, st_lab)
     elif _type == 'slide4':
       x_test = four_pixel_perm_sliding_img(nb_channal, x_test, st_lab)
+    elif _type == 'window':
+      x_test = window_perm_sliding_img(nb_channal, x_test, st_lab)
     elif _type == 'diff':
       x_test = diff_perm_per_classifier_img(st_lab, nb_channal, x_test)
 
