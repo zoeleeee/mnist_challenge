@@ -130,6 +130,37 @@ def two_pixel_perm_sliding(nb_channal, model_dir, seed):
 	input_shape = imgs.shape
 	return imgs, labels, input_shape, model_dir+'_slide'
 
+def four_pixel_perm_sliding_img(nb_channal, imgs, seed):
+	np.random.seed(seed)
+	perms = []
+	for j in range(256*256*256*32):
+		perms.append(np.random.permutation(np.arange(256)))
+
+	perms = np.array(perms).reshape((32,256,256,256,-1)).transpose((1,2,3,4,0)).astype(np.float32)/255.
+	# print(perms.shape)
+
+
+	if np.max(imgs) <= 1:
+		imgs *= 255
+	imgs = imgs.transpose((3,0,1,2))[0].astype(np.int)
+	#print(imgs.shape)
+	imgs = np.array([[[perms[b[i-3]][b[i-2]][b[i-1]][b[i]] for i in range(3, len(b), 1)] for b in a] for a in imgs])
+	return imgs
+
+def four_pixel_perm_sliding(nb_channal, model_dir, seed):
+	np.random.seed(seed)
+	perms = []
+	for j in range(256*256*256*32):
+		perms.append(np.random.permutation(np.arange(256)))
+
+	perms = np.array(perms).reshape((32,256,256,256,-1)).transpose((1,2,3,4,0)).astype(np.float32)/255.
+	# print(perms.shape)
+
+	imgs = np.load('data/mnist_data.npy').transpose((1,0,2,3))[0]
+	imgs = np.array([[[perms[b[i-3]][b[i-2]][b[i-1]][b[i]] for i in range(3, len(b), 1)] for b in a] for a in imgs])
+	labels = np.load('data/mnist_labels.npy')
+	input_shape = imgs.shape
+	return imgs, labels, input_shape, model_dir+'_slide4'
 
 def diff_perm_per_classifier(st_lab, nb_channal, model_dir):
 	np.random.seed(st_lab)

@@ -64,6 +64,8 @@ if dataset != 'origin.npy':
       x_test = two_pixel_perm_img(nb_channal, x_test)
     elif _type == 'slide':
       x_test = two_pixel_perm_sliding_img(nb_channal, x_test, st_lab)
+    elif _type == 'slide4':
+      x_test = four_pixel_perm_sliding_img(nb_channal, x_test, st_lab)
     elif _type == 'diff':
       x_test = diff_perm_per_classifier_img(st_lab, nb_channal, x_test)
 
