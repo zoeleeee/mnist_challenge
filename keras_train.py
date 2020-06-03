@@ -9,7 +9,7 @@ from keras import backend as K
 import sys
 import os
 import json
-from utils import load_data, order_extend_data, diff_perm_per_classifier, two_pixel_perm, two_pixel_perm_sliding
+from utils import load_data, order_extend_data, diff_perm_per_classifier, two_pixel_perm, two_pixel_perm_sliding, four_pixel_perm_sliding
 import numpy as np
 
 conf = sys.argv[-1]
