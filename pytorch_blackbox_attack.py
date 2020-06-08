@@ -28,7 +28,7 @@ def predict(models, img, t=0):
     if _type == 'slide':
         imgs = []
         for i in range(len(models)):
-            tmp = two_pixel_perm_sliding_img(nb_channel, np.array([img.numpy()])).transpose((0,3,1,2), i*nb_label)
+            tmp = two_pixel_perm_sliding_img(nb_channel, np.array([img.numpy()]), i*nb_label).transpose((0,3,1,2))
             imgs.append(torch.tensor(tmp).cuda())
         #img = torch.tensor(two_pixel_perm_sliding_img(nb_channel, np.array([img.numpy()])).transpose((0,3,1,2))).cuda()
         scores = torch.cat(tuple([torch.sigmoid(model(imgs[i])) for i,model in enumerate(models)]), dim=1)
@@ -575,7 +575,7 @@ if __name__ == '__main__':
             config = json.load(config_file)
         
         #idxs = np.arange(len(labels))
-        net = torch.load(config['model_dir']+'.pt')
+        net = torch.load(config['model_dir']+'_slide.pt')
         conf = conf[:conf.find(conf.split('_')[-1])]+str(config['num_labels']*(i+1))+'.json'
         nets.append(net)
     
