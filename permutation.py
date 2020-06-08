@@ -1,6 +1,6 @@
 import numpy as np
 
-imgs = np.load('data/mnist_data.npy').transpose((1,0,2,3))[0]
+imgs = np.load('data/mnist_data.npy').transpose((1,0,2,3))[0].astype(np.int)
 new_data = []
 for t in range(16):
     print(t)
