@@ -2,10 +2,11 @@ import numpy as np
 
 imgs = np.load('data/mnist_data.npy').transpose((1,0,2,3))[0].astype(np.int)
 new_data = []
-for t in range(16):
+for t in range(64):
     print(t)
     np.random.seed(t)
-    perms = []
+    if t%16 == 0:
+        perms = []
     for j in range(256*256*256):
         perms.append(np.random.permutation(np.arange(256)))
     tmp = np.array([[[perms[a[i-1][j-1]*256*256+a[i-1][j]*256+a[i][j-1]][a[i][j]] for j in range(1, len(a[i]), 1)] for i in range(1, len(a), 1)] for a in imgs])
