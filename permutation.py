@@ -7,7 +7,8 @@ for t in range(65):
     np.random.seed(t)
     if t%16 == 0:
         perms = []
-        np.save('data/window_mnist_data_{}.npy'.format(t), np.array(new_data).transpose((1,2,3,0)))
+        if t > 0:
+            np.save('data/window_mnist_data_{}.npy'.format(t), np.array(new_data).transpose((1,2,3,0)))
         new_data = []
     for j in range(256*256*256):
         perms.append(np.random.permutation(np.arange(256)))
