@@ -163,32 +163,38 @@ def four_pixel_perm_sliding(nb_channal, model_dir, seed):
 	return imgs, labels, input_shape, model_dir+'_slide4'
 
 def window_perm_sliding(nb_channal, model_dir, seed):
-	np.random.seed(seed)
-	perms = []
-	for j in range(256*256*256*nb_channal):
-		perms.append(np.random.permutation(np.arange(256)))
+	seed = seed/20*16
+	imgs = np.load('data/window_mnist_data_{}.npy'.format(seed)).astype(np.float32) / 255.
+	# np.random.seed(seed)
+	# perms = []
+	# for j in range(256*256*256*nb_channal):
+	# 	perms.append(np.random.permutation(np.arange(256)))
 
-	perms = np.array(perms).reshape((nb_channal,256,256,256,-1)).transpose((1,2,3,4,0)).astype(np.float32)/255.
-	# print(perms.shape)
+	# perms = np.array(perms).reshape((nb_channal,256,256,256,-1)).transpose((1,2,3,4,0)).astype(np.float32)/255.
+	# # print(perms.shape)
 
-	imgs = np.load('data/mnist_data.npy').transpose((1,0,2,3))[0]
-	imgs = np.array([[[perms[a[i-1][j-1], a[i-1][j], a[i][j-1], a[i][j]] for i in range(1, len(a[j]), 1)] for j in range(1, len(a), 1)] for a in imgs])
+	# imgs = np.load('data/mnist_data.npy').transpose((1,0,2,3))[0]
+	# imgs = np.array([[[perms[a[i-1][j-1], a[i-1][j], a[i][j-1], a[i][j]] for i in range(1, len(a[j]), 1)] for j in range(1, len(a), 1)] for a in imgs])
 	labels = np.load('data/mnist_labels.npy')
 	input_shape = imgs.shape
 	return imgs, labels, input_shape, model_dir+'_window'
 
 def window_perm_sliding_img(nb_channal, imgs, seed):
-	np.random.seed(seed)
-	perms = []
-	for j in range(256*256*256*nb_channal):
-		perms.append(np.random.permutation(np.arange(256)))
-
-	perms = np.array(perms).reshape((nb_channal,256,256,256,-1)).transpose((1,2,3,4,0)).astype(np.float32)/255.
-	
 	if np.max(imgs) <= 1:
 		imgs *= 255
 	imgs = imgs.transpose((3,0,1,2))[0].astype(np.int)
-	imgs = np.array([[[perms[a[i-1][j-1], a[i-1][j], a[i][j-1], a[i][j]] for i in range(1, len(a[j]), 1)] for j in range(1, len(a), 1)] for a in imgs])
+
+	st = seed/20*16
+	new_data = []
+	for i in range(st, st+16):
+		np.random.seed(i)
+		perms = []
+		for j in range(256*256*256):
+        	perms.append(np.random.permutation(np.arange(256)))
+   		tmp = np.array([[[perms[a[i-1][j-1]*256*256+a[i-1][j]*256+a[i][j-1]][a[i][j]] for j in range(1, len(a[i]), 1)] for i in range(1, len(a), 1)] for a in imgs])
+    	new_data.append(tmp)
+	imgs = np.array(new_data).transpose((1,2,3,0)).astype(np.float32)/255.
+	
 	return imgs
 
 def diff_perm_per_classifier(st_lab, nb_channal, model_dir):
