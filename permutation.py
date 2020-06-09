@@ -1,7 +1,7 @@
 import numpy as np
 
 imgs = np.load('data/mnist_data.npy').transpose((1,0,2,3))[0].astype(np.int)
-
+#new_data = np.random.random((2,3,4,5))
 for t in range(65):
     print(t)
     np.random.seed(t)
