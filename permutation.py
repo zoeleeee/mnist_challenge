@@ -4,9 +4,9 @@ imgs = np.load('data/mnist_data.npy').transpose((1,0,2,3))[0].astype(np.int)
 
 for t in range(65):
     print(t)
+    perms = []
     np.random.seed(t)
     if t%16 == 0:
-        perms = []
         if t > 0:
             np.save('data/window_mnist_data_{}.npy'.format(t), np.array(new_data).transpose((1,2,3,0)))
         new_data = []
