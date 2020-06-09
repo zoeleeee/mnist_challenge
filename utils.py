@@ -163,7 +163,7 @@ def four_pixel_perm_sliding(nb_channal, model_dir, seed):
 	return imgs, labels, input_shape, model_dir+'_slide4'
 
 def window_perm_sliding(nb_channal, model_dir, seed):
-	seed = seed/20*16
+	seed = (seed/20+1)*16
 	imgs = np.load('data/window_mnist_data_{}.npy'.format(seed)).astype(np.float32) / 255.
 	# np.random.seed(seed)
 	# perms = []
