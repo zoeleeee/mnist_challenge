@@ -185,7 +185,7 @@ def window_perm_sliding_img(nb_channal, imgs, seed):
         imgs *= 255
     imgs = imgs.transpose((3,0,1,2))[0].astype(np.int)
 
-    st = seed/20*16
+    st = int((seed/20+1)*16)
     new_data = []
     for i in range(st, st+16):
         np.random.seed(i)
