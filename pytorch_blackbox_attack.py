@@ -42,6 +42,12 @@ def predict(models, img, t=0):
             tmp = diff_perm_per_classifier_img(i*nb_label, nb_channel, np.array([img.numpy()])).transpose((0,3,1,2))
             imgs.append(torch.tensor(tmp).cuda())
         scores = torch.cat(tuple([torch.sigmoid(model(imgs[i])) for i,model in enumerate(models)]), dim=1)
+    elif _type == 'window':
+        imgs = []
+        for i in range(len(models)):
+            tmp = window_perm_sliding_img(i*nb_label, nb_channel, np.array([img.numpy()])).transpose((0,3,1,2))
+            imgs.append(torch.tensor(tmp).cuda())
+        scores = torch.cat(tuple([torch.sigmoid(model(imgs[i])) for i,model in enumerate(models)]), dim=1)
   #  print(scores)
  #   print(scores.size())
     nat_labels = torch.zeros(scores.shape).type(torch.FloatTensor)
