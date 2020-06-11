@@ -181,7 +181,7 @@ def window_perm_sliding(nb_channal, model_dir, seed):
         tmp = np.array([[[perms[a[i-1][j-1]*256*256+a[i-1][j]*256+a[i][j-1]][a[i][j]] for j in range(1, len(a[i]), 1)] for i in range(1, len(a), 1)] for a in imgs])
         # print(np.array(tmp).shape)
         new_data.append(tmp)
-
+    imgs = np.array(new_data).transpose((1,2,3,0)).astype(np.float32)/255.
     labels = np.load('data/mnist_labels.npy')
     input_shape = imgs.shape
     return imgs, labels, input_shape, model_dir+'_window'
