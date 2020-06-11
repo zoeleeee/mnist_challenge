@@ -104,12 +104,12 @@ def two_pixel_perm_sliding_img(nb_channal, imgs, seed):
     perms = np.array(perms).transpose((0,2,1)).astype(np.float32)/255.
     # print(perms.shape)
 
-
     if np.max(imgs) <= 1:
         imgs *= 255
     imgs = imgs.transpose((3,0,1,2))[0].astype(np.int)
-    #print(imgs.shape)
+    print(imgs.shape)
     imgs = np.array([[[perms[b[i-1]][b[i]] for i in range(1, len(b), 1)] for b in a] for a in imgs])
+    print(imgs.shape)
     return imgs
 
 def two_pixel_perm_sliding(nb_channal, model_dir, seed):
@@ -206,7 +206,7 @@ def window_perm_sliding_img(nb_channal, imgs, seed):
     if np.max(imgs) <= 1:
         imgs *= 255
     imgs = imgs.transpose((3,0,1,2))[0].astype(np.int)
-
+    print('image shape:',imgs.shape)
     st = int((seed/20+1)*nb_channal)
     new_data = []
     for i in range(st, st+nb_channal):
@@ -217,7 +217,7 @@ def window_perm_sliding_img(nb_channal, imgs, seed):
         tmp = np.array([[[perms[a[i-1][j-1]*256*256+a[i-1][j]*256+a[i][j-1]][a[i][j]] for j in range(1, len(a[i]), 1)] for i in range(1, len(a), 1)] for a in imgs])
         new_data.append(tmp)
     imgs = np.array(new_data).transpose((1,2,3,0)).astype(np.float32)/255.
-    
+    print('image shape:', imgs.shape)
     return imgs
 
 def diff_perm_per_classifier(st_lab, nb_channal, model_dir):

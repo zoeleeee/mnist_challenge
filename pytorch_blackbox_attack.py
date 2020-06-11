@@ -27,6 +27,7 @@ def predict(models, img, t=0):
 #    print(torch.max(img), torch.min(img))
     if _type == 'slide':
         imgs = []
+        print(img.shape)
         for i in range(len(models)):
             tmp = two_pixel_perm_sliding_img(nb_channel, np.array([img.numpy()]), i*nb_label).transpose((0,3,1,2))
             imgs.append(torch.tensor(tmp).cuda())
@@ -45,13 +46,13 @@ def predict(models, img, t=0):
     elif _type == 'window':
         imgs = []
         for i in range(len(models)):
-            tmp = window_perm_sliding_img(nb_channel, np.array([img.numpy()]).transpose((0,3,1,2)), i*nb_label)
+            tmp = window_perm_sliding_img(nb_channel, np.array([img.numpy()]), i*nb_label).transpose((0,3,1,2))
             imgs.append(torch.tensor(tmp).cuda())
         scores = torch.cat(tuple([torch.sigmoid(model(imgs[i])) for i,model in enumerate(models)]), dim=1)
     elif _type == 'slide4':
         imgs = []
         for i in range(len(models)):
-            tmp = four_pixel_perm_sliding_img(nb_channel, np.array([img.numpy()]).transpose((0,3,1,2)), i*nb_label)
+            tmp = four_pixel_perm_sliding_img(nb_channel, np.array([img.numpy()]), i*nb_label).transpose((0,3,1,2))
             imgs.append(torch.tensor(tmp).cuda())
         scores = torch.cat(tuple([torch.sigmoid(model(imgs[i])) for i,model in enumerate(models)]), dim=1)
   #  print(scores)
