@@ -131,33 +131,38 @@ def two_pixel_perm_sliding(nb_channal, model_dir, seed):
     return imgs, labels, input_shape, model_dir+'_slide'
 
 def four_pixel_perm_sliding_img(nb_channal, imgs, seed):
-    np.random.seed(seed)
-    perms = []
-    for j in range(256*256*256*nb_channal):
-        perms.append(np.random.permutation(np.arange(256)))
-
-    perms = np.array(perms).reshape((nb_channal,256,256,256,-1)).transpose((1,2,3,4,0)).astype(np.float32)/255.
-    # print(perms.shape)
-
-
     if np.max(imgs) <= 1:
         imgs *= 255
     imgs = imgs.transpose((3,0,1,2))[0].astype(np.int)
-    #print(imgs.shape)
-    imgs = np.array([[[perms[b[i-3]][b[i-2]][b[i-1]][b[i]] for i in range(3, len(b), 1)] for b in a] for a in imgs])
+
+    st = int((seed/20+1)*16)
+    new_data = []
+    for i in range(st, st+16):
+        np.random.seed(i)
+        perms = []
+        for j in range(256*256*256):
+            perms.append(np.random.permutation(np.arange(256)))
+        tmp = np.array([[[perms[a[i][j-3]*256*256+a[i][j-2]*256+a[i][j-1]][a[i][j]] for j in range(3, len(a[i]), 1)] for i in range(0, len(a), 1)] for a in imgs])
+        new_data.append(tmp)
+    imgs = np.array(new_data).transpose((1,2,3,0)).astype(np.float32)/255.
+    
     return imgs
 
 def four_pixel_perm_sliding(nb_channal, model_dir, seed):
-    np.random.seed(seed)
-    perms = []
-    for j in range(256*256*256*nb_channal):
-        perms.append(np.random.permutation(np.arange(256)))
-
-    perms = np.array(perms).reshape((nb_channal,256,256,256,-1)).transpose((1,2,3,4,0)).astype(np.float32)/255.
-    # print(perms.shape)
-
     imgs = np.load('data/mnist_data.npy').transpose((1,0,2,3))[0]
-    imgs = np.array([[[perms[b[i-3]][b[i-2]][b[i-1]][b[i]] for i in range(3, len(b), 1)] for b in a] for a in imgs])
+
+    new_data = []
+    st = int((seed/20+1)*16)
+    for t in range(st, st+16):
+        perms = []
+        np.random.seed(t)
+        
+        for j in range(256*256*256):
+            perms.append(np.random.permutation(np.arange(256)))
+        tmp = np.array([[[perms[a[i][j-3]*256*256+a[i][j-2]*256+a[i][j-1]][a[i][j]] for j in range(3, len(a[i]), 1)] for i in range(0, len(a), 1)] for a in imgs])
+        # print(np.array(tmp).shape)
+        new_data.append(tmp)
+
     labels = np.load('data/mnist_labels.npy')
     input_shape = imgs.shape
     return imgs, labels, input_shape, model_dir+'_slide4'

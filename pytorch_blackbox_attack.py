@@ -48,6 +48,12 @@ def predict(models, img, t=0):
             tmp = window_perm_sliding_img(nb_channel, np.array([img.numpy()]).transpose((0,3,1,2)), i*nb_label)
             imgs.append(torch.tensor(tmp).cuda())
         scores = torch.cat(tuple([torch.sigmoid(model(imgs[i])) for i,model in enumerate(models)]), dim=1)
+    elif _type == 'slide4':
+        imgs = []
+        for i in range(len(models)):
+            tmp = four_pixel_perm_sliding_img(nb_channel, np.array([img.numpy()]).transpose((0,3,1,2)), i*nb_label)
+            imgs.append(torch.tensor(tmp).cuda())
+        scores = torch.cat(tuple([torch.sigmoid(model(imgs[i])) for i,model in enumerate(models)]), dim=1)
   #  print(scores)
  #   print(scores.size())
     nat_labels = torch.zeros(scores.shape).type(torch.FloatTensor)
