@@ -45,7 +45,7 @@ def predict(models, img, t=0):
     elif _type == 'window':
         imgs = []
         for i in range(len(models)):
-            tmp = window_perm_sliding_img(nb_channel, np.array([img.numpy()])).transpose((0,3,1,2), i*nb_label)
+            tmp = window_perm_sliding_img(nb_channel, np.array([img.numpy()]).transpose((0,3,1,2)), i*nb_label)
             imgs.append(torch.tensor(tmp).cuda())
         scores = torch.cat(tuple([torch.sigmoid(model(imgs[i])) for i,model in enumerate(models)]), dim=1)
   #  print(scores)
