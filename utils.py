@@ -2,7 +2,12 @@ import keras
 import numpy as np
 import os
 import copy
+#<<<<<<< HEAD
 import time
+#=======
+import hashlib
+
+#>>>>>>> 78850af2b880b87b83140c609fb01cdf03c36538
 def permutate_labels(labels, path='2_label_permutation.npy'):
     order = np.load(path)
     labs = [order[i] for i in labels]
