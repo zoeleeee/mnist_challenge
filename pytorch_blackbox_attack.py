@@ -25,6 +25,7 @@ def predict(models, img, t=0):
     nb_channel = int(config['permutation'].split('_')[1].split('.')[1])
     img = torch.clamp(torch.tensor(img), 0, 1)*255
 #    print(torch.max(img), torch.min(img))
+
     if _type == 'slide':
         imgs = []
         print(img.shape)
