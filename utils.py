@@ -136,7 +136,7 @@ def four_pixel_perm_sliding_img(nb_channal, imgs, seed):
         imgs *= 255
     imgs = imgs.transpose((3,0,1,2))[0].astype(np.int)
 
-        if nb_channal ==16:
+    if nb_channal ==16:
         m = hashlib.md5
     elif nb_channal == 32:
         m = hashlib.sha256
