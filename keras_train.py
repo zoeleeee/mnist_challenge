@@ -38,7 +38,7 @@ nb_channal = int(path.split('_')[1].split('.')[1])
 if _type == 'diff':
   imgs, labels, input_shape, model_dir = diff_perm_per_classifier(st_lab, nb_channal, model_dir)
 elif _type == 'two':
-  imgs, labels, input_shape, model_dir = two_pixel_perm_img(nb_channal, model_dir)
+  imgs, labels, input_shape, model_dir = two_pixel_perm(nb_channal, model_dir)
 elif _type == 'slide':
   imgs, labels, input_shape, model_dir = two_pixel_perm_sliding(nb_channal, model_dir, st_lab)
 elif _type == 'normal':
@@ -108,6 +108,6 @@ nat_dists = np.sum(np.absolute(nat_labels-y_test), axis=-1)
 nat_acc = np.mean(nat_dists == 0)
 
 print('natural: {:.2f}%'.format(100 * nat_acc))
-
+print('data shape:', x_train.shape, x_test.shape)
 np.save('preds/pred_{}_{}'.format(model_dir.split('/')[1], 'origin.npy'), output)
 
