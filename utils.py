@@ -135,55 +135,83 @@ def four_pixel_perm_sliding_img(nb_channal, imgs, seed):
         imgs *= 255
     imgs = imgs.transpose((3,0,1,2))[0].astype(np.int)
 
-    st = int((seed/20+1)*nb_channal)
+        if nb_channal ==16:
+        m = hashlib.md5
+    elif nb_channal == 32:
+        m = hashlib.sha256
+
     new_data = []
-    for i in range(st, st+nb_channal):
-        np.random.seed(i)
-        perms = []
-        for j in range(256*256*256):
-            perms.append(np.random.permutation(np.arange(256)))
-        tmp = np.array([[[perms[a[i][j-3]*256*256+a[i][j-2]*256+a[i][j-1]][a[i][j]] for j in range(3, len(a[i]), 1)] for i in range(0, len(a), 1)] for a in imgs])
-        new_data.append(tmp)
-    imgs = np.array(new_data).transpose((1,2,3,0)).astype(np.float32)/255.
+    for a in imgs:
+        img = []
+        for i in range(0, len(a), 1):
+            tmp = []
+            for j in range(3, len(a[i]), 1):
+                b = m((str(seed)+str(a[i-1][j-1])+str(a[i-1][j])+str(a[i][j-1])+str(a[i][j])).encode('utf-8')).hexdigest()
+                tmp.append([int(b[t:t+1], 16) for i in range(0,nb_channal*2,2)])
+            img.append(tmp)
+        new_data.append(img)
+    imgs = np.array(new_data).astype(np.float32)/255.
     
     return imgs
 
 def four_pixel_perm_sliding(nb_channal, model_dir, seed):
     imgs = np.load('data/mnist_data.npy').transpose((1,0,2,3))[0]
+    if nb_channal ==16:
+        m = hashlib.md5
+    elif nb_channal == 32:
+        m = hashlib.sha256
 
     new_data = []
-    st = int((seed/20+1)*nb_channal)
-    for t in range(st, st+nb_channal):
-        perms = []
-        np.random.seed(t)
-        
-        for j in range(256*256*256):
-            perms.append(np.random.permutation(np.arange(256)))
-        tmp = np.array([[[perms[a[i][j-3]*256*256+a[i][j-2]*256+a[i][j-1]][a[i][j]] for j in range(3, len(a[i]), 1)] for i in range(0, len(a), 1)] for a in imgs])
-        # print(np.array(tmp).shape)
-        new_data.append(tmp)
-    imgs = np.array(new_data).transpose((1,2,3,0)).astype(np.float32)/255.
+    for a in imgs:
+        img = []
+        for i in range(0, len(a), 1):
+            tmp = []
+            for j in range(3, len(a[i]), 1):
+                b = m((str(seed)+str(a[i-1][j-1])+str(a[i-1][j])+str(a[i][j-1])+str(a[i][j])).encode('utf-8')).hexdigest()
+                tmp.append([int(b[t:t+1], 16) for i in range(0,nb_channal*2,2)])
+            img.append(tmp)
+        new_data.append(img)
+    
+    imgs = np.array(new_data).astype(np.float32)/255.
     labels = np.load('data/mnist_labels.npy')
     input_shape = imgs.shape
     return imgs, labels, input_shape, model_dir+'_slide4'
 
 def window_perm_sliding(nb_channal, model_dir, seed):
     imgs = np.load('data/mnist_data.npy').transpose((1,0,2,3))[0]
+    if nb_channal ==16:
+        m = hashlib.md5
+    elif nb_channal == 32:
+        m = hashlib.sha256
 
     new_data = []
-    st = int((seed/20+1)*nb_channal)
-    
-    for t in range(st, st+nb_channal):
-        perms = []
-        np.random.seed(t)
-        starttime = time.time()
-        for j in range(256*256*256):
-            perms.append(np.random.permutation(np.arange(256)))
-        tmp = np.array([[[perms[a[i-1][j-1]*256*256+a[i-1][j]*256+a[i][j-1]][a[i][j]] for j in range(1, len(a[i]), 1)] for i in range(1, len(a), 1)] for a in imgs])
-        print(time.time()-starttime)
+#<<<<<<< HEAD
+#    st = int((seed/20+1)*nb_channal)
+#    
+#    for t in range(st, st+nb_channal):
+#        perms = []
+#        np.random.seed(t)
+#        starttime = time.time()
+#        for j in range(256*256*256):
+#            perms.append(np.random.permutation(np.arange(256)))
+#        tmp = np.array([[[perms[a[i-1][j-1]*256*256+a[i-1][j]*256+a[i][j-1]][a[i][j]] for j in range(1, len(a[i]), 1)] for i in range(1, len(a), 1)] for a in imgs])
+#        print(time.time()-starttime)
         # print(np.array(tmp).shape)
-        new_data.append(tmp)
-    imgs = np.array(new_data).transpose((1,2,3,0)).astype(np.float32)/255.
+#        new_data.append(tmp)
+#    imgs = np.array(new_data).transpose((1,2,3,0)).astype(np.float32)/255.
+#=======
+    for a in imgs:
+        img = []
+        for i in range(1, len(a), 1):
+            tmp = []
+            for j in range(1, len(a[i]), 1):
+                b = m((str(seed)+str(a[i-1][j-1])+str(a[i-1][j])+str(a[i][j-1])+str(a[i][j])).encode('utf-8')).hexdigest()
+                tmp.append([int(b[t:t+1], 16) for i in range(0,nb_channal*2,2)])
+            img.append(tmp)
+        new_data.append(img)
+    
+    imgs = np.array(new_data).astype(np.float32)/255.
+#>>>>>>> refs/remotes/origin/master
     labels = np.load('data/mnist_labels.npy')
     input_shape = imgs.shape
     return imgs, labels, input_shape, model_dir+'_window'
@@ -208,20 +236,41 @@ def window_perm_sliding_img(nb_channal, imgs, seed):
     if np.max(imgs) <= 1:
         imgs *= 255
     imgs = imgs.transpose((3,0,1,2))[0].astype(np.int)
-    print('image shape:',imgs.shape)
-    st = int((seed/20)*nb_channal)
+#<<<<<<< HEAD
+#    print('image shape:',imgs.shape)
+#    st = int((seed/20)*nb_channal)
+#    new_data = []
+#    for i in range(st, st+nb_channal):
+#        np.random.seed(i)
+#        print(i)
+#        perms = []
+#        starttime = time.time()
+#        for j in range(256*256*256):           
+#            perms.append(np.random.permutation(np.arange(256)))
+#        tmp = np.array([[[perms[a[i-1][j-1]*256*256+a[i-1][j]*256+a[i][j-1]][a[i][j]] for j in range(1, len(a[i]), 1)] for i in range(1, len(a), 1)] for a in imgs])
+#        new_data.append(tmp)
+#        print(time.time()-starttime)
+#    imgs = np.array(new_data).transpose((1,2,3,0)).astype(np.float32)/255.
+#=======
+    
+    if nb_channal ==16:
+        m = hashlib.md5
+    elif nb_channal == 32:
+        m = hashlib.sha256
+
     new_data = []
-    for i in range(st, st+nb_channal):
-        np.random.seed(i)
-        print(i)
-        perms = []
-        starttime = time.time()
-        for j in range(256*256*256):           
-            perms.append(np.random.permutation(np.arange(256)))
-        tmp = np.array([[[perms[a[i-1][j-1]*256*256+a[i-1][j]*256+a[i][j-1]][a[i][j]] for j in range(1, len(a[i]), 1)] for i in range(1, len(a), 1)] for a in imgs])
-        new_data.append(tmp)
-        print(time.time()-starttime)
-    imgs = np.array(new_data).transpose((1,2,3,0)).astype(np.float32)/255.
+    for a in imgs:
+        img = []
+        for i in range(1, len(a), 1):
+            tmp = []
+            for j in range(1, len(a[i]), 1):
+                b = m((str(seed)+str(a[i-1][j-1])+str(a[i-1][j])+str(a[i][j-1])+str(a[i][j])).encode('utf-8')).hexdigest()
+                tmp.append([int(b[t:t+1], 16) for i in range(0,nb_channal*2,2)])
+            img.append(tmp)
+        new_data.append(img)
+    
+    imgs = np.array(new_data).astype(np.float32)/255.
+#>>>>>>> refs/remotes/origin/master
     print('image shape:', imgs.shape)
     return imgs
 
