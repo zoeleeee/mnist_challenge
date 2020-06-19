@@ -152,7 +152,7 @@ def four_pixel_perm_sliding_img(nb_channal, imgs, seed):
             tmp = []
             for j in range(3, len(a[i]), 1):
                 b = m((str(seed)+str(a[i-1][j-1])+str(a[i-1][j])+str(a[i][j-1])+str(a[i][j])).encode('utf-8')).hexdigest()
-                tmp.append([int(b[t:t+1], 16) for i in range(0,nb_channal*2,2)])
+                tmp.append([int(b[t:t+1], 16) for t in range(0,nb_channal*2,2)])
             img.append(tmp)
         new_data.append(img)
     imgs = np.array(new_data).astype(np.float32)/255.
@@ -173,7 +173,7 @@ def four_pixel_perm_sliding(nb_channal, model_dir, seed):
             tmp = []
             for j in range(3, len(a[i]), 1):
                 b = m((str(seed)+str(a[i-1][j-1])+str(a[i-1][j])+str(a[i][j-1])+str(a[i][j])).encode('utf-8')).hexdigest()
-                tmp.append([int(b[t:t+1], 16) for i in range(0,nb_channal*2,2)])
+                tmp.append([int(b[t:t+1], 16) for t in range(0,nb_channal*2,2)])
             img.append(tmp)
         new_data.append(img)
     
@@ -197,7 +197,7 @@ def window_perm_sliding(nb_channal, model_dir, seed):
             tmp = []
             for j in range(1, len(a[i]), 1):
                 b = m((str(seed)+str(a[i-1][j-1])+str(a[i-1][j])+str(a[i][j-1])+str(a[i][j])).encode('utf-8')).hexdigest()
-                tmp.append([int(b[t:t+1], 16) for i in range(0,nb_channal*2,2)])
+                tmp.append([int(b[t:t+1], 16) for t in range(0,nb_channal*2,2)])
             img.append(tmp)
         new_data.append(img)
     
@@ -223,7 +223,7 @@ def window_perm_sliding_img(nb_channal, imgs, seed):
             tmp = []
             for j in range(1, len(a[i]), 1):
                 b = m((str(seed)+str(a[i-1][j-1])+str(a[i-1][j])+str(a[i][j-1])+str(a[i][j])).encode('utf-8')).hexdigest()
-                tmp.append([int(b[t:t+1], 16) for i in range(0,nb_channal*2,2)])
+                tmp.append([int(b[t:t+1], 16) for t in range(0,nb_channal*2,2)])
             img.append(tmp)
         new_data.append(img)
     
