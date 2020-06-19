@@ -89,7 +89,7 @@ chkpt_cb = tf.keras.callbacks.ModelCheckpoint(model_dir+'.h5',
                                               mode='min')
 
 model.fit(x_train, y_train, batch_size=batch_size, epochs=int(epochs), verbose=2, validation_data=(x_test,y_test), callbacks=[chkpt_cb])
-
+eval_batch_size = config['eval_batch_size']
 output = model.predict(x_test, batch_size=eval_batch_size)
 nat_labels = np.zeros(output.shape).astype(np.float32)
 nat_labels[output>=0.5] = 1.
