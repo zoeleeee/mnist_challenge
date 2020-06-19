@@ -89,7 +89,25 @@ chkpt_cb = tf.keras.callbacks.ModelCheckpoint(model_dir+'.h5',
                                               mode='min')
 
 model.fit(x_train, y_train, batch_size=batch_size, epochs=int(epochs), verbose=2, validation_data=(x_test,y_test), callbacks=[chkpt_cb])
-#>>>>>>> refs/remotes/origin/master
 
-#model.save(model_dir+'.h5')
+output = model.predict(x_test, batch_size=eval_batch_size)
+nat_labels = np.zeros(output.shape).astype(np.float32)
+nat_labels[output>=0.5] = 1.
+nat_dists = np.sum(np.absolute(nat_labels-y_test), axis=-1)
+nat_acc = np.mean(nat_dists == 0)
+print('natural: {:.2f}%'.format(100 * nat_acc))
+
+############
+#TEST
+#############
+model = keras.models.load_model(model_dir+'.h5', custom_objects={ 'custom_loss': custom_loss(), 'loss':custom_loss() }, compile=False)
+output = model.predict(x_test, batch_size=eval_batch_size)
+nat_labels = np.zeros(output.shape).astype(np.float32)
+nat_labels[output>=0.5] = 1.
+nat_dists = np.sum(np.absolute(nat_labels-y_test), axis=-1)
+nat_acc = np.mean(nat_dists == 0)
+
+print('natural: {:.2f}%'.format(100 * nat_acc))
+
+np.save('preds/pred_{}_{}'.format(model_dir.split('/')[1], 'origin.npy'), output)
 

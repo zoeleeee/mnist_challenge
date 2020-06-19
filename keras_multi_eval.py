@@ -45,7 +45,7 @@ loss_func = config['loss_func']
 if _type == 'diff':
   imgs, labels, input_shape, model_dir = diff_perm_per_classifier(st_lab, nb_channal, model_dir)
 elif _type == 'two':
-  imgs, labels, input_shape, model_dir = two_pixel_perm_img(nb_channal, model_dir)
+  imgs, labels, input_shape, model_dir = two_pixel_perm(nb_channal, model_dir)
 elif _type == 'slide':
   imgs, labels, input_shape, model_dir = two_pixel_perm_sliding(nb_channal, model_dir, st_lab)
 elif _type == 'normal':
