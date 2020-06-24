@@ -175,7 +175,7 @@ def four_pixel_perm_sliding_img_AES(nb_channal, imgs, seed):
             tmp = []
             for j in range(3, len(a[i]), 1):
                 if nb_channal ==16:
-                    meg = pad((str(seed)+str(a[i-1][j-1])+str(a[i-1][j])+str(a[i][j-1])+str(a[i][j])), nb_channal)
+                    meg = pad((str(seed)+str(a[i-1][j-1])+str(a[i-1][j])+str(a[i][j-1])+str(a[i][j])).encode(), nb_channal)
                     b, _ = AES.new(key, AES.MODE_EAX).encrypt_and_digest(meg)
                     tmp.append(list(b))
                 elif nb_channal == 32:
@@ -221,7 +221,7 @@ def four_pixel_perm_sliding_AES(nb_channal, model_dir, seed):
             tmp = []
             for j in range(3, len(a[i]), 1):
                 if nb_channal ==16:
-                    meg = pad((str(seed)+str(a[i-1][j-1])+str(a[i-1][j])+str(a[i][j-1])+str(a[i][j])), nb_channal)
+                    meg = pad((str(seed)+str(a[i-1][j-1])+str(a[i-1][j])+str(a[i][j-1])+str(a[i][j])).encode(), nb_channal)
                     b, _ = AES.new(key, AES.MODE_EAX).encrypt_and_digest(meg)
                     tmp.append(list(b))
                 elif nb_channal == 32:
