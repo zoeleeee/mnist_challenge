@@ -6,6 +6,8 @@ import copy
 import time
 #=======
 import hashlib
+from Crypto.Util.Padding import pad
+from Crypto.Cipher import AES
 
 #>>>>>>> 78850af2b880b87b83140c609fb01cdf03c36538
 def permutate_labels(labels, path='2_label_permutation.npy'):
@@ -159,6 +161,32 @@ def four_pixel_perm_sliding_img(nb_channal, imgs, seed):
     
     return imgs
 
+def four_pixel_perm_sliding_img_AES(nb_channal, imgs, seed):
+    if np.max(imgs) <= 1:
+        imgs *= 255
+    imgs = imgs.transpose((3,0,1,2))[0].astype(np.int)
+
+    if nb_channal == 16:
+        key = os.urandom(nb_channal)
+    new_data = []
+    for a in imgs:
+        img = []
+        for i in range(0, len(a), 1):
+            tmp = []
+            for j in range(3, len(a[i]), 1):
+                if nb_channal ==16:
+                    meg = pad((str(seed)+str(a[i-1][j-1])+str(a[i-1][j])+str(a[i][j-1])+str(a[i][j])), nb_channal)
+                    b, _ = AES.new(key, AES.MODE_EAX).encrypt_and_digest(meg)
+                    tmp.append(list(b))
+                elif nb_channal == 32:
+                    b = hashlib.sha256((str(seed)+str(a[i-1][j-1])+str(a[i-1][j])+str(a[i][j-1])+str(a[i][j])).encode('utf-8')).hexdigest()
+                    tmp.append([int(b[t:t+1], 16) for t in range(0,nb_channal*2,2)])
+            img.append(tmp)
+        new_data.append(img)
+    imgs = np.array(new_data).astype(np.float32)/255.
+    
+    return imgs
+
 def four_pixel_perm_sliding(nb_channal, model_dir, seed):
     imgs = np.load('data/mnist_data.npy').transpose((1,0,2,3))[0]
     if nb_channal ==16:
@@ -174,6 +202,32 @@ def four_pixel_perm_sliding(nb_channal, model_dir, seed):
             for j in range(3, len(a[i]), 1):
                 b = m((str(seed)+str(a[i-1][j-1])+str(a[i-1][j])+str(a[i][j-1])+str(a[i][j])).encode('utf-8')).hexdigest()
                 tmp.append([int(b[t:t+1], 16) for t in range(0,nb_channal*2,2)])
+            img.append(tmp)
+        new_data.append(img)
+    
+    imgs = np.array(new_data).astype(np.float32)/255.
+    labels = np.load('data/mnist_labels.npy')
+    input_shape = imgs.shape
+    return imgs, labels, input_shape, model_dir+'_slide4'
+
+def four_pixel_perm_sliding_AES(nb_channal, model_dir, seed):
+    imgs = np.load('data/mnist_data.npy').transpose((1,0,2,3))[0]
+    if nb_channal == 16:
+        key = os.urandom(nb_channal)
+    new_data = []
+    for a in imgs:
+        img = []
+        for i in range(0, len(a), 1):
+            tmp = []
+            for j in range(3, len(a[i]), 1):
+                if nb_channal ==16:
+                    meg = pad((str(seed)+str(a[i-1][j-1])+str(a[i-1][j])+str(a[i][j-1])+str(a[i][j])), nb_channal)
+                    b, _ = AES.new(key, AES.MODE_EAX).encrypt_and_digest(meg)
+                    tmp.append(list(b))
+                elif nb_channal == 32:
+                    b = hashlib.sha256((str(seed)+str(a[i-1][j-1])+str(a[i-1][j])+str(a[i][j-1])+str(a[i][j])).encode('utf-8')).hexdigest()
+                    tmp.append([int(b[t:t+1], 16) for t in range(0,nb_channal*2,2)])
+                
             img.append(tmp)
         new_data.append(img)
     

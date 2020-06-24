@@ -51,7 +51,7 @@ elif _type == 'slide':
 elif _type == 'normal':
   imgs, labels, input_shape = load_data(config['permutation'], config['num_labels'])
 elif _type == 'slide4':
-  imgs, labels, input_shape, model_dir = four_pixel_perm_sliding(nb_channal, model_dir, st_lab)
+  imgs, labels, input_shape, model_dir = four_pixel_perm_sliding_AES(nb_channal, model_dir, st_lab)
 elif _type == 'window':
   imgs, labels, input_shape, model_dir = window_perm_sliding(nb_channal, model_dir, st_lab)
 
@@ -69,7 +69,7 @@ if dataset != 'origin.npy':
     elif _type == 'slide':
       x_test = two_pixel_perm_sliding_img(nb_channal, x_test, st_lab)
     elif _type == 'slide4':
-      x_test = four_pixel_perm_sliding_img(nb_channal, x_test, st_lab)
+      x_test = four_pixel_perm_sliding_img_AES(nb_channal, x_test, st_lab)
     elif _type == 'window':
       x_test = window_perm_sliding_img(nb_channal, x_test, st_lab)
     elif _type == 'diff':
