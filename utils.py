@@ -217,6 +217,7 @@ def window_perm_sliding_img(nb_channal, imgs, seed):
         m = hashlib.sha256
 
     new_data = []
+#    st = time.time()
     for a in imgs:
         img = []
         for i in range(1, len(a), 1):
@@ -226,6 +227,7 @@ def window_perm_sliding_img(nb_channal, imgs, seed):
                 tmp.append([int(b[t:t+1], 16) for t in range(0,nb_channal*2,2)])
             img.append(tmp)
         new_data.append(img)
+ #       print('time:', time.time()-st)
     
     imgs = np.array(new_data).astype(np.float32)/255.
     print('image shape:', imgs.shape)
