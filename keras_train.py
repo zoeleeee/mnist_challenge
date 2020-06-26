@@ -9,11 +9,12 @@ from keras import backend as K
 import sys
 import os
 import json
-from utils import load_data, order_extend_data, diff_perm_per_classifier, two_pixel_perm, two_pixel_perm_sliding, four_pixel_perm_sliding, window_perm_sliding, four_pixel_perm_sliding_AES
+from utils import load_data, order_extend_data, diff_perm_per_classifier, two_pixel_perm, two_pixel_perm_sliding, four_pixel_perm_sliding, window_perm_sliding, window_perm_sliding_AES, four_pixel_perm_sliding_AES
 import numpy as np
 
 conf = sys.argv[-1]
 _type = sys.argv[-2]
+input_bytes = eval(sys.argv[-3])
 with open(conf) as config_file:
     config = json.load(config_file)
 
@@ -44,9 +45,9 @@ elif _type == 'slide':
 elif _type == 'normal':
   imgs, labels, input_shape = load_data(config['permutation'], config['num_labels'])
 elif _type == 'slide4':
-  imgs, labels, input_shape, model_dir = four_pixel_perm_sliding_AES(nb_channal, model_dir, st_lab)
+  imgs, labels, input_shape, model_dir = four_pixel_perm_sliding_AES(nb_channal, model_dir, st_lab, input_bytes)
 elif _type == 'window':
-  imgs, labels, input_shape, model_dir = window_perm_sliding(nb_channal, model_dir, st_lab)
+  imgs, labels, input_shape, model_dir = window_perm_sliding_AES(nb_channal, model_dir, st_lab, input_bytes)
 
 print(input_shape)
 if loss_func != 'xent':
