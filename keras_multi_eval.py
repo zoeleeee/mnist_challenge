@@ -19,6 +19,7 @@ import numpy as np
 conf = sys.argv[-1]
 dataset = sys.argv[-2]
 _type = sys.argv[-3]
+input_bytes = sys.argv[-4]
 # Global constants
 with open(conf) as config_file:
   config = json.load(config_file)
@@ -51,9 +52,9 @@ elif _type == 'slide':
 elif _type == 'normal':
   imgs, labels, input_shape = load_data(config['permutation'], config['num_labels'])
 elif _type == 'slide4':
-  imgs, labels, input_shape, model_dir = four_pixel_perm_sliding_AES(nb_channal, model_dir, st_lab)
+  imgs, labels, input_shape, model_dir = four_pixel_perm_sliding_AES(nb_channal, model_dir, st_lab, input_bytes)
 elif _type == 'window':
-  imgs, labels, input_shape, model_dir = window_perm_sliding(nb_channal, model_dir, st_lab)
+  imgs, labels, input_shape, model_dir = window_perm_sliding_AES(nb_channal, model_dir, st_lab, input_bytes)
 
 labels = np.array([rep[i] for i in labels]).astype(np.float32)
 #x_train, y_train = imgs[:60000], labels[:60000]
