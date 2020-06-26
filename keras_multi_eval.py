@@ -19,7 +19,7 @@ import numpy as np
 conf = sys.argv[-1]
 dataset = sys.argv[-2]
 _type = sys.argv[-3]
-input_bytes = sys.argv[-4]
+input_bytes = eval(sys.argv[-4])
 # Global constants
 with open(conf) as config_file:
   config = json.load(config_file)
