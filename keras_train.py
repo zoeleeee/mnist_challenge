@@ -45,9 +45,9 @@ elif _type == 'slide':
 elif _type == 'normal':
   imgs, labels, input_shape = load_data(config['permutation'], config['num_labels'])
 elif _type == 'slide4':
-  imgs, labels, input_shape, model_dir = four_pixel_perm_sliding_AES(nb_channal, model_dir, st_lab)
+  imgs, labels, input_shape, model_dir = four_pixel_perm_sliding_AES(nb_channal, model_dir, st_lab, input_bytes)
 elif _type == 'window':
-  imgs, labels, input_shape, model_dir = window_perm_sliding_AES(nb_channal, model_dir, st_lab)
+  imgs, labels, input_shape, model_dir = window_perm_sliding_AES(nb_channal, model_dir, st_lab, input_bytes)
 
 print(input_shape)
 if loss_func != 'xent':
