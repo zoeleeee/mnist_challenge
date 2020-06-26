@@ -280,7 +280,7 @@ def window_perm_sliding_AES(nb_channal, model_dir, seed, input_bytes):
                     for l in range(int(math.sqrt(input_bytes))):
                         string += str(a[i-t][j-l])
                 if nb_channal ==16:
-                    meg = pad(string, nb_channal)
+                    meg = pad(string.encode(), nb_channal)
                     b, _ = AES.new(key, AES.MODE_EAX).encrypt_and_digest(meg)
                     tmp.append(list(b))
                 elif nb_channal == 32:
@@ -338,7 +338,7 @@ def window_perm_sliding_img_AES(nb_channal, imgs, seed, input_bytes):
                     for l in range(int(math.sqrt(input_bytes))):
                         string += str(a[i-t][j-l])
                 if nb_channal ==16:
-                    meg = pad(string, nb_channal)
+                    meg = pad(string.encode(), nb_channal)
                     b, _ = AES.new(key, AES.MODE_EAX).encrypt_and_digest(meg)
                     tmp.append(list(b))
                 elif nb_channal == 32:
