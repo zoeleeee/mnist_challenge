@@ -14,6 +14,7 @@ import numpy as np
 
 conf = sys.argv[-1]
 _type = sys.argv[-2]
+input_bytes = eval(sys.argv[-3])
 with open(conf) as config_file:
     config = json.load(config_file)
 
