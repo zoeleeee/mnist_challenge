@@ -175,7 +175,7 @@ def four_pixel_perm_sliding_img_AES(nb_channal, imgs, seed, input_bytes):
         for i in range(0, len(a), 1):
             tmp = []
             for j in range(input_bytes-1, len(a[i]), 1):
-                string = str(seed)
+                string = ''
                 for t in range(input_bytes):
                     string += str(a[i][j-t])
                 if nb_channal ==16: 
@@ -183,7 +183,7 @@ def four_pixel_perm_sliding_img_AES(nb_channal, imgs, seed, input_bytes):
                     b, _ = AES.new(key, AES.MODE_EAX).encrypt_and_digest(meg)
                     tmp.append(list(b))
                 elif nb_channal == 32:
-                    b = hashlib.sha256(string.encode('utf-8')).hexdigest()
+                    b = hashlib.sha256((str(seed)+string).encode('utf-8')).hexdigest()
                     tmp.append([int(b[t:t+1], 16) for t in range(0,nb_channal*2,2)])
             img.append(tmp)
         new_data.append(img)
