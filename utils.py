@@ -166,7 +166,9 @@ def four_pixel_perm_sliding_img_AES(nb_channal, imgs, seed, input_bytes):
     imgs = imgs.transpose((3,0,1,2))[0].astype(np.int)
 
     if nb_channal == 16:
-        key = os.urandom(nb_channal)
+        np.random.seed(seed)
+        key = bytearray(np.random.randint(0,256,16).astype(np.uint8))
+        # key = os.urandom(nb_channal)
     new_data = []
     for a in imgs:
         img = []
