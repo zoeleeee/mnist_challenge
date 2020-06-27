@@ -285,13 +285,13 @@ def window_perm_sliding_AES(nb_channal, model_dir, seed, input_bytes):
     new_data = []
     for a in imgs:
         img = []
-        for i in range(0, len(a), 1):
+        for i in range(int(math.sqrt(input_bytes))-1, len(a), 1):
             tmp = []
-            for j in range(input_bytes-1, len(a[i]), 1):
+            for j in range(int(math.sqrt(input_bytes))-1, len(a[i]), 1):
                 meg = []
-                for t in range(input_bytes):
-                    meg.append(a[i][j-t])
-                #meg = bytearray(meg)
+                for t in range(int(math.sqrt(input_bytes))):
+                    for l in range(int(math.sqrt(input_bytes))):
+                        meg.append(a[i-t][j-l])
                 if nb_channal ==16:
                     if len(meg) < nb_channal:
                         meg = pad(meg, nb_channal)
@@ -347,13 +347,13 @@ def window_perm_sliding_img_AES(nb_channal, imgs, seed, input_bytes):
     new_data = []
     for a in imgs:
         img = []
-        for i in range(0, len(a), 1):
+        for i in range(int(math.sqrt(input_bytes))-1, len(a), 1):
             tmp = []
-            for j in range(input_bytes-1, len(a[i]), 1):
+            for j in range(int(math.sqrt(input_bytes))-1, len(a[i]), 1):
                 meg = []
-                for t in range(input_bytes):
-                    meg.append(a[i][j-t])
-                #meg = bytearray(meg)
+                for t in range(int(math.sqrt(input_bytes))):
+                    for l in range(int(math.sqrt(input_bytes))):
+                        meg.append(a[i-t][j-l])
                 if nb_channal ==16:
                     if len(meg) < nb_channal:
                         meg = pad(meg, nb_channal)
@@ -364,7 +364,6 @@ def window_perm_sliding_img_AES(nb_channal, imgs, seed, input_bytes):
                 elif nb_channal == 32:
                     b = hashlib.sha256(bytearray(meg+[seed])).hexdigest()
                     tmp.append([int(b[t:t+1], 16) for t in range(0,nb_channal*2,2)])
-                
             img.append(tmp)
         new_data.append(img)
     imgs = np.array(new_data).astype(np.float32)/255.
