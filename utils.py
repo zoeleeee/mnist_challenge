@@ -217,7 +217,8 @@ def four_pixel_perm_sliding(nb_channal, model_dir, seed):
 def four_pixel_perm_sliding_AES(nb_channal, model_dir, seed, input_bytes):
     imgs = np.load('data/mnist_data.npy').astype(np.uint8).transpose((1,0,2,3))[0]
     if nb_channal == 16:
-        key = os.urandom(nb_channal)
+        np.random.seed(seed)
+        key = bytearray(np.random.randint(0,256,16).astype(np.uint8))
     new_data = []
     for a in imgs:
         img = []
