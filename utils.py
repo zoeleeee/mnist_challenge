@@ -168,23 +168,27 @@ def four_pixel_perm_sliding_img_AES(nb_channal, imgs, seed, input_bytes):
     if nb_channal == 16:
         np.random.seed(seed)
         key = bytearray(np.random.randint(0,256,16).astype(np.uint8))
-        # key = os.urandom(nb_channal)
     new_data = []
     for a in imgs:
         img = []
         for i in range(0, len(a), 1):
             tmp = []
             for j in range(input_bytes-1, len(a[i]), 1):
-                string = ''
+                meg = []
                 for t in range(input_bytes):
-                    string += str(a[i][j-t])
-                if nb_channal ==16: 
-                    meg = pad(string.encode(), nb_channal)
+                    meg.append(a[i][j-t])
+                #meg = bytearray(meg)
+                if nb_channal ==16:
+                    if len(meg) < nb_channal:
+                        meg = pad(meg, nb_channal)
+                    else:
+                        meg = bytearray(meg)
                     b, _ = AES.new(key, AES.MODE_EAX).encrypt_and_digest(meg)
                     tmp.append(list(b))
                 elif nb_channal == 32:
-                    b = hashlib.sha256((str(seed)+string).encode('utf-8')).hexdigest()
+                    b = hashlib.sha256(bytearray(meg+[seed])).hexdigest()
                     tmp.append([int(b[t:t+1], 16) for t in range(0,nb_channal*2,2)])
+                
             img.append(tmp)
         new_data.append(img)
     imgs = np.array(new_data).astype(np.float32)/255.
@@ -221,7 +225,7 @@ def four_pixel_perm_sliding_AES(nb_channal, model_dir, seed, input_bytes):
         np.random.seed(seed)
         key = bytearray(np.random.randint(0,256,16).astype(np.uint8))
     new_data = []
-    for a in imgs[:10]:
+    for a in imgs:
         img = []
         for i in range(0, len(a), 1):
             tmp = []
@@ -276,23 +280,27 @@ def window_perm_sliding(nb_channal, model_dir, seed):
 def window_perm_sliding_AES(nb_channal, model_dir, seed, input_bytes):
     imgs = np.load('data/mnist_data.npy').transpose((1,0,2,3))[0]
     if nb_channal == 16:
-        key = os.urandom(nb_channal)
+        np.random.seed(seed)
+        key = bytearray(np.random.randint(0,256,16).astype(np.uint8))
     new_data = []
     for a in imgs:
         img = []
-        for i in range(int(math.sqrt(input_bytes))-1, len(a), 1):
+        for i in range(0, len(a), 1):
             tmp = []
-            for j in range(int(math.sqrt(input_bytes))-1, len(a[i]), 1):
-                string = str(seed)
-                for t in range(int(math.sqrt(input_bytes))):
-                    for l in range(int(math.sqrt(input_bytes))):
-                        string += str(a[i-t][j-l])
+            for j in range(input_bytes-1, len(a[i]), 1):
+                meg = []
+                for t in range(input_bytes):
+                    meg.append(a[i][j-t])
+                #meg = bytearray(meg)
                 if nb_channal ==16:
-                    meg = pad(string.encode(), nb_channal)
+                    if len(meg) < nb_channal:
+                        meg = pad(meg, nb_channal)
+                    else:
+                        meg = bytearray(meg)
                     b, _ = AES.new(key, AES.MODE_EAX).encrypt_and_digest(meg)
                     tmp.append(list(b))
                 elif nb_channal == 32:
-                    b = hashlib.sha256(string.encode('utf-8')).hexdigest()
+                    b = hashlib.sha256(bytearray(meg+[seed])).hexdigest()
                     tmp.append([int(b[t:t+1], 16) for t in range(0,nb_channal*2,2)])
                 
             img.append(tmp)
@@ -334,24 +342,29 @@ def window_perm_sliding_img_AES(nb_channal, imgs, seed, input_bytes):
         imgs *= 255
     imgs = imgs.transpose((3,0,1,2))[0].astype(np.int)
     if nb_channal == 16:
-        key = os.urandom(nb_channal)
+        np.random.seed(seed)
+        key = bytearray(np.random.randint(0,256,16).astype(np.uint8))
     new_data = []
     for a in imgs:
         img = []
-        for i in range(int(math.sqrt(input_bytes))-1, len(a), 1):
+        for i in range(0, len(a), 1):
             tmp = []
-            for j in range(int(math.sqrt(input_bytes))-1, len(a[i]), 1):
-                string = str(seed)
-                for t in range(int(math.sqrt(input_bytes))):
-                    for l in range(int(math.sqrt(input_bytes))):
-                        string += str(a[i-t][j-l])
+            for j in range(input_bytes-1, len(a[i]), 1):
+                meg = []
+                for t in range(input_bytes):
+                    meg.append(a[i][j-t])
+                #meg = bytearray(meg)
                 if nb_channal ==16:
-                    meg = pad(string.encode(), nb_channal)
+                    if len(meg) < nb_channal:
+                        meg = pad(meg, nb_channal)
+                    else:
+                        meg = bytearray(meg)
                     b, _ = AES.new(key, AES.MODE_EAX).encrypt_and_digest(meg)
                     tmp.append(list(b))
                 elif nb_channal == 32:
-                    b = hashlib.sha256(string.encode('utf-8')).hexdigest()
+                    b = hashlib.sha256(bytearray(meg+[seed])).hexdigest()
                     tmp.append([int(b[t:t+1], 16) for t in range(0,nb_channal*2,2)])
+                
             img.append(tmp)
         new_data.append(img)
     imgs = np.array(new_data).astype(np.float32)/255.
