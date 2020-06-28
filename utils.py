@@ -183,7 +183,7 @@ def four_pixel_perm_sliding_img_AES(nb_channal, imgs, seed, input_bytes):
                         meg = pad(meg, nb_channal)
                     else:
                         meg = bytearray(meg)
-                    b, _ = AES.new(key, AES.MODE_EAX).encrypt_and_digest(meg)
+                    b, _ = AES.new(key, AES.MODE_ECB).encrypt(meg)
                     tmp.append(list(b))
                 elif nb_channal == 32:
                     b = hashlib.sha256(bytearray(meg+[seed])).hexdigest()
@@ -239,7 +239,7 @@ def four_pixel_perm_sliding_AES(nb_channal, model_dir, seed, input_bytes):
                         meg = pad(meg, nb_channal)
                     else:
                         meg = bytearray(meg)
-                    b, _ = AES.new(key, AES.MODE_EAX).encrypt_and_digest(meg)
+                    b, _ = AES.new(key, AES.MODE_ECB).encrypt(meg)
                     tmp.append(list(b))
                 elif nb_channal == 32:
                     b = hashlib.sha256(bytearray(meg+[seed])).hexdigest()
@@ -297,7 +297,7 @@ def window_perm_sliding_AES(nb_channal, model_dir, seed, input_bytes):
                         meg = pad(meg, nb_channal)
                     else:
                         meg = bytearray(meg)
-                    b, _ = AES.new(key, AES.MODE_EAX).encrypt_and_digest(meg)
+                    b, _ = AES.new(key, AES.MODE_ECB).encrypt(meg)
                     tmp.append(list(b))
                 elif nb_channal == 32:
                     b = hashlib.sha256(bytearray(meg+[seed])).hexdigest()
@@ -359,7 +359,7 @@ def window_perm_sliding_img_AES(nb_channal, imgs, seed, input_bytes):
                         meg = pad(meg, nb_channal)
                     else:
                         meg = bytearray(meg)
-                    b, _ = AES.new(key, AES.MODE_EAX).encrypt_and_digest(meg)
+                    b, _ = AES.new(key, AES.MODE_ECB).encrypt(meg)
                     tmp.append(list(b))
                 elif nb_channal == 32:
                     b = hashlib.sha256(bytearray(meg+[seed])).hexdigest()
