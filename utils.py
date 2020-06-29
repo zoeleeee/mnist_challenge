@@ -163,7 +163,7 @@ def four_pixel_perm_sliding_img(nb_channal, imgs, seed):
 def four_pixel_perm_sliding_img_AES(nb_channal, imgs, seed, input_bytes):
     if np.max(imgs) <= 1:
         imgs *= 255
-    imgs = imgs.transpose((3,0,1,2))[0].astype(np.int)
+    imgs = imgs.transpose((3,0,1,2))[0].astype(np.uint8)
 
     if nb_channal == 16:
         np.random.seed(seed)
@@ -340,7 +340,7 @@ def window_perm_sliding_img(nb_channal, imgs, seed):
 def window_perm_sliding_img_AES(nb_channal, imgs, seed, input_bytes):
     if np.max(imgs) <= 1:
         imgs *= 255
-    imgs = imgs.transpose((3,0,1,2))[0].astype(np.int)
+    imgs = imgs.transpose((3,0,1,2))[0].astype(np.uint8)
     if nb_channal == 16:
         np.random.seed(seed)
         key = bytearray(np.random.randint(0,256,16).astype(np.uint8))
