@@ -16,6 +16,7 @@ rep_labels[rep_labels==0] = -1
 conf = sys.argv[-1]
 nb_models = int(sys.argv[-2])
 _type = sys.argv[-3]
+input_bytes = eval(sys.argv[-4])
 with open(conf) as config_file:
     config = json.load(config_file)
 st_lab = config['start_label']
@@ -47,13 +48,13 @@ def predict(models, img, t=0):
     elif _type == 'window':
         imgs = []
         for i in range(len(models)):
-            tmp = window_perm_sliding_img(nb_channel, np.array([img.numpy()]), i*nb_label).transpose((0,3,1,2))
+            tmp = window_perm_sliding_img_AES(nb_channel, np.array([img.numpy()]), i*nb_label, input_bytes).transpose((0,3,1,2))
             imgs.append(torch.tensor(tmp).cuda())
         scores = torch.cat(tuple([torch.sigmoid(model(imgs[i])) for i,model in enumerate(models)]), dim=1)
     elif _type == 'slide4':
         imgs = []
         for i in range(len(models)):
-            tmp = four_pixel_perm_sliding_img(nb_channel, np.array([img.numpy()]), i*nb_label).transpose((0,3,1,2))
+            tmp = four_pixel_perm_sliding_img_AES(nb_channel, np.array([img.numpy()]), i*nb_label, input_bytes).transpose((0,3,1,2))
             imgs.append(torch.tensor(tmp).cuda())
         scores = torch.cat(tuple([torch.sigmoid(model(imgs[i])) for i,model in enumerate(models)]), dim=1)
   #  print(scores)
