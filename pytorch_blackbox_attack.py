@@ -116,7 +116,9 @@ def attack_targeted(model, train_dataset, x0, y0, target, alpha = 0.1, beta = 0.
             if lbd < g_theta:
                 best_theta, g_theta = theta, lbd
                 print("--------> Found distortion %.4f" % g_theta)
-
+    if best_theta is None:
+        print('===========> Give UP fail to find best distortion in initial %d samples' % (num_samples))
+        return 
     timeend = time.time()
     print("==========> Found best distortion %.4f in %.4f seconds using %d queries" % (g_theta, timeend-timestart, query_count))
     # return x0+g_theta*best_theta
@@ -494,6 +496,8 @@ def attack_mnist(nets, alpha=0.2, beta=0.001, isTarget= False, num_attacks= 100)
         for i in range(1,2):#nb_labs+1):
             target = (label + i) % (nb_labs+1)
             adv = attack_targeted(model, aux_imgs, image, label, target, alpha = alpha, beta = beta, iterations = 1)
+            if adv is None:
+                continue
             tmp = (adv.numpy()*255.).astype(np.int).astype(np.float32)/255.
             show_image((adv.numpy()*255.).astype(np.int).astype(np.float32)/255.)
             print(i, "Predicted label for adversarial example: ", predict(model, adv), np.linalg.norm(tmp-image.numpy()), np.linalg.norm(tmp.reshape(-1)-image.numpy().reshape(-1), axis=-1, ord=np.inf), np.sum(tmp!=image.numpy()))
