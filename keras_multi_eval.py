@@ -62,7 +62,6 @@ x_test, y_test = imgs[60000:], labels[60000:]
 if dataset != 'origin.npy':
   x_test = np.load(dataset)
   if dataset.endswith('show.npy'):
-
     if _type == 'normal':
       x_test = extend_data(config['permutation'], x_test)
     elif _type == 'two':
