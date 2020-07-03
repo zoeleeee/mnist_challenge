@@ -63,8 +63,8 @@ def predict(models, img, t=0):
 #<<<<<<< HEAD
 #    nat_labels[scores>=0.5] = 1.
 #=======
-    nat_labels[scores>=0.9] = 1.
-    nat_labels[scores<=0.1] = -1.
+    nat_labels[scores>=0.5] = 1.
+    nat_labels[scores<0.5] = -1.
 #>>>>>>> refs/remotes/origin/master
     #print(nat_labels, rep[3])
     rep = torch.tensor(rep_labels[:scores.size()[1]].T)
@@ -540,7 +540,7 @@ def attack_cifar10(alpha= 0.2, beta= 0.001, isTarget= False, num_attacks= 100):
     samples = [6311, 6890, 663, 4242, 8376, 7961, 6634, 4969, 7808, 5866, 9558, 3578, 8268, 2281, 2289, 1553, 4104, 8725, 9861, 2407, 5081, 1618, 1208, 5409, 7735, 9171, 1649, 5796, 7113, 5180, 3350,9052, 7253, 8541, 4267, 1020, 8989, 230, 1528, 6534, 18, 8086, 3996, 1031, 3130, 9298, 3632, 3909, 2334, 8896, 7339, 1494, 5243, 8322, 8016, 1786, 9031, 4769, 8969, 5451, 8852, 3329, 9882, 8965, 9627, 4712, 7290, 9769, 6306, 5194, 3966, 4756, 3012, 3102, 540, 4260, 7807, 1471, 2133, 2450, 633, 1314, 8857, 6410, 8594, 4515, 8549, 3858, 3525, 6411, 4360, 7753, 7413, 684,3343, 6785, 7079, 2263] 
     #true_labels = [3, 5, 6, 8, 7, 3, 4, 1, 8, 4, 0, 7, 5, 5, 1, 4, 0, 8, 6, 9, 5, 7, 3, 1, 4, 2, 5, 5, 9, 9, 8, 0, 4, 8, 7, 1, 4, 5, 2, 7, 8, 4, 6, 3, 3, 1, 1, 5, 1, 8, 6, 7, 1, 4, 4, 1, 0, 8, 8, 6, 7, 3, 1, 4, 4, 4, 6, 8, 0, 7, 4, 6, 1, 0, 1, 8, 3, 8, 3, 1, 8, 9, 0, 1, 3, 0, 1, 8, 2, 8, 6, 9, 1, 9, 3, 6, 7, 6]
     #samples = [7753, 1314, 633]
-    samples = [6311]
+    #samples = [6311]
     for idx in samples:
         #idx = random.randint(100, len(test_dataset)-1)
         image, label = test_dataset[idx]
@@ -594,7 +594,7 @@ if __name__ == '__main__':
             config = json.load(config_file)
         
         #idxs = np.arange(len(labels))
-        net = torch.load(config['model_dir']+'_slide16.pt')
+        net = torch.load(config['model_dir']+'_window16.pt')
         conf = conf[:conf.find(conf.split('_')[-1])]+str(config['num_labels']*(i+1))+'.json'
         nets.append(net)
     
