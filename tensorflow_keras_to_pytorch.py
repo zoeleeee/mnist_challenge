@@ -3,8 +3,8 @@ import sys
 import numpy as np
 config = sys.argv[-1]
 loss_func = 'bce'
-input_shape = eval(sys.argv[-3])
-nb_channel = int(sys.argv[-2])
+#input_shape = eval(sys.argv[-3])
+#nb_channel = int(sys.argv[-2])
 def custom_loss():
   def loss(y_true, y_pred):
     if loss_func == 'bce':
@@ -19,7 +19,7 @@ def custom_loss():
   return loss
 model = k.models.load_model(config, custom_objects={ 'custom_loss': custom_loss(), 'loss':custom_loss() }, compile=False)
 weights = model.get_weights()
-
+input_shape = model.layers[0].input_shape[1:]
 import keras
 
 model = keras.Sequential([keras.layers.Conv2D(32, kernel_size=(5,5), activation='relu', input_shape=input_shape, padding='same'),
@@ -30,7 +30,7 @@ model = keras.Sequential([keras.layers.Conv2D(32, kernel_size=(5,5), activation=
     keras.layers.Dense(1024, activation='relu'),
     keras.layers.Dense(20)
     ])
-
+model.summary()
 model.set_weights(weights)
 model.save(config)
 

@@ -29,7 +29,7 @@ def predict(models, img, t=0):
 
     if _type == 'slide':
         imgs = []
-        print(img.shape)
+        #print(img.shape)
         for i in range(len(models)):
             tmp = two_pixel_perm_sliding_img(nb_channel, np.array([img.numpy()]), i*nb_label).transpose((0,3,1,2))
             imgs.append(torch.tensor(tmp).cuda())
@@ -63,8 +63,8 @@ def predict(models, img, t=0):
 #<<<<<<< HEAD
 #    nat_labels[scores>=0.5] = 1.
 #=======
-    nat_labels[scores>=0.5] = 1.
-    nat_labels[scores<0.5] = -1.
+    nat_labels[scores>=0.9] = 1.
+    nat_labels[scores<=0.1] = -1.
 #>>>>>>> refs/remotes/origin/master
     #print(nat_labels, rep[3])
     rep = torch.tensor(rep_labels[:scores.size()[1]].T)
@@ -109,7 +109,7 @@ def attack_targeted(model, train_dataset, x0, y0, target, alpha = 0.1, beta = 0.
         if predict(model,xi) == target:
             theta = torch.tensor(xi) - x0
             initial_lbd = torch.norm(theta)
-            print(theta, torch.norm(theta))
+            #print(theta, torch.norm(theta))
             theta = theta/torch.norm(theta)
             lbd, count = fine_grained_binary_search_targeted(model, x0, y0, target, theta, initial_lbd)
             query_count += count
@@ -593,7 +593,7 @@ if __name__ == '__main__':
             config = json.load(config_file)
         
         #idxs = np.arange(len(labels))
-        net = torch.load(config['model_dir']+'_window4.pt')
+        net = torch.load(config['model_dir']+'_window16.pt')
         conf = conf[:conf.find(conf.split('_')[-1])]+str(config['num_labels']*(i+1))+'.json'
         nets.append(net)
     
