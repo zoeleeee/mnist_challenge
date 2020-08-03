@@ -1,3 +1,5 @@
+#CUDA_VISIBLE_DEVICES=0 python keras_rnd_multi_eval.py 0.9 window 16 0 100 0 4 configs/
+
 from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
@@ -12,7 +14,7 @@ import tensorflow as tf
 from tensorflow import keras
 from tensorflow.examples.tutorials.mnist import input_data
 
-from utils import load_data, extend_data
+from utils import *
 import numpy as np
 
 conf = sys.argv[-1]
@@ -20,6 +22,9 @@ nb_models = int(sys.argv[-2])
 t = int(sys.argv[-3])
 nb_imgs = int(sys.argv[-4])
 st_imgs = int(sys.argv[-5])
+input_bytes = eval(sys.argv[-6])
+_type = sys.argv[-7]
+_t = sys.argv[-8]
 #dataset = sys.argv[-2]
 # Global constants
 with open(conf) as config_file:
@@ -30,7 +35,9 @@ eval_on_cpu = config['eval_on_cpu']
 nb_labels = config['num_labels']
 st_lab = config['start_label']
 rep = np.load('2_label_permutation.npy')[st_lab:st_lab+nb_labels*nb_models].T
-
+rep[rep==0] = -1
+nb_channel = int(config['permutation'].split('_')[1].split('.')[1])
+nb_label = config['num_labels']
 #if dataset == 'origin.npy':
 # imgs, labels, input_shape = load_data(config['permutation'], config['num_labels'])
 labels = np.load('data/mnist_labels.npy')
@@ -79,14 +86,23 @@ while True:
   else:
     tot_amt += 1
     noise = np.clip(np.random.randint(-1*int(config['epsilon']*255), int(config['epsilon']*255), x_test.shape)+x_test, 0, 255).astype(np.int)
-    samples = np.array([[[permut[d[0]] for d in c] for c in b] for b in noise])
-    x_input = samples.astype(np.float32) / 255.
+    if _type == 'window':
+      samples = [window_perm_sliding_img_AES(nb_channel, noise, i*nb_label, input_bytes) for i in range(nb_models)]
+    if _type == 'slide4':
+      samples = [four_pixel_perm_sliding_img_AES(nb_channel, noise, i*nb_label, input_bytes) for i in range(nb_models)]
+    # samples = np.array([[[permut[d[0]] for d in c] for c in b] for b in noise])
+    x_input = [samples[i].astype(np.float32) / 255. for i in range(len(models))]
     scores = []
     for i in range(nb_models):
-      scores.append(models[i].predict(x_input, batch_size=eval_batch_size))
+      scores.append(models[i].predict(x_input[i], batch_size=eval_batch_size))
     scores = np.hstack(scores)
     nat_labels = np.zeros(scores.shape)
-    nat_labels[scores>=0.5] = 1.
+    nat_labels[scores>=_t] = 1.
+    if _t == .5:
+      nat_labels[scores<1-_t] = -1
+    else:
+      nat_labels[scores <= 1-_t] = -1
+
     preds, preds_dist, preds_score = [], [], []
     print(scores.shape)
     for i in range(len(nat_labels)):

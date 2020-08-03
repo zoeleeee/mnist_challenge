@@ -160,6 +160,9 @@ def four_pixel_perm_sliding_img(nb_channal, imgs, seed):
     
     return imgs
 
+# def AES_decrypt(cnt, seed):
+    
+
 def four_pixel_perm_sliding_img_AES(nb_channal, imgs, seed, input_bytes):
     if np.max(imgs) <= 1:
         imgs *= 255
