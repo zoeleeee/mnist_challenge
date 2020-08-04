@@ -63,9 +63,9 @@ def custom_loss():
 
 models = []
 if _type == 'window':
-    model_var = '_window' + str(input_bytes)
-  elif _type == 'slide4':
-    model_var = '_slide'+str(input_bytes)
+  model_var = '_window' + str(input_bytes)
+elif _type == 'slide4':
+  model_var = '_slide'+str(input_bytes)
 for i in range(nb_models):
   with open(conf) as config_file:
     config = json.load(config_file)
