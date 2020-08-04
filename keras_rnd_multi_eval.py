@@ -1,4 +1,4 @@
-#CUDA_VISIBLE_DEVICES=0 python keras_rnd_multi_eval.py 0.9 window 16 0 100 0 4 configs/
+#CUDA_VISIBLE_DEVICES=0 python keras_rnd_multi_eval.py 0.9 window 16 1 100 0 4 configs/
 
 from __future__ import absolute_import
 from __future__ import division
@@ -24,7 +24,7 @@ nb_imgs = int(sys.argv[-4])
 st_imgs = int(sys.argv[-5])
 input_bytes = eval(sys.argv[-6])
 _type = sys.argv[-7]
-_t = sys.argv[-8]
+_t = eval(sys.argv[-8])
 #dataset = sys.argv[-2]
 # Global constants
 with open(conf) as config_file:
