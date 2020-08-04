@@ -89,7 +89,8 @@ while True:
     break
   else:
     tot_amt += 1
-    noise = np.clip(np.random.randint(-1*int(config['epsilon']*255), int(config['epsilon']*255), x_test.shape)+x_test, 0, 255).astype(np.int)
+    noise = x_test
+    # noise = np.clip(np.random.randint(-1*int(config['epsilon']*255), int(config['epsilon']*255), x_test.shape)+x_test, 0, 255).astype(np.int)
     if _type == 'window':
       samples = [window_perm_sliding_img_AES(nb_channel, noise, i*nb_label, input_bytes) for i in range(nb_models)]
     if _type == 'slide4':
