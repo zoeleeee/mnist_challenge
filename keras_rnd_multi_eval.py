@@ -66,7 +66,11 @@ for i in range(nb_models):
   with open(conf) as config_file:
     config = json.load(config_file)
   model_dir = config['model_dir']
-  models.append(keras.models.load_model(model_dir+'.h5', custom_objects={ 'custom_loss': custom_loss(), 'loss':custom_loss() }, compile=False))
+  if _type == 'window':
+    model_id = model_dir + '_window' + str(input_bytes)
+  elif _type == 'slide4':
+    model_id = model_dir + '_slide'+str(input_bytes)
+  models.append(keras.models.load_model(model_id+'.h5', custom_objects={ 'custom_loss': custom_loss(), 'loss':custom_loss() }, compile=False))
   conf = conf[:conf.find(conf.split('_')[-1])]+str(nb_labels*(i+1))+'.json'
 
 tot_advs_acc = np.zeros(len(y_test))
