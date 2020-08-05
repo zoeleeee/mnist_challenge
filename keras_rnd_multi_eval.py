@@ -130,4 +130,4 @@ while True:
     change_advs_acc.append(np.mean(tot_advs_acc))
     if tot_amt % 1000 == 0:
       np.save('advs/rnd_'+model_dir.split('/')[-1]+model_var+'.npy', rnd_imgs)
-    print('{} error rate per time: {:.2f}%; right rate: {:.2f}%; total adversarial acc:{}%'.format(tot_amt, np.sum(preds_dist[preds!=y_test] <= t)/len(preds)*100, np.sum(preds_dist[preds==y_test] <= t)/len(preds)*100, np.mean(tot_advs_acc)/len(preds)*100))
+    print('{} error rate per time: {:.2f}%; right rate: {:.2f}%; total adversarial acc:{}%'.format(tot_amt, np.sum(preds_dist[preds!=y_test] <= t)/len(preds)*100, np.sum(preds_dist[preds==y_test] <= t)/len(preds)*100, np.mean(tot_advs_acc)*100))
