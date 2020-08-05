@@ -120,6 +120,7 @@ while True:
       preds.append(pred_label)
       preds_dist.append(dists[pred_label])
       preds_score.append(np.max(pred_scores))
+
     error_idxs = np.arange(len(preds))[preds != y_test]
     preds = np.array(preds)
     preds_dist = np.array(preds_dist)
@@ -128,5 +129,5 @@ while True:
     rnd_imgs[error_idxs[preds_dist[preds!=y_test]<= t]] = noise[error_idxs[preds_dist[preds!=y_test]<= t]]
     change_advs_acc.append(np.mean(tot_advs_acc))
     if tot_amt % 1000 == 0:
-      np.save('advs/rnd_'+model_dir.split('/')[-1]+'.npy', rnd_imgs)
-    print('{} natural: {:.2f}%; total adversarial acc:{}'.format(tot_amt, np.sum(preds_dist[preds!=y_test] <= t), np.mean(tot_advs_acc)))
+      np.save('advs/rnd_'+model_dir.split('/')[-1]+model_var+'.npy', rnd_imgs)
+    print('{} error rate per time: {:.2f}%; total adversarial acc:{}%'.format(tot_amt, np.mean(preds_dist[preds!=y_test] <= t), np.mean(tot_advs_acc)))
