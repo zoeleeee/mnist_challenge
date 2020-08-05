@@ -92,9 +92,9 @@ while True:
     noise = x_test
     # noise = np.clip(np.random.randint(-1*int(config['epsilon']*255), int(config['epsilon']*255), x_test.shape)+x_test, 0, 255).astype(np.int)
     if _type == 'window':
-      x_input = [window_perm_sliding_img_AES(nb_channel, noise, i*nb_label, input_bytes) for i in range(nb_models)]
+      x_input = [window_perm_sliding_img_AES(nb_channel, noise, st_lab+i*nb_label, input_bytes) for i in range(nb_models)]
     if _type == 'slide4':
-      x_input = [four_pixel_perm_sliding_img_AES(nb_channel, noise, i*nb_label, input_bytes) for i in range(nb_models)]
+      x_input = [four_pixel_perm_sliding_img_AES(nb_channel, noise, st_lab+i*nb_label, input_bytes) for i in range(nb_models)]
     # samples = np.array([[[permut[d[0]] for d in c] for c in b] for b in noise])
     # x_input = [samples[i].astype(np.float32) / 255. for i in range(len(models))]
     scores = []
