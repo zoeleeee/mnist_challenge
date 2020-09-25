@@ -1,3 +1,4 @@
+#python keras_train.py 1 diff config/20_256.16_0.json
 from __future__ import print_function
 import tensorflow as tf
 from tensorflow import keras
@@ -24,7 +25,7 @@ path = config['permutation']
 st_lab = config['start_label']
 #np.random.seed(st_lab)
 # lab_perm = np.random.permutation(np.load('2_label_permutation.npy')[:nb_labels].T)#[st_lab:st_lab+nb_labels].T)
-lab_perm = np.load('2_label_permutation.npy')[st_lab:st_lab+nb_labels].T
+lab_perm = np.load('data/2_label_permutation.npy')[st_lab:st_lab+nb_labels].T
 
 # Setting up training parameters
 tf.set_random_seed(config['random_seed'])
@@ -48,7 +49,8 @@ elif _type == 'slide4':
   imgs, labels, input_shape, model_dir = four_pixel_perm_sliding_AES(nb_channal, model_dir, st_lab, input_bytes)
 elif _type == 'window':
   imgs, labels, input_shape, model_dir = window_perm_sliding_AES(nb_channal, model_dir, st_lab, input_bytes)
-
+elif _type == 'HASH':
+  imgs, labels, input_shape, model_dir = window_perm_sliding(nb_channal, model_dir, st_lab, input_bytes)
 print(input_shape)
 if loss_func != 'xent':
   labels = np.array([lab_perm[i] for i in labels]).astype(np.float32)
