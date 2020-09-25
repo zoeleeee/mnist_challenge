@@ -269,8 +269,8 @@ def window_perm_sliding(nb_channal, model_dir, seed, input_bytes):
         for i in range(int(math.sqrt(input_bytes))-1, len(a), 1):
             tmp = []
             for j in range(int(math.sqrt(input_bytes))-1, len(a[i]), 1):
-            	meg = []
-            	for t in range(int(math.sqrt(input_bytes))):
+                meg = []
+                for t in range(int(math.sqrt(input_bytes))):
                     for l in range(int(math.sqrt(input_bytes))):
                         meg.append(a[i-t][j-l])
                 b = hashlib.sha256(bytearray(meg+[seed])).hexdigest()
@@ -326,13 +326,13 @@ def window_perm_sliding_img(nb_channal, imgs, seed):
     m = hashlib.sha256
 
     new_data = []
-	for a in imgs:
+    for a in imgs:
         img = []
         for i in range(int(math.sqrt(input_bytes))-1, len(a), 1):
             tmp = []
             for j in range(int(math.sqrt(input_bytes))-1, len(a[i]), 1):
-            	meg = []
-            	for t in range(int(math.sqrt(input_bytes))):
+                meg = []
+                for t in range(int(math.sqrt(input_bytes))):
                     for l in range(int(math.sqrt(input_bytes))):
                         meg.append(a[i-t][j-l])
                 b = hashlib.sha256(bytearray(meg+[seed])).hexdigest()
