@@ -1,6 +1,7 @@
 #python keras_train.py 1 diff config/20_256.16_0.json
 from __future__ import print_function
 import tensorflow as tf
+#import keras
 from tensorflow import keras
 #from mnist import get_data
 from keras.models import Sequential
