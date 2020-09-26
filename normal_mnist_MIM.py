@@ -22,7 +22,7 @@ keras.backend.set_learning_phase(0)
 sess = keras.backend.get_session()
 
 attack = MomentumIterativeMethod(KerasModelWrapper(model), sess=sess)
-for decay_factor in [0.0, 0.5, 1.0]:
+for decay_factor in [.5]:
     x_adv = attack.generate_np(data, eps=0.3, ord=np.inf,
                                       decay_factor=decay_factor,
                                       clip_min=0, clip_max=1.0)

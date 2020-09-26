@@ -1,4 +1,4 @@
-#python keras_train.py 1 diff config/20_256.16_0.json
+#python keras_train.py 1 HASH config/20_256.16_0.json
 from __future__ import print_function
 import tensorflow as tf
 #import keras

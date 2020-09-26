@@ -1,3 +1,4 @@
+#python keras_multi_eval.py 1 HASH origin.npy configs/
 from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
@@ -55,7 +56,8 @@ elif _type == 'slide4':
   imgs, labels, input_shape, model_dir = four_pixel_perm_sliding_AES(nb_channal, model_dir, st_lab, input_bytes)
 elif _type == 'window':
   imgs, labels, input_shape, model_dir = window_perm_sliding_AES(nb_channal, model_dir, st_lab, input_bytes)
-
+elif _type == 'HASH':
+  imgs, labels, input_shape, model_dir = window_perm_sliding(nb_channal, model_dir, st_lab, input_bytes)
 labels = np.array([rep[i] for i in labels]).astype(np.float32)
 #x_train, y_train = imgs[:60000], labels[:60000]
 x_test, y_test = imgs[60000:], labels[60000:]
