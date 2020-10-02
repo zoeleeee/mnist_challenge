@@ -16,7 +16,7 @@ from tensorflow.examples.tutorials.mnist import input_data
 
 #from utils import *
 import numpy as np
-
+print(sys.argv[-1], sys.argv[-2], sys.argv[-3], sys.argv[-4])
 conf = sys.argv[-1]
 dataset = sys.argv[-2]
 _type = sys.argv[-3]
@@ -30,7 +30,7 @@ eval_on_cpu = config['eval_on_cpu']
 nb_labels = config['num_labels']
 model_dir = config['model_dir']
 st_lab = config['start_label']
-rep = np.load('2_label_permutation.npy')[st_lab:st_lab+nb_labels].T
+rep = np.load('data/2_label_permutation.npy')[st_lab:st_lab+nb_labels].T
 nb_channal = int(config['permutation'].split('_')[1].split('.')[1])
 loss_func = config['loss_func']
 #if dataset == 'origin.npy':

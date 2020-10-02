@@ -8,7 +8,7 @@ from utils import load_data
 def hamming_idxs(scores, config, t):
 	res = []
 	#nb_labels = config['num_labels']
-	rep = np.load('2_label_permutation.npy')[config['start_label']:config['start_label']+scores.shape[-1]].T
+	rep = np.load('data/2_label_permutation.npy')[config['start_label']:config['start_label']+scores.shape[-1]].T
 	#tmp = np.load('2_label_permutation.npy')[:config['num_labels']].T
 	#np.random.seed(0)
 	#rep = np.random.permutation(tmp)
@@ -16,8 +16,10 @@ def hamming_idxs(scores, config, t):
 	#	np.random.seed(rep.shape[-1])
 	#	rep = np.hstack((rep, np.random.permutation(tmp)))
 
-	imgs, labels, input_shape = load_data(config['permutation'], scores.shape[-1])
-	labels = labels[60000:60000+len(scores)]
+#	imgs, labels, input_shape = load_data(config['permutation'], scores.shape[-1])
+        labels = np.load('data/mnist_labels.npy')
+        labels = labels[60000:60000+len(scores)]
+
 	print(t)
 	nat_labels = np.zeros(scores.shape).astype(np.float32)
 

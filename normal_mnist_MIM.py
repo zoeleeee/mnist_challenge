@@ -13,9 +13,10 @@ data = np.load('data/mnist_data.npy')[60000:].transpose((0,2,3,1)).astype(np.flo
 labels = np.load('data/mnist_labels.npy')[60000:]
 
 preds = model.predict(data)
+np.save('preds/nat_predict.npy', np.argmax(preds, axis=1))
 print('acc:', np.mean(np.argmax(preds, axis=1) == labels))
 
-from cleverhans.attacks import MomentumIterativeMethod
+#from cleverhans.attacks import MomentumIterativeMethod
 from cleverhans.utils_keras import KerasModelWrapper
 #with tf.Session() as sess:
 keras.backend.set_learning_phase(0)
