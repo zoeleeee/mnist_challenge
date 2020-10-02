@@ -59,6 +59,9 @@ elif attack_method == 'CW':
 # for decay_factor in [.5]:
 x_adv = attack.generate_np(data, **params)
 print('advs acc:', np.mean(np.argmax(model.predict(x_adv), axis=1)==labels))
+attack_idxs = np.argmax(model.predict(x_adv), axis=1)!=labels
 # delta = np.max(np.max(np.abs(x_adv - data), axis=1))
 # print(delta)
-np.save('advs/normal_mnist_MIM_advs_{}_show.npy'.format(decay_factor), np.clip(x_adv*255., 0, 255))
+np.save('advs/mnist_'+attack_method+'_'+sign+'_advs_show.npy', np.clip(np.vstack(advs)[attack_idxs]*255., 0, 255))
+np.save('advs/mnist_'+attack_method+'_'+sign+'_advs_label.npy', labels[attack_idxs])
+# np.save('advs/normal_mnist_MIM_advs_{}_show.npy'.format(decay_factor), np.clip(x_adv*255., 0, 255))
