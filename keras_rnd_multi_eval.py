@@ -1,3 +1,5 @@
+#CUDA_VISIBLE_DEVICES=0 python keras_rnd_multi_eval.py 0.9 window 16 1 100 0 4 configs/
+
 from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
@@ -12,7 +14,7 @@ import tensorflow as tf
 from tensorflow import keras
 from tensorflow.examples.tutorials.mnist import input_data
 
-from utils import load_data, extend_data
+from utils import *
 import numpy as np
 
 conf = sys.argv[-1]
@@ -20,6 +22,9 @@ nb_models = int(sys.argv[-2])
 t = int(sys.argv[-3])
 nb_imgs = int(sys.argv[-4])
 st_imgs = int(sys.argv[-5])
+input_bytes = eval(sys.argv[-6])
+_type = sys.argv[-7]
+_t = eval(sys.argv[-8])
 #dataset = sys.argv[-2]
 # Global constants
 with open(conf) as config_file:
@@ -30,7 +35,9 @@ eval_on_cpu = config['eval_on_cpu']
 nb_labels = config['num_labels']
 st_lab = config['start_label']
 rep = np.load('2_label_permutation.npy')[st_lab:st_lab+nb_labels*nb_models].T
-
+rep[rep==0] = -1
+nb_channel = int(config['permutation'].split('_')[1].split('.')[1])
+nb_label = config['num_labels']
 #if dataset == 'origin.npy':
 # imgs, labels, input_shape = load_data(config['permutation'], config['num_labels'])
 labels = np.load('data/mnist_labels.npy')
@@ -55,11 +62,15 @@ def custom_loss():
   return loss
 
 models = []
+if _type == 'window':
+  model_var = '_window' + str(input_bytes)
+elif _type == 'slide4':
+  model_var = '_slide'+str(input_bytes)
 for i in range(nb_models):
   with open(conf) as config_file:
     config = json.load(config_file)
   model_dir = config['model_dir']
-  models.append(keras.models.load_model(model_dir+'.h5', custom_objects={ 'custom_loss': custom_loss(), 'loss':custom_loss() }, compile=False))
+  models.append(keras.models.load_model(model_dir+model_var+'.h5', custom_objects={ 'custom_loss': custom_loss(), 'loss':custom_loss() }, compile=False))
   conf = conf[:conf.find(conf.split('_')[-1])]+str(nb_labels*(i+1))+'.json'
 
 tot_advs_acc = np.zeros(len(y_test))
@@ -78,15 +89,25 @@ while True:
     break
   else:
     tot_amt += 1
+    # noise = x_test
     noise = np.clip(np.random.randint(-1*int(config['epsilon']*255), int(config['epsilon']*255), x_test.shape)+x_test, 0, 255).astype(np.int)
-    samples = np.array([[[permut[d[0]] for d in c] for c in b] for b in noise])
-    x_input = samples.astype(np.float32) / 255.
+    if _type == 'window':
+      x_input = [window_perm_sliding_img_AES(nb_channel, noise, st_lab+i*nb_label, input_bytes) for i in range(nb_models)]
+    if _type == 'slide4':
+      x_input = [four_pixel_perm_sliding_img_AES(nb_channel, noise, st_lab+i*nb_label, input_bytes) for i in range(nb_models)]
+    # samples = np.array([[[permut[d[0]] for d in c] for c in b] for b in noise])
+    # x_input = [samples[i].astype(np.float32) / 255. for i in range(len(models))]
     scores = []
     for i in range(nb_models):
-      scores.append(models[i].predict(x_input, batch_size=eval_batch_size))
+      scores.append(models[i].predict(x_input[i], batch_size=eval_batch_size))
     scores = np.hstack(scores)
     nat_labels = np.zeros(scores.shape)
-    nat_labels[scores>=0.5] = 1.
+    nat_labels[scores>=_t] = 1.
+    if _t == .5:
+      nat_labels[scores<1-_t] = -1
+    else:
+      nat_labels[scores <= 1-_t] = -1
+
     preds, preds_dist, preds_score = [], [], []
     print(scores.shape)
     for i in range(len(nat_labels)):
@@ -99,6 +120,7 @@ while True:
       preds.append(pred_label)
       preds_dist.append(dists[pred_label])
       preds_score.append(np.max(pred_scores))
+
     error_idxs = np.arange(len(preds))[preds != y_test]
     preds = np.array(preds)
     preds_dist = np.array(preds_dist)
@@ -107,5 +129,5 @@ while True:
     rnd_imgs[error_idxs[preds_dist[preds!=y_test]<= t]] = noise[error_idxs[preds_dist[preds!=y_test]<= t]]
     change_advs_acc.append(np.mean(tot_advs_acc))
     if tot_amt % 1000 == 0:
-      np.save('advs/rnd_'+model_dir.split('/')[-1]+'.npy', rnd_imgs)
-    print('{} natural: {:.2f}%; total adversarial acc:{}'.format(tot_amt, np.sum(preds_dist[preds!=y_test] <= t), np.mean(tot_advs_acc)))
+      np.save('advs/rnd_'+model_dir.split('/')[-1]+model_var+'.npy', rnd_imgs)
+    print('{} error rate per time: {:.2f}%; right rate: {:.2f}%; total adversarial acc:{}%'.format(tot_amt, np.sum(preds_dist[preds!=y_test] <= t)/len(preds)*100, np.sum(preds_dist[preds==y_test] <= t)/len(preds)*100, np.mean(tot_advs_acc)*100))

@@ -1,3 +1,4 @@
+#python keras_multi_eval.py 1 HASH origin.npy configs/
 from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
@@ -15,7 +16,7 @@ from tensorflow.examples.tutorials.mnist import input_data
 
 #from utils import *
 import numpy as np
-
+print(sys.argv[-1], sys.argv[-2], sys.argv[-3], sys.argv[-4])
 conf = sys.argv[-1]
 dataset = sys.argv[-2]
 _type = sys.argv[-3]
@@ -29,7 +30,7 @@ eval_on_cpu = config['eval_on_cpu']
 nb_labels = config['num_labels']
 model_dir = config['model_dir']
 st_lab = config['start_label']
-rep = np.load('2_label_permutation.npy')[st_lab:st_lab+nb_labels].T
+rep = np.load('data/2_label_permutation.npy')[st_lab:st_lab+nb_labels].T
 nb_channal = int(config['permutation'].split('_')[1].split('.')[1])
 loss_func = config['loss_func']
 #if dataset == 'origin.npy':
@@ -55,7 +56,8 @@ elif _type == 'slide4':
   imgs, labels, input_shape, model_dir = four_pixel_perm_sliding_AES(nb_channal, model_dir, st_lab, input_bytes)
 elif _type == 'window':
   imgs, labels, input_shape, model_dir = window_perm_sliding_AES(nb_channal, model_dir, st_lab, input_bytes)
-
+elif _type == 'HASH':
+  imgs, labels, input_shape, model_dir = window_perm_sliding(nb_channal, model_dir, st_lab, input_bytes)
 labels = np.array([rep[i] for i in labels]).astype(np.float32)
 #x_train, y_train = imgs[:60000], labels[:60000]
 x_test, y_test = imgs[60000:], labels[60000:]

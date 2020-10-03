@@ -9,7 +9,7 @@ from Crypto.Util.Padding import pad
 from Crypto.Cipher import AES
 
 
-def permutate_labels(labels, path='2_label_permutation.npy'):
+def permutate_labels(labels, path='data/2_label_permutation.npy'):
     order = np.load(path)
     labs = [order[i] for i in labels]
     return np.array(labs)
@@ -153,12 +153,15 @@ def four_pixel_perm_sliding_img(nb_channal, imgs, seed):
             tmp = []
             for j in range(3, len(a[i]), 1):
                 b = m((str(seed)+str(a[i][j])+str(a[i][j-1])+str(a[i][j-2])+str(a[i][j-3])).encode('utf-8')).hexdigest()
-                tmp.append([int(b[t:t+1], 16) for t in range(0,nb_channal*2,2)])
+                tmp.append([int(b[t:t+2], 16) for t in range(0,nb_channal*2,2)])
             img.append(tmp)
         new_data.append(img)
     imgs = np.array(new_data).astype(np.float32)/255.
     
     return imgs
+
+# def AES_decrypt(cnt, seed):
+    
 
 def four_pixel_perm_sliding_img_AES(nb_channal, imgs, seed, input_bytes):
     if np.max(imgs) <= 1:
@@ -188,7 +191,7 @@ def four_pixel_perm_sliding_img_AES(nb_channal, imgs, seed, input_bytes):
                     tmp.append(list(b))
                 elif nb_channal == 32:
                     b = hashlib.sha256(bytearray(meg+[seed])).hexdigest()
-                    tmp.append([int(b[t:t+1], 16) for t in range(0,nb_channal*2,2)])
+                    tmp.append([int(b[t:t+2], 16) for t in range(0,nb_channal*2,2)])
                 
             img.append(tmp)
         new_data.append(img)
@@ -210,7 +213,7 @@ def four_pixel_perm_sliding(nb_channal, model_dir, seed):
             tmp = []
             for j in range(3, len(a[i]), 1):
                 b = m((str(seed)+str(a[i-1][j-1])+str(a[i-1][j])+str(a[i][j-1])+str(a[i][j])).encode('utf-8')).hexdigest()
-                tmp.append([int(b[t:t+1], 16) for t in range(0,nb_channal*2,2)])
+                tmp.append([int(b[t:t+2], 16) for t in range(0,nb_channal*2,2)])
             img.append(tmp)
         new_data.append(img)
     
@@ -245,7 +248,7 @@ def four_pixel_perm_sliding_AES(nb_channal, model_dir, seed, input_bytes):
                     tmp.append(list(b))
                 elif nb_channal == 32:
                     b = hashlib.sha256(bytearray(meg+[seed])).hexdigest()
-                    tmp.append([int(b[t:t+1], 16) for t in range(0,nb_channal*2,2)])
+                    tmp.append([int(b[t:t+2], 16) for t in range(0,nb_channal*2,2)])
                 
             img.append(tmp)
         new_data.append(img)
@@ -255,29 +258,30 @@ def four_pixel_perm_sliding_AES(nb_channal, model_dir, seed, input_bytes):
     input_shape = imgs.shape
     return imgs, labels, input_shape, model_dir+'_slide'+str(input_bytes)
 
-def window_perm_sliding(nb_channal, model_dir, seed):
+def window_perm_sliding(nb_channal, model_dir, seed, input_bytes):
     imgs = np.load('data/mnist_data.npy').transpose((1,0,2,3))[0]
-    if nb_channal ==16:
-        m = hashlib.md5
-    elif nb_channal == 32:
-        m = hashlib.sha256
+    m = hashlib.sha256
 
     new_data = []
 
     for a in imgs:
         img = []
-        for i in range(1, len(a), 1):
+        for i in range(int(math.sqrt(input_bytes))-1, len(a), 1):
             tmp = []
-            for j in range(1, len(a[i]), 1):
-                b = m((str(seed)+str(a[i-1][j-1])+str(a[i-1][j])+str(a[i][j-1])+str(a[i][j])).encode('utf-8')).hexdigest()
-                tmp.append([int(b[t:t+1], 16) for t in range(0,nb_channal*2,2)])
+            for j in range(int(math.sqrt(input_bytes))-1, len(a[i]), 1):
+                meg = []
+                for t in range(int(math.sqrt(input_bytes))):
+                    for l in range(int(math.sqrt(input_bytes))):
+                        meg.append(a[i-t][j-l])
+                b = hashlib.sha256(bytearray(meg+[seed])).hexdigest()
+                tmp.append([int(b[t:t+2], 16) for t in range(0,nb_channal*2,2)])
             img.append(tmp)
         new_data.append(img)
     
     imgs = np.array(new_data).astype(np.float32)/255.
     labels = np.load('data/mnist_labels.npy')
     input_shape = imgs.shape
-    return imgs, labels, input_shape, model_dir+'_window'
+    return imgs, labels, input_shape, model_dir+'_HASH'
 
 def window_perm_sliding_AES(nb_channal, model_dir, seed, input_bytes):
     imgs = np.load('data/mnist_data.npy').astype(np.uint8).transpose((1,0,2,3))[0]
@@ -304,7 +308,7 @@ def window_perm_sliding_AES(nb_channal, model_dir, seed, input_bytes):
                     tmp.append(list(b))
                 elif nb_channal == 32:
                     b = hashlib.sha256(bytearray(meg+[seed])).hexdigest()
-                    tmp.append([int(b[t:t+1], 16) for t in range(0,nb_channal*2,2)])
+                    tmp.append([int(b[t:t+2], 16) for t in range(0,nb_channal*2,2)])
                 
             img.append(tmp)
         new_data.append(img)
@@ -318,23 +322,23 @@ def window_perm_sliding_img(nb_channal, imgs, seed):
     if np.max(imgs) <= 1:
         imgs *= 255
     imgs = imgs.transpose((3,0,1,2))[0].astype(np.int)
-    if nb_channal ==16:
-        m = hashlib.md5
-    elif nb_channal == 32:
-        m = hashlib.sha256
+
+    m = hashlib.sha256
 
     new_data = []
-#    st = time.time()
     for a in imgs:
         img = []
-        for i in range(1, len(a), 1):
+        for i in range(int(math.sqrt(input_bytes))-1, len(a), 1):
             tmp = []
-            for j in range(1, len(a[i]), 1):
-                b = m((str(seed)+str(a[i-1][j-1])+str(a[i-1][j])+str(a[i][j-1])+str(a[i][j])).encode('utf-8')).hexdigest()
-                tmp.append([int(b[t:t+1], 16) for t in range(0,nb_channal*2,2)])
+            for j in range(int(math.sqrt(input_bytes))-1, len(a[i]), 1):
+                meg = []
+                for t in range(int(math.sqrt(input_bytes))):
+                    for l in range(int(math.sqrt(input_bytes))):
+                        meg.append(a[i-t][j-l])
+                b = hashlib.sha256(bytearray(meg+[seed])).hexdigest()
+                tmp.append([int(b[t:t+2], 16) for t in range(0,nb_channal*2,2)])
             img.append(tmp)
         new_data.append(img)
- #       print('time:', time.time()-st)
     
     imgs = np.array(new_data).astype(np.float32)/255.
     print('image shape:', imgs.shape)
@@ -367,7 +371,7 @@ def window_perm_sliding_img_AES(nb_channal, imgs, seed, input_bytes):
                     tmp.append(list(b))
                 elif nb_channal == 32:
                     b = hashlib.sha256(bytearray(meg+[seed])).hexdigest()
-                    tmp.append([int(b[t:t+1], 16) for t in range(0,nb_channal*2,2)])
+                    tmp.append([int(b[t:t+2], 16) for t in range(0,nb_channal*2,2)])
             img.append(tmp)
         new_data.append(img)
     imgs = np.array(new_data).astype(np.float32)/255.

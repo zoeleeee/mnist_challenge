@@ -12,7 +12,7 @@ np.random.seed(777)
 
 x = np.arange(n).astype(np.float64)
 file = sys.argv[-1]
-y = np.load(file).reshape(256,-1).transpose((1,0))
+# y = np.load(file).reshape(256,-1).transpose((1,0))
 
 # xx = np.array([mpf(val) for val in x])
 # yy = np.array([mpf(val) for val in x])

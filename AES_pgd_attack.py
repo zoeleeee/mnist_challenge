@@ -44,15 +44,15 @@ class LinfPGDAttack:
     #   loss = model.xent
 #    self.input = tf.Variable(np.zeros([batch_size, 28, 28, input_shape[-1]]), dtype=tf.float32, name='input')
 #    self.labels = tf.Variable(np.zeros([len(models), batch_size, nb_labels]), dtype=tf.float32, name='labels')
-    self.assign_input = tf.placeholder(tf.float32, shape=[batch_size, 28, 28, input_shape[-1]])
+    self.assign_input = tf.placeholder(tf.float32, shape=[batch_size, 28, 28, input_shape[-1]*len(models)])
     self.assign_labels = tf.placeholder(tf.float32, shape=[len(models), batch_size, nb_labels])
 
     if loss_func == 'hinge':
         hinge_loss = tf.keras.losses.Hinge()
-        loss = tf.reduce_sum([hinge_loss(self.assign_labels[i], tf.nn.sigmoid(model(self.assign_input))) for i, model in enumerate(self.models)])
+        loss = tf.reduce_sum([hinge_loss(self.assign_labels[i], tf.nn.sigmoid(model(self.assign_input[:,:,:,i*input_shape[-1]:(i+1)*input_shape[-1]]))) for i, model in enumerate(self.models)])
     elif loss_func == 'bce':
         bce_loss = keras.losses.BinaryCrossentropy()
-        loss = tf.reduce_sum([bce_loss(self.assign_labels[i], tf.nn.sigmoid(model(self.assign_input))) for i,model in enumerate(self.models)])
+        loss = tf.reduce_sum([bce_loss(self.assign_labels[i], tf.nn.sigmoid(model(self.assign_input[:,:,:,i*input_shape[-1]:(i+1)*input_shape[-1]]))) for i,model in enumerate(self.models)])
     # self.grad = tf.reduce_sum([tf.gradients(loss, )[0] for m in self.models], 0)
     self.grad = tf.gradients(loss, self.assign_input)
 
@@ -86,6 +86,8 @@ class LinfPGDAttack:
 
       else:
         x_upd = x+self.a*np.sign(grad)
+
+      tmp = [AES_decrypt(x_upd, i) for i in range()]
 
       tmp = np.zeros(org_img.shape)
       for t in range(x.shape[0]):

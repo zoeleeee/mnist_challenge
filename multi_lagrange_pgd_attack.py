@@ -1,4 +1,5 @@
 """
+lagrange pgd attack, input: original images, every time use polyval change to permuted images, and back to original images
 Implementation of attack methods. Running this file as a program will
 apply the attack to the model specified by the config file and store
 the examples in an .npy file.
