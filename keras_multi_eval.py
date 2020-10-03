@@ -47,6 +47,7 @@ loss_func = config['loss_func']
 if dataset != 'origin.npy':
   x_test = np.load(dataset)
   y_test = np.load(dataset[:-8]+'label.npy')
+  y_test = np.array([rep[i] for i in y_test]).astype(np.float32)
   if dataset.endswith('show.npy'):
     if _type == 'normal':
       x_test = extend_data(config['permutation'], x_test)
