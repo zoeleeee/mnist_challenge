@@ -318,7 +318,7 @@ def window_perm_sliding_AES(nb_channal, model_dir, seed, input_bytes):
     input_shape = imgs.shape
     return imgs, labels, input_shape, model_dir+'_window'+str(input_bytes)
 
-def window_perm_sliding_img(nb_channal, imgs, seed):
+def window_perm_sliding_img(nb_channal, imgs, seed, input_bytes):
     if np.max(imgs) <= 1:
         imgs *= 255
     imgs = imgs.transpose((3,0,1,2))[0].astype(np.int)
