@@ -5,7 +5,7 @@ from scipy.special import expit
 
 from utils import load_data
 
-def hamming_idxs(scores, config, t):
+def hamming_idxs(scores, config, t, label_path='data/mnist_labels.npy'):
     res = []
     #nb_labels = config['num_labels']
     rep = np.load('data/2_label_permutation.npy')[config['start_label']:config['start_label']+scores.shape[-1]].T
@@ -15,10 +15,12 @@ def hamming_idxs(scores, config, t):
     #while rep.shape[-1] < scores.shape[-1]:
     #   np.random.seed(rep.shape[-1])
     #   rep = np.hstack((rep, np.random.permutation(tmp)))
-
+    
+    idxs = np.load('data/final_random_1000_correct_idxs.npy')
 #   imgs, labels, input_shape = load_data(config['permutation'], scores.shape[-1])
-    labels = np.load('data/mnist_labels.npy')
-    labels = labels[60000:60000+len(scores)]
+    labels = np.load(label_path)
+    if label_path == 'data/mnist_labels.npy':
+        labels = labels[60000:][idxs]
 
     print(t)
     nat_labels = np.zeros(scores.shape).astype(np.float32)

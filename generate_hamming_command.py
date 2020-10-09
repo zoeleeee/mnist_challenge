@@ -1,7 +1,7 @@
 import numpy as np 
 import os
-
-fils = os.listdir('preds')
+path = 'preds'
+files = os.listdir(path)
 lst = []
 for f in files:
     if f.find('_0_HASH') == -1:
@@ -14,12 +14,13 @@ for f in files:
         lst.append(f)
 
 for f in lst:
-    strs = f.split('_0_')
-    a = np.load(strs[0]+'_0_'+strs[1])
-    b = np.load(strs[0]+'_20_'+strs[1])
-    c = np.load(strs[0]+'_40_'+strs[1])
-    d = np.load(strs[0]+'_60_'+strs[1])
-    np.save(strs[0]+'_80_'+strs[1], np.hstack((a,b,c,d)))
+    strs = f.split('_0_HASH_')
+    print(strs)
+    a = np.load(os.path.join(path, strs[0]+'_0_HASH_'+strs[1]))
+    b = np.load(os.path.join(path, strs[0]+'_20_HASH_'+strs[1]))
+    c = np.load(os.path.join(path, strs[0]+'_40_HASH_'+strs[1]))
+    d = np.load(os.path.join(path, strs[0]+'_60_HASH_'+strs[1]))
+    np.save(os.path.join(path, strs[0]+'_80_HASH_'+strs[1]), np.hstack((a,b,c,d)))
     
 
     
