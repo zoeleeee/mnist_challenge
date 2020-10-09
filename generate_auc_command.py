@@ -32,5 +32,6 @@ for f in lst:
 		idx = 1
 		conf = 'configs/20_256.32_HASH_0.json'
 	for s in [.5, .6, .7, .8, .9]:
+                fin.write('echo {}, {}'.format(s, os.path.join(path,f)))
 		fin.write('CUDA_VISIBLE_DEVICES={} python get_auc.py {} {} {} {}\n'.format(gpu_id, s, test_file[idx], os.path.join(path,f), conf))
 fin.close()
