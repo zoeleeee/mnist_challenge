@@ -281,7 +281,7 @@ def window_perm_sliding(nb_channal, model_dir, seed, input_bytes):
     imgs = np.array(new_data).astype(np.float32)/255.
     labels = np.load('data/mnist_labels.npy')
     input_shape = imgs.shape
-    return imgs, labels, input_shape, model_dir+'_HASH'
+    return imgs, labels, input_shape, model_dir+'_HASH'+str(input_bytes)
 
 def window_perm_sliding_AES(nb_channal, model_dir, seed, input_bytes):
     imgs = np.load('data/mnist_data.npy').astype(np.uint8).transpose((1,0,2,3))[0]

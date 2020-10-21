@@ -63,7 +63,7 @@ if dataset != 'origin.npy':
       x_test = diff_perm_per_classifier_img(st_lab, nb_channal, x_test)
     elif _type == 'HASH':
       x_test = window_perm_sliding_img(nb_channal, x_test, st_lab, input_bytes)
-      model_dir += '_HASH' 
+      model_dir += '_HASH'+str(input_bytes) 
 else:
   if _type == 'diff':
     imgs, labels, input_shape, model_dir = diff_perm_per_classifier(st_lab, nb_channal, model_dir)
