@@ -1,7 +1,6 @@
 #python random_restarts.py linf MIM low at
-import torch
+from tensorflow import keras
 import numpy as np
-from torch.utils.data import TensorDataset, DataLoader
 import sys
 import os
 import json
@@ -60,34 +59,22 @@ if model_id.find('config') != -1:
 else:
     res = np.ones(1000)
 
-    if model_id == 'at':
-        if metric == 'linf':
-            model = torch.load('cifar10_linf_at.pth')
-        elif metric == 'l2':
-            model = torch.load('cifar10_l2_at.pth')
+    if model_id == 'at':#linf
+        model = torch.load('models/adv_trained.h5')
     elif model_id == 'nat':
-        model = torch.load('cifar10_nat.pth')
+        model = keras.models.load_model('models/natural.h5')
     model.eval()
     for path in lst:
         print(path)
-        path = os.path.join('data', path)
+        path = os.path.join('advs', path)
         x_test = np.load(path).astype(np.float32)
         y_test = np.load(path[:-8]+'label.npy')
         idx_test = np.load(path[:-8]+'idxs.npy')
         x_test /= 255.
 #        print(x_test.shape, y_test.shape, idx_test.shape, np.max(idx_test), np.min(idx_test), np.max(x_test))
 
-        x_test = torch.Tensor(x_test)
-        test_dataset = TensorDataset(x_test, torch.Tensor(y_test))
-        test_loader = DataLoader(test_dataset, batch_size=100, num_workers=0, shuffle=False)
-        
-        pred_labs = []
-        for im, label in test_loader:
-            _, preds = torch.max(model(im.cuda())[0], dim=1)
-            pred_labs.append(preds.cpu().numpy())
-        pred_labs = np.hstack(pred_labs)
-        print(pred_labs.shape)
-#        print(np.sum(pred_labs-y_test))
+        output = model.predict(x_test, batch_size=100)
+        pred_labs = np.argmax(output, axis=-1)
         res[idx_test] = np.logical_and(pred_labs==y_test, res[idx_test])
 
     print('{}_{}_{}_{} acc: {}'.format(model_id, _type, attack, metric, np.mean(res.astype(np.float32))))
