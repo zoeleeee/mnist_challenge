@@ -5,6 +5,7 @@ import sys
 import os
 import json
 from hamming_eval import hamming_idxs
+from get_auc import cal_auc
 
 model_id = sys.argv[-1]
 _type = sys.argv[-2]
@@ -26,7 +27,12 @@ if model_id.find('config') != -1:
         config = json.load(config_file)
     model_dir = config['model_dir']
     
+    
+    test_file = 'preds/pred_{}_{}'.format(model_dir.split('/')[1]+'_'+sign, 'origin.npy')
+    idxs = np.load('data/final_random_1000_correct_idxs.npy')
+    scores = np.load(test_file)[idxs]
     for s in [.5, .6, .7, .8, .9]:
+        test_dist, _, _ = hamming_idxs(scores,config,s)
         valid = 10
         num = 0
         res = np.zeros((10, 1000))
@@ -54,7 +60,7 @@ if model_id.find('config') != -1:
     #        print(np.sum(res))
         
         for i in  range(valid):
-            print('{}_{}: {}_{}_{}_{} acc: {} / err: {} / dec: {}'.format(s, i, model_id, _type, attack, metric, np.sum(res[i]==1), np.sum(res[i]==2), np.sum(res[i]==0)))
+            print('{}_{}: {}_{}_{}_{} auc:{} / acc: {} / err: {} / dec: {}'.format(s, i, model_id, _type, attack, metric, cal_auc(pred_dist, test_dist, i), np.sum(res[i]==1), np.sum(res[i]==2), np.sum(res[i]==0)))
 
 else:
     res = np.ones(1000)

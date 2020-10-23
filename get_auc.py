@@ -19,6 +19,15 @@ scores = np.load(test_file)[idxs]
 test_dist, _, _ = hamming_idxs(scores,config,s)
 ts = max(np.max(advs_dist), np.max(test_dist))
 
+def cal_auc(advs_dist, test_dist, t):
+  y_true = np.concatenate((np.ones(advs_dist.shape), np.zeros(test_dist.shape)),axis=-1)
+  advs_pred = np.zeros(advs_dist.shape)
+  advs_pred[advs_dist>t] = 1
+  test_pred = np.zeros(test_dist.shape)
+  test_pred[test_dist>t] = 1
+  y_pred = np.concatenate((advs_pred, test_pred),axis=-1)
+  return roc_auc_score(y_true, y_pred)
+
 y_true = np.concatenate((np.ones(advs_dist.shape), np.zeros(test_dist.shape)),axis=-1)
 print(y_true.shape)
 auc_scores = []
