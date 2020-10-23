@@ -22,7 +22,7 @@ def hamming_idxs(scores, config, t, label_path='data/mnist_labels.npy'):
     if label_path == 'data/mnist_labels.npy':
         labels = labels[60000:]#[idxs]
 
-    print(t)
+    #print(t)
     nat_labels = np.zeros(scores.shape).astype(np.float32)
 
     nat_labels[scores>=t] = 1.
@@ -46,7 +46,7 @@ def hamming_idxs(scores, config, t, label_path='data/mnist_labels.npy'):
 
     preds = np.array(preds)
     preds_dist = np.array(preds_dist)
-    print(preds)
+    #print(preds)
     correct_idxs = np.arange(len(preds))[preds == labels]
     error_idxs = np.arange(len(preds))[preds != labels]
     return preds_dist, correct_idxs, error_idxs
