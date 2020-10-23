@@ -5,7 +5,14 @@ import sys
 import os
 import json
 from hamming_eval import hamming_idxs
-from get_auc import cal_auc
+
+def cal_auc(advs, test_dist, t):
+    advs_pred = np.zeros(advs_pred.shape)
+    advs_pred[advs==0] = 1
+    test_pred = np.zeros(test_dist.shape)
+    test_pred[test_dist>t] = 1
+    y_pred = np.concatenate((advs_pred, test_pred),axis=-1)
+  return roc_auc_score(y_true, y_pred)
 
 model_id = sys.argv[-1]
 _type = sys.argv[-2]
@@ -60,7 +67,7 @@ if model_id.find('config') != -1:
     #        print(np.sum(res))
         
         for i in  range(valid):
-            print('{}_{}: {}_{}_{}_{} auc:{} / acc: {} / err: {} / dec: {}'.format(s, i, model_id, _type, attack, metric, cal_auc(pred_dist, test_dist, i), np.sum(res[i]==1), np.sum(res[i]==2), np.sum(res[i]==0)))
+            print('{}_{}: {}_{}_{}_{} auc:{} / acc: {} / err: {} / dec: {}'.format(s, i, model_id, _type, attack, metric, cal_auc(res[i], test_dist, i), np.sum(res[i]==1), np.sum(res[i]==2), np.sum(res[i]==0)))
 
 else:
     res = np.ones(1000)
