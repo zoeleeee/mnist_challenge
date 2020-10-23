@@ -60,7 +60,7 @@ if model_id.find('config') != -1:
                     correct_tmp = np.zeros(1000)
                     correct_tmp[idxs[correct_idxs[pred_dist[correct_idxs] <= t]]]  = 1
                     if len(scores) == res.shape[-1]:
-                        res[t] = np.array([2 if v == 2 else np.logical_and(v, correct_tmp[i]) for i,v in enumerate(res)])
+                        res[t] = np.array([2 if v == 2 else np.logical_and(v, correct_tmp[i]) for i,v in enumerate(res[t])])
                     else:
                         res[t][idxs[correct_idxs[pred_dist[correct_idxs] <= t]]] = 1
                 num += 1
@@ -73,10 +73,9 @@ else:
     res = np.ones(1000)
 
     if model_id == 'at':#linf
-        model = torch.load('models/adv_trained.h5')
+        model = keras.models.load_model('models/adv_trained.h5')
     elif model_id == 'nat':
         model = keras.models.load_model('models/natural.h5')
-    model.eval()
     for path in lst:
         print(path)
         path = os.path.join('advs', path)
