@@ -6,7 +6,7 @@ lst = []
 for f in files:
     if f.find('_0_HASH') == -1:
         continue
-    if f.find('MIM') == -1:
+    if f.find('CW') == -1:
         continue
     if f.find('low')==-1 and f.find('high')==-1 and f.find('mix')==-1:
         continue

@@ -11,9 +11,9 @@ for f in files:
         continue
     if not f.endswith('show.npy'):
         continue
-    if f.find('MIM') == -1:
+    if f.find('CW') == -1:
         continue
-    if f.find('low') == -1:# and f.find('high') == -1:# and f.find('mix') == -1:
+    if f.find('mix') == -1:# and f.find('high') == -1:# and f.find('mix') == -1:
         continue
     if f.find(metric) == -1:
         continue
@@ -27,9 +27,9 @@ labs = np.load('data/mnist_labels.npy')[idxs]
 print(imgs.shape, labs.shape)
 #print(imgs[999]==0)
 cnt = 0
-num = 1000
+num = 50
 for f in lst:
-    cnt = 0
+#    cnt = 0
     print(f)
     f = os.path.join('advs', f)
     b = np.load(f).astype(np.float32) / 255.

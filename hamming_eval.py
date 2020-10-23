@@ -16,11 +16,11 @@ def hamming_idxs(scores, config, t, label_path='data/mnist_labels.npy'):
     #   np.random.seed(rep.shape[-1])
     #   rep = np.hstack((rep, np.random.permutation(tmp)))
     
-    idxs = np.load('data/final_random_1000_correct_idxs.npy')
+#    idxs = np.load('data/final_random_1000_correct_idxs.npy')
 #   imgs, labels, input_shape = load_data(config['permutation'], scores.shape[-1])
     labels = np.load(label_path)
     if label_path == 'data/mnist_labels.npy':
-        labels = labels[60000:][idxs]
+        labels = labels[60000:]#[idxs]
 
     print(t)
     nat_labels = np.zeros(scores.shape).astype(np.float32)
@@ -54,16 +54,16 @@ def hamming_idxs(scores, config, t, label_path='data/mnist_labels.npy'):
 if __name__ == '__main__':
     with open(sys.argv[-1]) as config_file:
       config = json.load(config_file)
-    name = sys.argv[-2].split('/')[-1][5:]
-    # _type = sys.argv[-3]
+    name = sys.argv[-2]#.split('/')[-1][5:]
+    _type = sys.argv[-4]
     t = eval(sys.argv[-3])
     #model_dir = config['model_dir']
-    scores = np.load('preds/pred_{}'.format(name))
+    scores = np.load(name)#('preds/pred_{}'.format(name))
 #   if np.max(scores) > 1:
 #       scores = expit(scores)
     # labels = np.load('preds/labels_{}'.format(name))
     print(scores.shape)
-    preds_dist, correct_idxs, error_idxs = hamming_idxs(scores, config, t)
+    preds_dist, correct_idxs, error_idxs = hamming_idxs(scores, config, t, _type)
     print(preds_dist.shape)
     print('avg Hamming distance:{}, max:{}, min:{}, med:{}'.format(np.mean(preds_dist), np.max(preds_dist), np.min(preds_dist), np.median(preds_dist)))
 

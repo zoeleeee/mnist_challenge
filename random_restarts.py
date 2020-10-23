@@ -13,7 +13,7 @@ attack = sys.argv[-3]
 metric = sys.argv[-4]
 sign = sys.argv[-5]
 
-files = os.listdir('data')
+files = os.listdir('advs')
 lst = []
 for f in files:
     if not f.endswith('show.npy'):
@@ -30,11 +30,11 @@ if model_id.find('config') != -1:
     for s in [.5, .6, .7, .8, .9]:
         valid = 10
         num = 0
-        res = np.zeros(10, 1000)
+        res = np.zeros((10, 1000))
         for f in lst:
-            label_path = os.path.join('data', f[:-8]+'label.npy')
-            idxs = np.load(os.path.join('data', f[:-8]+'idxs.npy')).astype(np.int)
-            scores = np.load('preds/pred_{}_{}'.format(model_dir.split('/')[1]+sign, , f.split('/')[-1]))
+            label_path = os.path.join('advs', f[:-8]+'label.npy')
+            idxs = np.load(os.path.join('advs', f[:-8]+'idxs.npy')).astype(np.int)
+            scores = np.load('preds/pred_{}_{}'.format(model_dir.split('/')[1]+'_'+sign, f.split('/')[-1]))
             pred_dist, correct_idxs, error_idxs = hamming_idxs(scores, config, s, label_path)
     #        print(np.sum(res), len(correct_idxs), len(error_idxs))
     #        print(len(idxs), error_idxs)

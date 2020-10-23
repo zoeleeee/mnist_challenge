@@ -43,7 +43,7 @@ loss_func = config['loss_func']
 # imgs = order_extend_data(perm, imgs)
 # labels = np.load('data/mnist_labels.npy')
 # input_shape = imgs.shape[1:]
-
+print(model_dir)
 if dataset != 'origin.npy':
   x_test = np.load(dataset)
   y_test = np.load(dataset[:-8]+'label.npy')
@@ -82,7 +82,7 @@ else:
   labels = np.array([rep[i] for i in labels]).astype(np.float32)
   #x_train, y_train = imgs[:60000], labels[:60000]
   x_test, y_test = imgs[60000:], labels[60000:]
-
+print(model_dir)
 
 if len(x_test.shape) == 3:
   x_test = x_test.reshape(x_test.shape[0], x_test.shape[1], x_test.shape[2], 1)
