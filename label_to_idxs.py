@@ -48,14 +48,6 @@ for f in lst:
         if i >= len(a):
             break
 #        print(i, v, a[i])
-        if i > 0 and v == a[i-1]:
-            dis = np.max(np.absolute(b[i]-imgs[j])) if metric == 'linf' else  np.sum((b[i]-imgs[j])**2)
-            if dis < mindis:
-                mindis = dis
-                tmp = [j]
-            elif dis == mindis:
-                tmp.append(j)
-#            print(i, v, a[i-1], dis, mindis)
         if v == a[i]:
             if len(tmp) > 0:
                 pos.append(np.random.permutation(tmp)[0])
@@ -66,6 +58,15 @@ for f in lst:
             tmp = [j]
 #            print(v, a[i-1], pos, mindis, tmp)
             i += 1
+        elif i > 0 and v == a[i-1]:
+            dis = np.max(np.absolute(b[i]-imgs[j])) if metric == 'linf' else  np.sum((b[i]-imgs[j])**2)
+            if dis < mindis:
+                mindis = dis
+                tmp = [j]
+            elif dis == mindis:
+                tmp.append(j)
+#            print(i, v, a[i-1], dis, mindis)
+        
     if len(tmp) > 0:
         pos.append(np.random.permutation(tmp)[0])
     print(len(a), len(pos))

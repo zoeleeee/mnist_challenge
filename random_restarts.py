@@ -43,11 +43,16 @@ if model_id.find('config') != -1:
         valid = 10
         num = 0
         res = np.zeros((10, 1000))
+        tot_idxs = []
         for f in lst:
             label_path = os.path.join('advs', f[:-8]+'label.npy')
             idxs = np.load(os.path.join('advs', f[:-8]+'idxs.npy')).astype(np.int)
             scores = np.load('preds/pred_{}_{}'.format(model_dir.split('/')[1]+'_'+sign, f.split('/')[-1]))
             pred_dist, correct_idxs, error_idxs = hamming_idxs(scores, config, s, label_path)
+            if len(tot_idxs) == 0:
+                tot_idxs = idxs
+            else:
+                tot_idxs = np.union1d(tot_idxs, idxs)
     #        print(np.sum(res), len(correct_idxs), len(error_idxs))
     #        print(len(idxs), error_idxs)
             valid = min(10, np.max(pred_dist))
@@ -59,15 +64,18 @@ if model_id.find('config') != -1:
                 else:
                     correct_tmp = np.zeros(1000)
                     correct_tmp[idxs[correct_idxs[pred_dist[correct_idxs] <= t]]]  = 1
-                    if len(scores) == res.shape[-1]:
-                        res[t] = np.array([2 if v == 2 else np.logical_and(v, correct_tmp[i]) for i,v in enumerate(res[t])])
-                    else:
+                    if attack == 'CW' and _type=='mix':
                         res[t][idxs[correct_idxs[pred_dist[correct_idxs] <= t]]] = 1
-                num += 1
+                    else:
+                        res[t] = np.array([2 if v == 2 else np.logical_and(v, correct_tmp[i]) for i,v in enumerate(res[t])])
+            num += 1
     #        print(np.sum(res))
         
         for i in  range(valid):
-            print('{}_{}: {}_{}_{}_{} auc:{} / acc: {} / err: {} / dec: {}'.format(s, i, model_id, _type, attack, metric, cal_auc(res[i], test_dist, i), np.sum(res[i]==1), np.sum(res[i]==2), np.sum(res[i]==0)))
+            acc = np.sum(res[i]==1)/len(tot_idxs)
+            err = np.sum(res[i]==2)/len(tot_idxs)
+            det = 1-acc-err
+            print('{}_{}: {}_{}_{}_{} auc:{} / acc: {} / err: {} / dec: {}'.format(s, i, model_id, _type, attack, metric, cal_auc(res[i], test_dist, i), acc, err, det))
 
 else:
     res = np.ones(1000)
@@ -76,6 +84,7 @@ else:
         model = keras.models.load_model('models/adv_trained.h5')
     elif model_id == 'nat':
         model = keras.models.load_model('models/natural.h5')
+    idxs = []
     for path in lst:
         print(path)
         path = os.path.join('advs', path)
@@ -83,7 +92,7 @@ else:
         y_test = np.load(path[:-8]+'label.npy')
         idx_test = np.load(path[:-8]+'idxs.npy')
         x_test /= 255.
-#        print(x_test.shape, y_test.shape, idx_test.shape, np.max(idx_test), np.min(idx_test), np.max(x_test))
+        idxs = idx_test if len(idxs) == 0 else np.union1d(idxs, idx_test)
 
         output = model.predict(x_test, batch_size=100)
         pred_labs = np.argmax(output, axis=-1)
