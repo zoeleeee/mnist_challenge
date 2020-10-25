@@ -5,14 +5,16 @@ import sys
 import os
 import json
 from hamming_eval import hamming_idxs
+from sklearn.metrics import roc_auc_score
 
 def cal_auc(advs, test_dist, t):
-    advs_pred = np.zeros(advs_pred.shape)
+    y_true = np.concatenate((np.ones(advs.shape), np.zeros(test_dist.shape)),axis=-1)
+    advs_pred = np.zeros(advs.shape)
     advs_pred[advs==0] = 1
     test_pred = np.zeros(test_dist.shape)
     test_pred[test_dist>t] = 1
     y_pred = np.concatenate((advs_pred, test_pred),axis=-1)
-  return roc_auc_score(y_true, y_pred)
+    return roc_auc_score(y_true, y_pred)
 
 model_id = sys.argv[-1]
 _type = sys.argv[-2]
@@ -35,7 +37,7 @@ if model_id.find('config') != -1:
     model_dir = config['model_dir']
     
     
-    test_file = 'preds/pred_{}_{}'.format(model_dir.split('/')[1]+'_'+sign, 'origin.npy')
+    test_file = 'preds/pred_{}_{}'.format(model_dir.split('/')[1][:-1]+'80_'+sign, 'origin.npy')
     idxs = np.load('data/final_random_1000_correct_idxs.npy')
     scores = np.load(test_file)[idxs]
     for s in [.5, .6, .7, .8, .9]:
