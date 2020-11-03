@@ -22,7 +22,7 @@ if order == -1:
 #model = keras.models.model_from_json(json_model)
 #model.load_weights('models/mnist.h5')
 model = keras.models.load_model('models/natural.h5')
-idxs = np.load('data/final_random_1000_correct_idxs.npy')
+idxs = np.arange(10000)#np.load('data/final_random_1000_correct_idxs.npy')
 data = np.load('data/mnist_data.npy')[60000:]
 data = data[idxs].transpose((0,2,3,1)).astype(np.float32) / 255.
 labels = np.load('data/mnist_labels.npy')[60000:]
@@ -32,7 +32,7 @@ labels = labels[idxs]
 # np.save('preds/nat_predict.npy', np.argmax(preds, axis=1))
 # print('acc:', np.mean(np.argmax(preds, axis=1) == labels))
 
-from cleverhans.attacks import MomentumIterativeMethod, CarliniWagnerL2
+from cleverhans.attacks import MomentumIterativeMethod, CarliniWagnerL2, ProjectedGradientDescent
 from cleverhans.utils_keras import KerasModelWrapper
 #with tf.Session() as sess:
 keras.backend.set_learning_phase(0)
@@ -47,6 +47,13 @@ if attack_method == 'MIM':
                 'decay_factor': decay_factor,
                 'clip_max': 1.,
                 'clip_min': 0}
+elif attack_method == 'PGD':
+  attack = ProjectedGradientDescent(KerasModelWrapper(model), sess=sess)
+  params = {'eps': eps, 
+              'eps_iter': eps_iter,
+              'nb_iter': nb_iter,
+              'clip_max': 1.,
+              'clip_min': 0}
 elif attack_method == 'CW':
   attack = CarliniWagnerL2(KerasModelWrapper(model), sess=sess)
   params = {'confidence': eps}
