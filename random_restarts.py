@@ -37,7 +37,7 @@ if model_id.find('config') != -1:
     model_dir = config['model_dir']
     
     
-    test_file = 'preds/pred_{}_{}'.format(model_dir.split('/')[1][:-1]+'80_'+sign, 'origin.npy')
+    test_file = 'preds/pred_{}_{}'.format(model_dir.split('/')[1][:-1]+'0_'+sign, 'origin.npy')
     idxs = np.load('data/final_random_1000_correct_idxs.npy')
     scores = np.load(test_file)[idxs]
     for s in [.5, .6, .7, .8, .9]:
@@ -100,4 +100,4 @@ else:
         pred_labs = np.argmax(output, axis=-1)
         res[idx_test] = np.logical_and(pred_labs==y_test, res[idx_test])
 
-    print('{}_{}_{}_{} acc: {}'.format(model_id, _type, attack, metric, np.mean(res.astype(np.float32))))
+    print('{}_{}_{}_{} acc: {}'.format(model_id, _type, attack, metric, 1-np.sum(res==0)/len(idxs)))
