@@ -66,16 +66,20 @@ elif attack_method == 'CW':
 # for decay_factor in [.5]:
 x_advs = []
 succ_idxs = []
-sep = 10
+sep = 500
 for i in range(0, len(data), sep):
-  x_adv = attack.generate_np(data[i:i+sep], **params)
+  _end = min(len(data), i+sep)
+  x_adv = attack.generate_np(data[i:_end], **params)
   x_adv = (np.array(x_adv)*255.).astype(np.uint8)
-
-  attack_sign = np.argmax(model.predict(x_adv.astype(np.float32)/255.), axis=1)!=labels
+#  print(x_adv.shape, data[i:_end].shape)
+  attack_sign = (np.argmax(model.predict(x_adv.astype(np.float32)/255.), axis=1)!=labels[i:_end])
+#  print(np.array(attack_sign).shape)
   x_advs.append(x_adv[attack_sign])
-  succ_idxs.append(np.arange(i, i+sep)[attack_sign])
-
+#  print(np.array(x_advs).shape, np.vstack(x_advs).shape)
+  succ_idxs.append(np.arange(i, _end)[attack_sign])
+#  print(np.hstack(succ_idxs).shape)
+#  print(len(labels),  succ_idxs)
+  np.save('advs/mnist_'+attack_method+'_'+sign+'_advs_show.npy', np.vstack(x_advs))
+  np.save('advs/mnist_'+attack_method+'_'+sign+'_advs_label.npy', labels[np.hstack(succ_idxs)])
+  np.save('advs/mnist_'+attack_method+'_'+sign+'_advs_label.npy', np.hstack(succ_idxs))
 print('model acc under aes:', 1-len(idxs)/len(data))
-np.save('advs/mnist_'+attack_method+'_'+sign+'_advs_show.npy', np.vstack(x_advs))
-np.save('advs/mnist_'+attack_method+'_'+sign+'_advs_label.npy', labels[succ_idxs])
-np.save('advs/mnist_'+attack_method+'_'+sign+'_advs_label.npy', np.hstack(succ_idxs))
