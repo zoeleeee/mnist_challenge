@@ -64,12 +64,21 @@ elif attack_method == 'CW':
 
 # attack = MomentumIterativeMethod(KerasModelWrapper(model), sess=sess)
 # for decay_factor in [.5]:
-x_adv = attack.generate_np(data, **params)
-print('advs acc:', np.mean(np.argmax(model.predict(x_adv), axis=1)==labels))
-attack_idxs = np.argmax(model.predict(x_adv), axis=1)!=labels
+x_advs = []
+succ_idxs = []
+sep = 10
+for i in range(0, len(data), sep):
+  x_adv = attack.generate_np(data[i:i+sep], **params)
+  x_adv = (np.array(x_adv)*255.).astype(np.uint8)
+
+  attack_sign = np.argmax(model.predict(x_adv.astype(np.float32)/255.), axis=1)!=labels
+  x_advs.append(x_adv[attack_sign])
+  succ_idxs.append(np.arange(i, i+sep)[attack_sign])
+
+print('model acc under aes:', 1-len(idxs)/len(data))
 # delta = np.max(np.max(np.abs(x_adv - data), axis=1))
 # print(delta)
-np.save('advs/mnist_'+attack_method+'_'+sign+'_advs_show.npy', np.clip(x_adv[attack_idxs]*255., 0, 255))
-np.save('advs/mnist_'+attack_method+'_'+sign+'_advs_label.npy', labels[attack_idxs])
-np.save('advs/mnist_'+attack_method+'_'+sign+'_advs_label.npy', attack_idxs)
+np.save('advs/mnist_'+attack_method+'_'+sign+'_advs_show.npy', np.vstack(x_advs))
+np.save('advs/mnist_'+attack_method+'_'+sign+'_advs_label.npy', labels[succ_idxs])
+np.save('advs/mnist_'+attack_method+'_'+sign+'_advs_label.npy', np.hstack(succ_idxs))
 # np.save('advs/normal_mnist_MIM_advs_{}_show.npy'.format(decay_factor), np.clip(x_adv*255., 0, 255))
